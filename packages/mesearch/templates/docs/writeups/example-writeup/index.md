@@ -1,6 +1,6 @@
 ---
 title: An example writeup
-created: { { date } }
+created: {{date}}
 depends_on: [example-concept]
 ---
 

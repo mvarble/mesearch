@@ -11,14 +11,6 @@
     overflow-wrap: break-word;
 }
 
-/* A full-width filler after the content, as mkdoc has: whatever inline content
- * sits directly in the container then ends on a justified line too. */
-.prose::after {
-    content: '';
-    display: inline-block;
-    width: 100%;
-}
-
 .prose > :first-child {
     margin-top: 0;
 }

@@ -29,11 +29,11 @@
             </div>
         {/if}
         <p class="counts">
-            {plural(counts.concepts, 'concept')} · {plural(
-                counts.writeups,
-                'writeup',
-            )}{#if counts.sequences}
-                · {plural(counts.sequences, 'sequence')}{/if}
+            {[
+                plural(counts.concepts, 'concept'),
+                plural(counts.writeups, 'writeup'),
+                ...(counts.sequences ? [plural(counts.sequences, 'sequence')] : []),
+            ].join(' · ')}
         </p>
     </header>
 

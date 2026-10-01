@@ -1,7 +1,7 @@
 import path from 'node:path';
 import type { Plugin } from 'vite';
 
-import { packageDir } from './paths.ts';
+import { appDir, packageDir } from './paths.ts';
 
 // Packages a site must share with mesearch rather than resolve for itself. Two
 // copies of Svelte make two runtimes, and the first component rendered by the
@@ -24,7 +24,11 @@ const isInside = (dir: string, file: string) => file == dir || file.startsWith(d
 // is tried from mesearch too. A document's own imports --- a `three` the
 // project installed, say --- still resolve from the project first.
 export function pinDependencies(): Plugin[] {
-    const importer = path.join(packageDir, 'package.json');
+    // Resolved as if one of the app's own files imported them --- not merely
+    // from somewhere inside the package --- because that is what decides,
+    // during development, whether Vite hands out its pre-bundled copy. Any
+    // other importer gets the package's raw source: a second Svelte runtime.
+    const importer = path.join(appDir, 'routes', '+layout.svelte');
     return [
         {
             name: 'mesearch:pin',

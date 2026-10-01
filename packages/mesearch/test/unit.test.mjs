@@ -21,7 +21,12 @@ test('a config is filled in with defaults', () => {
 
 test('every problem with a config is reported at once', () => {
     assert.throws(
-        () => validate({ title: 3, base: 'notes/', katexMacros: { '\\x': 1 }, graph: { charge: 'lots' } }, 'mesearch.config.ts', 'x'),
+        () =>
+            validate(
+                { title: 3, base: 'notes/', katexMacros: { '\\x': 1 }, graph: { charge: 'lots' } },
+                'mesearch.config.ts',
+                'x',
+            ),
         (error) =>
             ['`title`', '`base`', '`katexMacros`', '`graph.charge`'].every((field) =>
                 error.message.includes(field),
@@ -55,19 +60,28 @@ test('init scaffolds a project and never overwrites without --force', () => {
         ]) {
             assert.ok(fs.existsSync(path.join(dir, file)), `${file} is written`);
         }
-        assert.match(fs.readFileSync(path.join(dir, 'mesearch.config.ts'), 'utf8'), /title: 'My notes'/);
+        assert.match(
+            fs.readFileSync(path.join(dir, 'mesearch.config.ts'), 'utf8'),
+            /title: 'My notes'/,
+        );
         const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
         assert.equal(manifest.scripts.dev, 'mesearch dev');
         assert.ok(manifest.dependencies['@mvarble/mesearch']);
         assert.match(fs.readFileSync(path.join(dir, '.gitignore'), 'utf8'), /\.mesearch\//);
-        assert.match(fs.readFileSync(path.join(dir, 'prettier.config.js'), 'utf8'), /trailingComma: 'all'/);
+        assert.match(
+            fs.readFileSync(path.join(dir, 'prettier.config.js'), 'utf8'),
+            /trailingComma: 'all'/,
+        );
 
         fs.writeFileSync(path.join(dir, 'AGENTS.md'), 'mine');
         manifest.scripts.dev = 'custom';
         fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify(manifest));
         initProject(dir);
         assert.equal(fs.readFileSync(path.join(dir, 'AGENTS.md'), 'utf8'), 'mine');
-        assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8')).scripts.dev, 'custom');
+        assert.equal(
+            JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8')).scripts.dev,
+            'custom',
+        );
         initProject(dir, { force: true });
         assert.notEqual(fs.readFileSync(path.join(dir, 'AGENTS.md'), 'utf8'), 'mine');
     } finally {
@@ -77,7 +91,10 @@ test('init scaffolds a project and never overwrites without --force', () => {
 
 test('the stylesheet lists every variable, commented out', () => {
     const css = userStylesheet();
-    const tokens = fs.readFileSync(new URL('../app/lib/styles/tokens.css', import.meta.url), 'utf8');
+    const tokens = fs.readFileSync(
+        new URL('../app/lib/styles/tokens.css', import.meta.url),
+        'utf8',
+    );
     const names = [...tokens.matchAll(/^\s*(--[\w-]+)\s*:/gm)].map((match) => match[1]);
     assert.ok(names.length > 30);
     for (const name of new Set(names)) assert.ok(css.includes(`/* ${name}:`), `${name} is listed`);
@@ -89,7 +106,10 @@ test('the stylesheet lists every variable, commented out', () => {
 
 test('document headings move one level down', () => {
     const h = (tagName) => ({ type: 'element', tagName, properties: {}, children: [] });
-    const tree = { type: 'root', children: [h('h1'), h('h3'), h('h6'), { ...h('blockquote'), children: [h('h2')] }] };
+    const tree = {
+        type: 'root',
+        children: [h('h1'), h('h3'), h('h6'), { ...h('blockquote'), children: [h('h2')] }],
+    };
     rehypeDemoteHeadings()(tree);
     assert.deepEqual(
         [...tree.children.slice(0, 3).map((n) => n.tagName), tree.children[3].children[0].tagName],

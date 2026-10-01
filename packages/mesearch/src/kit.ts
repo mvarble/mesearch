@@ -80,11 +80,25 @@ export async function viteConfig(root: string): Promise<UserConfig> {
         },
         optimizeDeps: {
             // The app ships as Svelte source inside this package, which Vite
-            // would otherwise try to pre-bundle as if it were a library.
-            exclude: ['@mvarble/mesearch', '@mvarble/mesearch-cms', '@mvarble/mesearch-markdown'],
+            // would otherwise try to pre-bundle as if it were a library. And
+            // Svelte itself is never pre-bundled: a project's documents reach
+            // it from outside this package, the app from inside, and a
+            // pre-bundled copy for one and the source for the other would be
+            // two runtimes.
+            exclude: [
+                '@mvarble/mesearch',
+                '@mvarble/mesearch-cms',
+                '@mvarble/mesearch-markdown',
+                'svelte',
+            ],
         },
         ssr: { noExternal: ['@mvarble/mesearch'] },
-        build: { chunkSizeWarningLimit: 2000 },
+        build: {
+            chunkSizeWarningLimit: 2000,
+            // A report on how long each plugin took is for whoever works on
+            // mesearch, not for someone building their notes.
+            rolldownOptions: { checks: { pluginTimings: false } },
+        },
     };
 }
 

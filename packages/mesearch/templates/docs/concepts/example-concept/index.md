@@ -1,6 +1,6 @@
 ---
 title: An example concept
-created: { { date } }
+created: {{date}}
 ---
 
 A concept explains one idea on its own terms: what it is, why it matters, and an example. Its folder name is its slug, so this one lives at `concepts/example-concept/`.
