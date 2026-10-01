@@ -4,18 +4,16 @@ import type { RootContent } from 'mdast';
 import { docRecord, type Doctype, type Preset } from '../../core/build.ts';
 import { Frontmatter } from '../../core/frontmatter.ts';
 import type { SourceFile } from '../../core/source.ts';
-import { readBibliography } from '../../core/bibtex.ts';
+import { bibliographies, readBibliography } from '../../core/bibtex.ts';
 import { registerStatement } from '../../core/statements.ts';
 import type { Store } from '../../core/store.ts';
 import { parseHeadings, walkDocument, type WalkTarget } from '../../core/walk.ts';
 import {
-    citationLabel,
     citations,
     equations,
     pageLinks,
     statements,
     TAG,
-    type Citation,
     type PageTarget,
 } from '../../resolvers/index.ts';
 import { gitDates, type DateProvider } from './dates.ts';
@@ -402,33 +400,6 @@ export function mesearchPreset(options: MesearchPresetOptions = {}): Preset {
             .replace(/^\.$/, '');
         return { pathname, hash };
     }
-}
-
-// What each page cites --- in its own text, in the statements it shows, and in
-// its description --- by pathname, in the order of the labels.
-function bibliographies(store: Store): Record<string, Citation[]> {
-    const cited = new Map<string, Map<string, Citation>>();
-    const all = store.collection<Citation>('citations');
-    for (const id of store.docs.keys()) {
-        const page = store.pathnameOf(id);
-        if (!page) continue;
-        for (const ref of store.refsOf(id)) {
-            if (ref.resolver != 'citation') continue;
-            const citation = all.get((ref.target as { key: string }).key);
-            if (!citation) continue;
-            if (!cited.has(page)) cited.set(page, new Map());
-            cited.get(page)!.set(citation.key, citation);
-        }
-    }
-    return Object.fromEntries(
-        [...cited].map(([page, citations]) => [
-            page,
-            [...citations.values()].sort(
-                (a, b) =>
-                    citationLabel(a).localeCompare(citationLabel(b)) || a.key.localeCompare(b.key),
-            ),
-        ]),
-    );
 }
 
 // References as the frontmatter writes them, before every document is known.

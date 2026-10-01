@@ -114,4 +114,12 @@ test('a reference reads as one short paragraph', async () => {
         publisher: 'Wiley',
     });
     assert.equal(book, 'A, B and C. <i>Brownian &lt;motion&gt;</i>. Fifth edition. Wiley, 2019.');
+    const second = referenceHtml({
+        kind: 'book',
+        title: 'T',
+        year: '1',
+        authors: [],
+        edition: '2',
+    });
+    assert.match(second, /2nd edition/);
 });

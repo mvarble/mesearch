@@ -6,6 +6,7 @@ import { live } from '../../runtime.ts';
 import type { BlogSnapshot, Post, PostInfo, Sequence, SequenceChild } from './types.ts';
 
 export type * from './types.ts';
+export { citationLabel } from '../../resolvers/citation.ts';
 
 const info = (post: Post): PostInfo => ({
     title: post.title,
@@ -59,6 +60,8 @@ export function bind(snapshot: BlogSnapshot) {
         citations: {
             list: () => snapshot.citations,
         },
+        // The references a page cites, for the list at its end.
+        bibliography: (pathname: string) => snapshot.bibliography[pathname] ?? [],
     };
 }
 

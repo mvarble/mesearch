@@ -1,6 +1,6 @@
 import bibtex from 'bibtex';
 
-import type { Citation } from '../resolvers/citation.ts';
+import { citationLabel, type Citation } from '../resolvers/citation.ts';
 import type { SourceFile } from './source.ts';
 import type { Store } from './store.ts';
 
@@ -48,6 +48,33 @@ export function readBibliography(store: Store, file: SourceFile, collection = 'c
             })),
         });
     }
+}
+
+// What each page cites --- in its own text, in the statements it shows, and in
+// its description --- by pathname, in the order of the labels.
+export function bibliographies(store: Store, collection = 'citations'): Record<string, Citation[]> {
+    const cited = new Map<string, Map<string, Citation>>();
+    const all = store.collection<Citation>(collection);
+    for (const id of store.docs.keys()) {
+        const page = store.pathnameOf(id);
+        if (!page) continue;
+        for (const ref of store.refsOf(id)) {
+            if (ref.resolver != 'citation') continue;
+            const citation = all.get((ref.target as { key: string }).key);
+            if (!citation) continue;
+            if (!cited.has(page)) cited.set(page, new Map());
+            cited.get(page)!.set(citation.key, citation);
+        }
+    }
+    return Object.fromEntries(
+        [...cited].map(([page, citations]) => [
+            page,
+            [...citations.values()].sort(
+                (a, b) =>
+                    citationLabel(a).localeCompare(citationLabel(b)) || a.key.localeCompare(b.key),
+            ),
+        ]),
+    );
 }
 
 // Which file each key came from, per build, to report a key defined twice.

@@ -23,8 +23,25 @@ test('a description folds its owner macros and resolves its links', () => {
     });
     const id = 'src/content/post/description.svx';
     assert.deepEqual(store.foldedMacros(id), { '\\site': 'S', '\\owner': 'O', '\\own': 'D' });
-    assert.equal(store.refsOf(id).length, 1);
+    assert.equal(store.refsOf(id).length, 2);
     assert.equal(store.pathnameOf(id), 'posts/dpost');
+});
+
+test('a citation points at the list at the end of its page', () => {
+    const preset = blogPreset();
+    const store = buildStore({ root: fixtureRoot('descriptions'), preset });
+    const body = store.ref('src/content/post/index.svx', 'citation', 'lee2012');
+    assert.equal(body.target.url, '#cite:lee2012');
+    assert.equal(body.target.label, 'Lee12');
+    // A description is shown on the listings, so it reaches the post's page.
+    const preview = store.ref('src/content/post/description.svx', 'citation', 'lee2018');
+    assert.equal(preview.target.url, '/posts/dpost/#cite:lee2018');
+    const cms = bind(preset.snapshot(store));
+    assert.deepEqual(
+        cms.bibliography('posts/dpost').map((citation) => citation.key),
+        ['lee2012', 'lee2018'],
+    );
+    assert.deepEqual(cms.bibliography('posts/elsewhere'), []);
 });
 
 test('inserting a statement changes the facts of every later document in the scope', () => {

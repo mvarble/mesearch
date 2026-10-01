@@ -4,3 +4,5 @@ katex_macros:
 ---
 
 A description linking to [%title](/posts/dpost).
+
+As in [](cite:lee2018).

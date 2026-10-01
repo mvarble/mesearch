@@ -11,3 +11,5 @@ katex_macros:
 # Body
 
 See [%title](/posts/dpost) and $\owner$.
+
+From [Chapter 1](cite:lee2012).

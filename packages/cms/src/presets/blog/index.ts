@@ -2,7 +2,7 @@ import { docRecord, type Doctype, type Preset } from '../../core/build.ts';
 import { Frontmatter } from '../../core/frontmatter.ts';
 import { resolveId } from '../../core/paths.ts';
 import type { SourceFile } from '../../core/source.ts';
-import { readBibliography } from '../../core/bibtex.ts';
+import { bibliographies, readBibliography } from '../../core/bibtex.ts';
 import { registerStatement } from '../../core/statements.ts';
 import type { Store } from '../../core/store.ts';
 import { parseHeadings, walkDocument, type WalkOptions, type WalkTarget } from '../../core/walk.ts';
@@ -36,7 +36,9 @@ export interface BlogPresetOptions {
 //   section pages beneath it, labelled by position when `enumerate` is set.
 // - `type: statement` is a theorem, lemma or the like, rendered inside the page
 //   that imports it and numbered with the equations around it.
-// - `.bib` files are the bibliography that `cite:` links draw from.
+// - `.bib` files are the bibliography that `cite:` links draw from. A
+//   citation points at the reference list at the end of the page it is on,
+//   which holds exactly what that page cites.
 //
 // Statements and equations share one counter per post, or per sequence, and
 // their slugs are unique within it.
@@ -266,7 +268,20 @@ export function blogPreset(options: BlogPresetOptions = {}): Preset {
         contentDir,
         include: (id) => id.endsWith('.svx') || id.endsWith('.bib'),
         doctypes: [post, sequence, statement, bib],
-        resolvers: [citations(), equations(), statements(), pathnameLinks()],
+        resolvers: [
+            // On the page itself, a citation jumps to the page's own list. A
+            // description is shown on the listings, so it points at the list
+            // on its post's page.
+            citations({
+                url: (key, store, doc) =>
+                    doc.doctype == 'description'
+                        ? `/${store.pathnameOf(doc.id)}/#cite:${key}`
+                        : `#cite:${key}`,
+            }),
+            equations(),
+            statements(),
+            pathnameLinks(),
+        ],
         headingDepth: 2,
         runtime: '@mvarble/mesearch-cms/presets/blog/runtime',
         snapshot: (store): BlogSnapshot => ({
@@ -277,6 +292,7 @@ export function blogPreset(options: BlogPresetOptions = {}): Preset {
             ),
             headings: Object.fromEntries([...store.docs].map(([id, doc]) => [id, doc.headings])),
             citations: [...store.collection<Citation>('citations').values()],
+            bibliography: bibliographies(store),
         }),
     };
 }

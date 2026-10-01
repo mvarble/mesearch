@@ -48,6 +48,8 @@ export interface BlogSnapshot {
     // Each document's headings, by filename.
     headings: Record<string, Heading[]>;
     citations: Citation[];
+    // What each page cites, by pathname, in label order.
+    bibliography: Record<string, Citation[]>;
 }
 
 export type { Citation, CitationAuthor } from '../../resolvers/citation.ts';

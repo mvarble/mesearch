@@ -131,7 +131,9 @@ export function referenceHtml(source: ReferenceSource, macros: KatexMacros = {})
         }
         const edition = clean(source.edition);
         if (edition)
-            parts.push(escapeHtml(/edition/i.test(edition) ? edition : `${edition} edition`));
+            parts.push(
+                escapeHtml(/edition/i.test(edition) ? edition : `${ordinal(edition)} edition`),
+            );
     }
     const house = clean(source.publisher) || clean(source.institution);
     const year = clean(source.year);
@@ -147,4 +149,13 @@ export function referenceHtml(source: ReferenceSource, macros: KatexMacros = {})
         html += ` <a href="${escapeHtml(url)}">${escapeHtml(new URL(url).host)}</a>`;
     }
     return html;
+}
+
+// `2` as `2nd`; anything already in words is left as it is.
+function ordinal(text: string): string {
+    if (!/^\d+$/.test(text)) return text;
+    const n = Number(text);
+    const suffix =
+        n % 100 >= 11 && n % 100 <= 13 ? 'th' : (['th', 'st', 'nd', 'rd'][n % 10] ?? 'th');
+    return `${n}${suffix}`;
 }
