@@ -8,7 +8,9 @@ import type { SourceFile } from './source.ts';
 export interface LinkNode {
     type: 'link';
     url: string;
+    title?: string | null;
     children: Array<{ type: string; value?: string }>;
+    data?: { hProperties?: Record<string, unknown> } & Record<string, unknown>;
 }
 
 export interface MathNode {

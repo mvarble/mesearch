@@ -51,6 +51,50 @@ A `description.md` has no frontmatter beyond optional `katex_macros`. It is one 
 - Never put a link inside a heading. When a section concerns another document, put `See also: [Name](../name/)` on its own line under the heading.
 - `$$ ... @tag(slug) $$` numbers a display equation; `[](eq:slug)` refers to it as `(n)` from the same document, and `[](eq:concepts/<slug>/<eq-slug>)` from another.
 
+## Statements and proofs
+
+A theorem, lemma, proposition, corollary, definition, remark or example that the text refers back to is a **statement**: a short document of its own in a `statements/` folder beside the document showing it.
+
+```yaml
+---
+type: statement
+kind: theorem # lemma, proposition, corollary, definition, remark, example, ...
+title: Heine–Borel # optional: a name of its own
+slug: heine-borel # optional: the filename without its extension
+---
+```
+
+The body is the statement alone, in the same markdown as any document. The document shows it, and wraps a proof in `<Proof>`:
+
+```svelte
+<script>
+	import Statement from '@mvarble/mesearch/Statement.svelte';
+	import Proof from '@mvarble/mesearch/Proof.svelte';
+	import * as heineBorel from './statements/heine-borel.md';
+</script>
+
+<Statement {...heineBorel} />
+
+<Proof>
+
+Take an open cover of $[a, b]$ ...
+
+</Proof>
+```
+
+- Leave a blank line after `<Proof>` and before `</Proof>`, so that what is between is read as markdown.
+- Statements and equations share one count within a document: Theorem 1, equation (2), Lemma 3.
+- `[%full](statement:heine-borel)` refers to a statement as "Theorem 1"; `%kind` and `%label` give "Theorem" and "1" alone. From another document, write `statement:concepts/<slug>/<statement-slug>`.
+- Claims (theorems, lemmas, propositions, corollaries) are set in italics; definitions, remarks and examples are not. Do not italicise them yourself.
+
+## Citations
+
+Bibliography entries go in BibTeX files anywhere under `docs/`, usually `docs/references.bib`. Keys are shared across the site, so check that an entry is not already there before adding it, and name new keys `<surname><year>`, as `folland1999`.
+
+- `[](cite:folland1999)` cites an entry as `[Foll99]`; `[Theorem 1.8](cite:folland1999)` as `[Foll99, Theorem 1.8]`. Point at the exact theorem, section or page whenever you can.
+- Each document lists what it cites at its end, and each citation jumps to its entry there, so cite in the sentence that relies on the source rather than in a list of your own.
+- Cite only sources you are sure of, with their real titles, authors and years. Include `doi` when there is one.
+
 ## Math
 
 Use LaTeX for anything mathematical. Inline math uses single dollar signs, as in `$x + y$`. A displayed equation opens with `$$` alone on its line, then the equation indented by one tab (several lines are fine), then a closing `$$` alone on its line:

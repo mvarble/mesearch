@@ -1,8 +1,9 @@
 export { equations, TAG, type EquationTarget, type EquationOptions } from './equation.ts';
-export { statements, type StatementTarget } from './statement.ts';
+export { statements, type StatementTarget, type StatementOptions } from './statement.ts';
 export {
     citations,
     citationLabel,
+    citationText,
     type Citation,
     type CitationAuthor,
     type CitationTarget,

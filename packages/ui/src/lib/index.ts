@@ -14,11 +14,14 @@ export { default as GraphPanel } from './components/GraphPanel.svelte';
 export { default as Icon } from './components/Icon.svelte';
 export { default as Index } from './components/Index.svelte';
 export { default as Pager } from './components/Pager.svelte';
+export { default as Proof } from './components/Proof.svelte';
+export { default as References } from './components/References.svelte';
 export { default as Palette } from './components/Palette.svelte';
 export { default as Parts } from './components/Parts.svelte';
 export { default as Rail } from './components/Rail.svelte';
 export { default as SequenceTrack } from './components/SequenceTrack.svelte';
 export { default as Shell } from './components/Shell.svelte';
+export { default as Statement } from './components/Statement.svelte';
 export { default as ThemeToggle } from './components/ThemeToggle.svelte';
 export { default as Toc } from './components/Toc.svelte';
 

@@ -1,9 +1,9 @@
-import bibtex from 'bibtex';
-
 import { docRecord, type Doctype, type Preset } from '../../core/build.ts';
 import { Frontmatter } from '../../core/frontmatter.ts';
 import { resolveId } from '../../core/paths.ts';
 import type { SourceFile } from '../../core/source.ts';
+import { readBibliography } from '../../core/bibtex.ts';
+import { registerStatement } from '../../core/statements.ts';
 import type { Store } from '../../core/store.ts';
 import { parseHeadings, walkDocument, type WalkOptions, type WalkTarget } from '../../core/walk.ts';
 import { labelPages, Numbering, type PageTree } from '../../model/build.ts';
@@ -15,7 +15,7 @@ import {
     TAG,
     type Citation,
 } from '../../resolvers/index.ts';
-import type { BlogSnapshot, Post, Sequence, SequenceChild, StatementInjection } from './types.ts';
+import type { BlogSnapshot, Post, Sequence, SequenceChild } from './types.ts';
 
 export type * from './types.ts';
 export type { BlogCms } from './runtime.ts';
@@ -68,7 +68,10 @@ export function blogPreset(options: BlogPresetOptions = {}): Preset {
                 }
             },
             onImport(id, at) {
-                registerStatement(store, id, at, numbering, walk);
+                registerStatement(store, id, at, {
+                    next: () => numbering.next(),
+                    walk: (file, target) => walk(store, file, target, numbering),
+                });
             },
         };
         walkDocument(file, target, walkOptions);
@@ -255,44 +258,7 @@ export function blogPreset(options: BlogPresetOptions = {}): Preset {
     const bib: Doctype = {
         name: 'bibtex',
         claims: (file) => file.id.endsWith('.bib'),
-        initialize(store, file) {
-            const entries = store.collection<Citation>('citations');
-            let parsed;
-            try {
-                parsed = bibtex.parseBibFile(file.raw);
-            } catch (error) {
-                store.error(file.id, `${file.id}: the bibliography does not parse.\n${error}`);
-                return;
-            }
-            for (const [key, entry] of Object.entries(parsed.entries$)) {
-                const field = (name: string) => {
-                    const value = entry.getFieldAsString(name);
-                    return value === undefined ? undefined : String(value);
-                };
-                entries.set(key, {
-                    kind: entry.type,
-                    key,
-                    title: field('title') ?? '',
-                    year: field('year') ?? '',
-                    doi: field('doi'),
-                    publisher: field('publisher'),
-                    issn: field('issn'),
-                    isbn: field('isbn'),
-                    journal: field('journal'),
-                    number: field('number'),
-                    pages: field('pages'),
-                    volume: field('volume'),
-                    institution: field('institution'),
-                    edition: field('edition'),
-                    url: field('url'),
-                    series: field('series'),
-                    authors: (entry.getAuthors()?.authors$ ?? []).map((author) => ({
-                        lastname: String(author.lastNames$.at(-1)),
-                        fullname: fullname(author),
-                    })),
-                });
-            }
-        },
+        initialize: (store, file) => readBibliography(store, file),
     };
 
     return {
@@ -313,66 +279,6 @@ export function blogPreset(options: BlogPresetOptions = {}): Preset {
             citations: [...store.collection<Citation>('citations').values()],
         }),
     };
-}
-
-// A statement imported into the page being walked. It takes the next number,
-// and anything it contains keeps counting from there --- a statement nested
-// inside another does not restart, it belongs to the same run as the page.
-function registerStatement(
-    store: Store,
-    id: string,
-    at: WalkTarget,
-    numbering: Numbering,
-    walk: (store: Store, file: SourceFile, target: WalkTarget, numbering: Numbering) => void,
-) {
-    let file: SourceFile;
-    try {
-        file = store.file(id);
-    } catch {
-        store.error(at.doc, `${at.doc}: imports \`${id}\`, which does not exist.`);
-        return;
-    }
-    const fm = new Frontmatter(store.root, id, file.frontmatter, 'Statement');
-    if (fm.raw('type') != 'statement') return;
-    const kind = fm.raw('kind');
-    if (typeof kind != 'string' || !kind) return;
-
-    const slug = fm.slug();
-    const label = numbering.next();
-    // Rendering a statement twice takes two numbers, and only the last label
-    // sticks. It is usually an accident: an element such as `<Uniform />` is
-    // matched case-insensitively against an imported `uniform` document. The
-    // numbering is kept as it is, since published labels depend on it.
-    if (store.docs.has(id)) {
-        store.error(
-            id,
-            `${id}: rendered more than once on \`${at.page}\`; each rendering takes a number ` +
-                'and the last label wins. (An element whose name matches the import ' +
-                'case-insensitively counts as a rendering.)',
-        );
-    }
-    // A statement's macros fold under the page it is shown on, not under a
-    // statement that happens to contain it.
-    store.addDoc(
-        docRecord(id, 'statement', {
-            scope: at.scope,
-            host: at.host,
-            macroParent: at.host,
-            macros: fm.katexMacros(),
-        }),
-    );
-    store.addAnchor({
-        kind: 'statement',
-        scope: at.scope,
-        slug,
-        label,
-        source: id,
-        page: at.page,
-        data: { kind },
-    });
-    const injection: StatementInjection = { kind, label, slug, pathname: at.page, filename: id };
-    store.inject(id, { ...injection });
-    walk(store, file, { doc: id, scope: at.scope, page: at.page, host: at.host }, numbering);
 }
 
 interface ChildInput extends PageTree {
@@ -481,13 +387,4 @@ function report(store: Store, fm: Frontmatter): boolean {
     for (const problem of fm.problems) store.error(fm.filename, problem);
     fm.problems.length = 0;
     return valid;
-}
-
-function fullname(name: bibtex.AuthorName): string {
-    const append = (str: string, add: string) => `${str.trim()} ${add.trim()}`;
-    let out = name.firstNames.join(' ');
-    out = append(out, name.vons.join(' '));
-    out = append(out, name.lastNames.join(' '));
-    out = append(out, name.jrs.join(' '));
-    return out;
 }

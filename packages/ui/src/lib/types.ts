@@ -89,3 +89,24 @@ export type IconName =
     | 'pen'
     | 'book'
     | 'quote';
+
+// One entry in a page's list of references, its HTML already made.
+export interface Reference {
+    // The `id` a citation on the page links to.
+    id: string;
+    // `Foll99`, shown as `[Foll99]`.
+    label: string;
+    html: string;
+}
+
+// What a statement's module tells the component framing it.
+export interface StatementInfo {
+    // `theorem`, `definition`, `remark`, ...
+    kind: string;
+    label: string;
+    slug: string;
+    // Its own name, as in "Theorem 3 (Heine--Borel)".
+    title?: string;
+    // The `id` it is rendered with; its slug by default.
+    id?: string;
+}

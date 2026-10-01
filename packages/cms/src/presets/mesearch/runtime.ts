@@ -2,10 +2,12 @@
 // Vite plugin inlines into the virtual module. Nothing here touches the
 // filesystem.
 import { buildOutline } from '../../model/outline.ts';
+import { citationLabel } from '../../resolvers/citation.ts';
 import { live } from '../../runtime.ts';
 import type { GraphEdge, MesearchDocument, MesearchSequence, MesearchSnapshot } from './types.ts';
 
 export type * from './types.ts';
+export { citationLabel };
 
 export type SortKey = 'updated' | 'created' | 'title';
 
@@ -63,6 +65,8 @@ export function bind(snapshot: MesearchSnapshot) {
             ]),
         headings: (filename: string) => snapshot.headings[filename] ?? [],
         outline: (filename: string) => buildOutline(snapshot.headings[filename] ?? []),
+        // The references a document cites, for the list at its end.
+        bibliography: (key: string) => snapshot.bibliography[key] ?? [],
     };
 }
 

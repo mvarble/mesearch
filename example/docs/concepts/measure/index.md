@@ -7,6 +7,12 @@ katex_macros:
     '\meas': '\mu'
 ---
 
+<script>
+	import Statement from '@mvarble/mesearch/Statement.svelte';
+	import Proof from '@mvarble/mesearch/Proof.svelte';
+	import * as continuity from './statements/continuity.md';
+</script>
+
 A measure assigns a size to each set in a [σ-algebra](../sigma-algebra/), in a way that adds up correctly over disjoint pieces. Length, area, volume, counting and probability are all measures.
 
 # Definition
@@ -23,4 +29,14 @@ The counting measure gives a finite set its number of elements. Lebesgue measure
 
 # Consequences
 
-Additivity alone forces monotonicity, $A \subseteq B \implies \meas(A) \le \meas(B)$, and continuity along increasing sequences, $\meas(A_n) \uparrow \meas(\bigcup_n A_n)$. The second is what lets integrals be defined by approximation, as in [the Lebesgue integral](../../writeups/lebesgue-integral/).
+Additivity alone forces monotonicity, $A \subseteq B \implies \meas(A) \le \meas(B)$, and it forces continuity along increasing sequences [Theorem 1.8](cite:folland1999).
+
+<Statement {...continuity} />
+
+<Proof>
+
+Write $\bigcup_n A_n$ as the disjoint union of $B_1 = A_1$ and $B_k = A_k \setminus A_{k-1}$. By [additivity](eq:additivity), $\meas(\bigcup_n A_n) = \sum_k \meas(B_k)$, whose partial sums are $\meas(A_n)$.
+
+</Proof>
+
+[%full](statement:continuity) is what lets integrals be defined by approximation, as in [the Lebesgue integral](../../writeups/lebesgue-integral/). The axioms in this form go back to [](cite:kolmogorov1933).

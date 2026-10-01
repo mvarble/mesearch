@@ -81,3 +81,37 @@ test('settings name kinds and write dates in the site language', () => {
         delete settings.kinds.essay;
     }
 });
+
+test('a reference reads as one short paragraph', async () => {
+    const { referenceHtml } = await import('../dist/server.js');
+    const article = referenceHtml({
+        kind: 'article',
+        title: 'An elementary proof on $\\mathbb{R}^{d}$',
+        year: '1981',
+        authors: [{ fullname: 'Nasrollah Etemadi' }],
+        journal: 'Zeitschrift für Wahrscheinlichkeitstheorie',
+        volume: '55',
+        number: '1',
+        pages: '119--122',
+        doi: '10.1007/BF01013465',
+    });
+    assert.match(article, /^Nasrollah Etemadi\. An elementary proof on <span class="katex">/);
+    assert.match(
+        article,
+        /<i>Zeitschrift für Wahrscheinlichkeitstheorie<\/i> 55\(1\), 119–122\. 1981\./,
+    );
+    assert.match(
+        article,
+        /<a href="https:\/\/doi\.org\/10\.1007\/BF01013465">doi:10\.1007\/BF01013465<\/a>$/,
+    );
+    assert.doesNotMatch(article, /katex-error/);
+    const book = referenceHtml({
+        kind: 'book',
+        title: '{B}rownian <motion>',
+        year: '2019',
+        authors: [{ fullname: 'A' }, { fullname: 'B' }, { fullname: 'C' }],
+        edition: 'Fifth',
+        publisher: 'Wiley',
+    });
+    assert.equal(book, 'A, B and C. <i>Brownian &lt;motion&gt;</i>. Fifth edition. Wiley, 2019.');
+});

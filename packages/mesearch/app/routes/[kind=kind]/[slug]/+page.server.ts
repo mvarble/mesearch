@@ -1,5 +1,8 @@
 import { error } from '@sveltejs/kit';
 import type { OutlineEntry } from '@mvarble/mesearch-cms/presets/mesearch';
+import { citationLabel } from '@mvarble/mesearch-cms/presets/mesearch/runtime';
+import { referenceHtml } from '@mvarble/mesearch-ui/server';
+import site from '$site';
 import { cms } from '$cms';
 
 import { inlineHtml, toIndexEntry, toRef } from '$lib/server/refs';
@@ -48,5 +51,12 @@ export const load = ({ params }) => {
         related: cms.related(key).map(toRef),
         memberships,
         contents,
+        // What the page cites, for the list at its end; `cite:key` links on the
+        // page jump to `#cite:key`.
+        references: cms.bibliography(key).map((citation) => ({
+            id: `cite:${citation.key}`,
+            label: citationLabel(citation),
+            html: referenceHtml(citation, { ...site.katexMacros, ...doc.katexMacros }),
+        })),
     };
 };

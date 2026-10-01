@@ -75,6 +75,17 @@
     text-decoration-color: var(--accent);
 }
 
+/* A citation is a quiet aside in the sentence, not a link to follow away: no
+ * underline until it is pointed at, and its reference is in the tooltip. */
+.prose a.citation {
+    text-decoration-color: transparent;
+    font-variant-numeric: lining-nums;
+}
+
+.prose a.citation:hover {
+    text-decoration-color: currentColor;
+}
+
 .prose strong {
     font-weight: 650;
 }

@@ -40,15 +40,6 @@ export interface Sequence extends Post {
     children: SequenceChild[];
 }
 
-// What a statement's compiled module exports as `cms`.
-export interface StatementInjection {
-    kind: string;
-    label: string;
-    slug: string;
-    pathname: string;
-    filename: string;
-}
-
 export interface BlogSnapshot {
     posts: Post[];
     sequences: Sequence[];
@@ -60,4 +51,5 @@ export interface BlogSnapshot {
 }
 
 export type { Citation, CitationAuthor } from '../../resolvers/citation.ts';
+export type { StatementInjection } from '../../core/statements.ts';
 export type { Heading, OutlineEntry } from '../../model/outline.ts';

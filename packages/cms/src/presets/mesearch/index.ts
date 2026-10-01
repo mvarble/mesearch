@@ -4,9 +4,20 @@ import type { RootContent } from 'mdast';
 import { docRecord, type Doctype, type Preset } from '../../core/build.ts';
 import { Frontmatter } from '../../core/frontmatter.ts';
 import type { SourceFile } from '../../core/source.ts';
+import { readBibliography } from '../../core/bibtex.ts';
+import { registerStatement } from '../../core/statements.ts';
 import type { Store } from '../../core/store.ts';
-import { parseHeadings, walkDocument } from '../../core/walk.ts';
-import { equations, pageLinks, TAG, type PageTarget } from '../../resolvers/index.ts';
+import { parseHeadings, walkDocument, type WalkTarget } from '../../core/walk.ts';
+import {
+    citationLabel,
+    citations,
+    equations,
+    pageLinks,
+    statements,
+    TAG,
+    type Citation,
+    type PageTarget,
+} from '../../resolvers/index.ts';
 import { gitDates, type DateProvider } from './dates.ts';
 import {
     FOLDERS,
@@ -35,6 +46,10 @@ export interface MesearchPresetOptions {
 }
 
 const MARKDOWN = /\.(md|svx)$/;
+const BIBTEX = /\.bib$/;
+
+// What a document imports to render a statement: `<Statement {...theorem} />`.
+export const STATEMENT_COMPONENT = '@mvarble/mesearch/Statement.svelte';
 const KINDS: Kind[] = ['concept', 'writeup', 'sequence'];
 
 // mesearch's opinionated layout, under `docs/`:
@@ -47,8 +62,14 @@ const KINDS: Kind[] = ['concept', 'writeup', 'sequence'];
 //
 // A document's frontmatter gives its `title`, `created` and `updated` dates,
 // what it `depends_on`, and its `katex_macros`. Each document is its own scope:
-// its equations number from one and are referred to as `eq:slug` from within
-// it, or `concepts/<slug>/slug` from elsewhere.
+// its equations and the statements it shows (`type: statement` documents
+// spread into `<Statement>`) share one count from one, and are referred to as
+// `eq:slug` or `statement:slug` from within it, or `concepts/<slug>/slug` from
+// elsewhere.
+//
+// Every `.bib` file under `docs/` adds to one bibliography. A `cite:key` link
+// points at the reference list at the end of the page it is on, which holds
+// exactly what that page cites.
 export function mesearchPreset(options: MesearchPresetOptions = {}): Preset {
     const docsDir = (options.docsDir ?? 'docs').replace(/\/+$/, '');
     const base = options.base ?? '';
@@ -151,36 +172,56 @@ export function mesearchPreset(options: MesearchPresetOptions = {}): Preset {
                         macros: dfm.katexMacros(),
                     }),
                 );
-                entry.summary = plainText(description.mdast.children);
-            } else {
-                const paragraph = file.mdast.children.find((node) => node.type == 'paragraph');
-                entry.summary = paragraph ? plainText([paragraph]) : '';
             }
+            // Written out in `finalize`, once its references are resolved.
+            const paragraph = file.mdast.children.find((node) => node.type == 'paragraph');
+            store.collection<Summary>('summaries').set(key, {
+                doc: descriptionFilename ?? file.id,
+                nodes: descriptionFilename
+                    ? store.file(descriptionFilename).mdast.children
+                    : paragraph
+                      ? [paragraph]
+                      : [],
+            });
 
             documents(store).set(key, entry);
 
-            // Each document numbers its own equations, from one.
-            let equations = 0;
-            walkDocument(
-                file,
-                { doc: file.id, scope: file.id, page: key, host: file.id },
-                {
+            // Each document numbers its own equations and statements, from one,
+            // in the order a reader meets them.
+            let count = 0;
+            const next = () => String(++count);
+            const walk = (file: SourceFile, target: WalkTarget) =>
+                walkDocument(file, target, {
+                    isComponent: (specifier) => specifier == STATEMENT_COMPONENT,
                     onMath(tex, at) {
                         for (const [, eq] of tex.matchAll(TAG)) {
                             store.addAnchor({
                                 kind: 'equation',
                                 scope: at.scope,
                                 slug: eq!,
-                                label: String(++equations),
+                                label: next(),
                                 source: at.doc,
                                 page: at.page,
                             });
                         }
                     },
-                },
-            );
+                    onImport(id, at) {
+                        registerStatement(store, id, at, {
+                            next,
+                            walk,
+                            id: (slug) => `statement:${slug}`,
+                        });
+                    },
+                });
+            walk(file, { doc: file.id, scope: file.id, page: key, host: file.id });
         },
         finalize: (store) => finalize(store),
+    };
+
+    const bibliography: Doctype = {
+        name: 'bibtex',
+        claims: (file) => BIBTEX.test(file.id),
+        initialize: (store, file) => readBibliography(store, file),
     };
 
     // `depends_on: [x]` names `concepts/x` or `writeups/x`; a bare slug has to
@@ -215,6 +256,9 @@ export function mesearchPreset(options: MesearchPresetOptions = {}): Preset {
         const all = documents(store);
         const sequences: MesearchSequence[] = [];
         for (const entry of all.values()) {
+            const summary = store.collection<Summary>('summaries').get(entry.key);
+            if (summary)
+                entry.summary = plainText(summary.nodes, referenceText(store, summary.doc));
             const written = store.collection<Written>('written').get(entry.key)!;
             entry.dependsOn = unique(
                 written.dependsOn
@@ -266,8 +310,9 @@ export function mesearchPreset(options: MesearchPresetOptions = {}): Preset {
         const dashed = new Set<string>();
         for (const entry of entries) {
             if (!isNode.has(entry.key)) continue;
-            const sources = [entry.filename, entry.descriptionFilename].filter(
-                (id): id is string => !!id,
+            // The document, its description, and the statements it shows.
+            const sources = [...store.docs.keys()].filter(
+                (id) => store.pathnameOf(id) == entry.key,
             );
             for (const source of sources) {
                 for (const ref of store.refsOf(source)) {
@@ -288,10 +333,20 @@ export function mesearchPreset(options: MesearchPresetOptions = {}): Preset {
     return {
         name: 'mesearch',
         contentDir: docsDir,
-        include: (id) => MARKDOWN.test(id),
-        doctypes: [site, document],
+        include: (id) => MARKDOWN.test(id) || BIBTEX.test(id),
+        doctypes: [site, document, bibliography],
         resolvers: [
             equations({ url: (page, slug) => url(page, `#eq:${slug}`) }),
+            statements({ url: (page, slug) => url(page, `#statement:${slug}`) }),
+            // On the page itself, a citation jumps to the page's own list. A
+            // description is shown elsewhere --- on the map --- so it points at
+            // the list on its document's page.
+            citations({
+                url: (key, store, doc) =>
+                    doc.doctype == 'description'
+                        ? url(store.pathnameOf(doc.id) ?? '', `#cite:${key}`)
+                        : `#cite:${key}`,
+            }),
             pageLinks({
                 // Anything that is not an external URL, a bare fragment, a file
                 // such as a figure, or a reference another resolver claims.
@@ -318,6 +373,7 @@ export function mesearchPreset(options: MesearchPresetOptions = {}): Preset {
                 headings: Object.fromEntries(
                     [...store.docs].map(([id, doc]) => [id, doc.headings]),
                 ),
+                bibliography: bibliographies(store),
             };
         },
     };
@@ -348,10 +404,63 @@ export function mesearchPreset(options: MesearchPresetOptions = {}): Preset {
     }
 }
 
+// What each page cites --- in its own text, in the statements it shows, and in
+// its description --- by pathname, in the order of the labels.
+function bibliographies(store: Store): Record<string, Citation[]> {
+    const cited = new Map<string, Map<string, Citation>>();
+    const all = store.collection<Citation>('citations');
+    for (const id of store.docs.keys()) {
+        const page = store.pathnameOf(id);
+        if (!page) continue;
+        for (const ref of store.refsOf(id)) {
+            if (ref.resolver != 'citation') continue;
+            const citation = all.get((ref.target as { key: string }).key);
+            if (!citation) continue;
+            if (!cited.has(page)) cited.set(page, new Map());
+            cited.get(page)!.set(citation.key, citation);
+        }
+    }
+    return Object.fromEntries(
+        [...cited].map(([page, citations]) => [
+            page,
+            [...citations.values()].sort(
+                (a, b) =>
+                    citationLabel(a).localeCompare(citationLabel(b)) || a.key.localeCompare(b.key),
+            ),
+        ]),
+    );
+}
+
 // References as the frontmatter writes them, before every document is known.
 interface Written {
     dependsOn: string[];
     documents: string[];
+}
+
+// What a document's summary is made from: its description, or else its first
+// paragraph.
+interface Summary {
+    doc: string;
+    nodes: RootContent[];
+}
+
+// A reference as a preview shows it: as the page renders it, without the link.
+function referenceText(store: Store, doc: string) {
+    return (url: string, text: string): string | undefined => {
+        const [, scheme, written] = /^(cite|statement|eq):(.+)$/.exec(url) ?? [];
+        if (!scheme || !written) return undefined;
+        const resolver = { cite: 'citation', statement: 'statement', eq: 'equation' }[scheme]!;
+        const target = store.ref(doc, resolver, written)?.target as
+            { label: string; kind?: string; full?: string } | undefined;
+        if (!target) return text;
+        if (resolver == 'citation')
+            return text ? `[${target.label}, ${text}]` : `[${target.label}]`;
+        if (resolver == 'equation') return `(${target.label})`;
+        return text
+            .replaceAll('%label', target.label)
+            .replaceAll('%kind', target.kind ?? '')
+            .replaceAll('%full', target.full ?? '');
+    };
 }
 
 function siblingDescription(store: Store, folder: string): string | undefined {
@@ -373,10 +482,18 @@ function firstHeading(file: SourceFile): string | undefined {
 }
 
 // Prose as a reader would see it in a preview: inline math keeps its `$`s so
-// that it can be rendered, everything else is flattened to text.
-function plainText(nodes: RootContent[]): string {
+// that it can be rendered, everything else is flattened to text. `link` may
+// say what a link reads as instead of its own text.
+function plainText(
+    nodes: RootContent[],
+    link?: (url: string, text: string) => string | undefined,
+): string {
     const text = (node: RootContent): string => {
         if (node.type == 'inlineMath') return `$${node.value}$`;
+        if (node.type == 'link' && link) {
+            const own = node.children.map(text).join('');
+            return link(node.url, own) ?? own;
+        }
         if (node.type == 'text' || node.type == 'inlineCode') return node.value;
         if (node.type == 'html' || node.type == 'yaml' || node.type == 'code') return '';
         if ('children' in node) return (node.children as RootContent[]).map(text).join('');

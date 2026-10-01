@@ -16,10 +16,16 @@ const capitalizeWords = (text: string) =>
         .map((word) => `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`)
         .join(' ');
 
+export interface StatementOptions {
+    // The URL of a statement on its page; `/<page>#<slug>` by default.
+    url?(page: string, slug: string): string;
+}
+
 // `[%full](statement:slug)` refers to a numbered statement --- a theorem, a
 // lemma --- substituting `%label`, `%kind` and `%full` ('Theorem 1.2') into the
 // link text.
-export function statements(): Resolver<StatementTarget> {
+export function statements(options: StatementOptions = {}): Resolver<StatementTarget> {
+    const url = options.url ?? ((page, slug) => `/${page}#${slug}`);
     return {
         name: 'statement',
         matchLink: (href) =>
@@ -37,7 +43,7 @@ export function statements(): Resolver<StatementTarget> {
                 label: anchor.label,
                 kind,
                 full: `${kind} ${anchor.label}`,
-                url: `/${anchor.page}#${anchor.slug}`,
+                url: url(anchor.page, anchor.slug),
             };
         },
         unresolved: (store, doc, written) =>

@@ -1,6 +1,7 @@
 import type { KatexMacros } from '@mvarble/mesearch-markdown/katex';
 
 import type { Heading } from '../../model/outline.ts';
+import type { Citation } from '../../resolvers/citation.ts';
 
 export type Kind = 'concept' | 'writeup' | 'sequence';
 
@@ -66,6 +67,10 @@ export interface MesearchSnapshot {
     graph: Graph;
     // Each document's headings, by filename.
     headings: Record<string, Heading[]>;
+    // What each document cites, by key, in label order.
+    bibliography: Record<string, Citation[]>;
 }
 
 export type { Heading, OutlineEntry } from '../../model/outline.ts';
+export type { Citation, CitationAuthor } from '../../resolvers/citation.ts';
+export type { StatementInjection } from '../../core/statements.ts';

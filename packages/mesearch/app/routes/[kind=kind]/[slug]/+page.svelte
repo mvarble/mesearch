@@ -6,6 +6,7 @@
         Icon,
         Pager,
         Parts,
+        References,
         SequenceTrack,
         Toc,
         kindLabel,
@@ -84,13 +85,14 @@
     leftNote={data.memberships.length == 1
         ? `${data.memberships[0]!.index + 1} of ${data.memberships[0]!.documents.length}`
         : undefined}
-    after={data.contents.length ? parts : undefined}
+    after={data.contents.length || data.references.length ? after : undefined}
 >
     <data.Content />
 </Article>
 
-{#snippet parts()}
-    <Parts parts={data.contents} />
+{#snippet after()}
+    <References entries={data.references} />
+    {#if data.contents.length}<Parts parts={data.contents} />{/if}
 {/snippet}
 
 <style>

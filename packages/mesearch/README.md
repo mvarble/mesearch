@@ -55,6 +55,10 @@ Link documents the way their folders sit on disk --- `[basis points](../basis-po
 
 `$$ ... @tag(slug) $$` numbers a display equation and `[](eq:slug)` refers to it as `(1)`. From another document the reference is `eq:concepts/<slug>/<eq-slug>`.
 
+A theorem, definition or remark is a small document with `type: statement` and a `kind`, shown with `<Statement {...theorem} />` (from `@mvarble/mesearch/Statement.svelte`). Statements count along with the document's equations, and `[%full](statement:slug)` refers to one as "Theorem 2". `@mvarble/mesearch/Proof.svelte` frames a proof. `AGENTS.md` has the details.
+
+Bibliography entries go in `.bib` files anywhere under `docs/`. `[](cite:key)` renders as `[Foll99]` and `[Theorem 1.8](cite:key)` as `[Foll99, Theorem 1.8]`. Hovering a citation shows the reference. Following it jumps to a short list of references at the end of the page, which holds only what that page cites. There is no site-wide bibliography page.
+
 The map on the home page is drawn from all of this:
 
 - Every concept and writeup is a node.

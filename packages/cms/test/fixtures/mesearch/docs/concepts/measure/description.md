@@ -2,4 +2,4 @@
 title: Measure, briefly
 ---
 
-Sizes of [sets](../sets/).
+Sizes of [sets](../sets/), as in [](cite:folland1999).

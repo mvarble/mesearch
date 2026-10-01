@@ -41,7 +41,8 @@ export const load = () => ({ posts: cms.posts.list({ limit: 3 }) });
 
 ## Presets
 
-- **`mesearchPreset`** --- `docs/{concepts,writeups,sequences}/<slug>/index.{md,svx}`. It reads `depends_on` and sequence membership, takes dates from git, numbers equations per document, resolves links written as paths on disk, and builds the dependency graph.
+- **`mesearchPreset`** --- `docs/{concepts,writeups,sequences}/<slug>/index.{md,svx}`. It reads `depends_on` and sequence membership, takes dates from git, resolves links written as paths on disk, and builds the dependency graph. Equations and the statements a document shows share one count per document. Every `.bib` file under `docs/` adds to one bibliography. A `cite:` link points at the document's own reference list, and `cms.bibliography(key)` gives what that list holds.
+- Both presets share the statement registration (`core/statements.ts`) and the BibTeX reader (`core/bibtex.ts`). The reader decodes LaTeX accents and drops protective braces.
 - **`blogPreset`** --- the blog's `type: post | sequence | statement` documents and `.bib` bibliographies. Statements and equations share one counter per post or sequence, and the preset provides the `cite:`, `eq:` and `statement:` references and the `%title`, `%label`, `%sequence` and `%full` link text.
 
 A preset is a list of doctypes and resolvers (see `Doctype` and `Resolver`). A doctype registers what a file contributes in a first pass, then resolves what it refers to in a second, once every document is known, so the result never depends on the order the files are read in.

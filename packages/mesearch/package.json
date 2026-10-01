@@ -39,6 +39,14 @@
             "types": "./dist/kit.d.ts",
             "import": "./dist/kit.js"
         },
+        "./Statement.svelte": {
+            "svelte": "./app/components/Statement.svelte",
+            "default": "./app/components/Statement.svelte"
+        },
+        "./Proof.svelte": {
+            "svelte": "./app/components/Proof.svelte",
+            "default": "./app/components/Proof.svelte"
+        },
         "./tsconfig.json": "./tsconfig.project.json",
         "./package.json": "./package.json"
     },

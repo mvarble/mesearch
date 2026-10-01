@@ -23,7 +23,7 @@ test('documents are found by folder, with their frontmatter', () => {
     assert.equal(measure.title, 'Measure');
     assert.equal(measure.kind, 'concept');
     assert.equal(measure.descriptionFilename, 'docs/concepts/measure/description.md');
-    assert.equal(measure.summary, 'Sizes of sets.');
+    assert.equal(measure.summary, 'Sizes of sets, as in [Foll99].');
     assert.equal(measure.updated.toISOString().slice(0, 10), '2026-03-01');
     assert.deepEqual(measure.dependsOn, ['concepts/sets']);
     // No description: the first paragraph stands in.
@@ -133,4 +133,72 @@ test('the loaders module imports every document', async () => {
     const code = plugin.load.call({}, id);
     assert.match(code, /"docs\/concepts\/measure\/description\.md": \(\) => import\(/);
     assert.ok(code.includes(path.join(root, 'docs/writeups/notes/index.md')));
+});
+
+test('statements share a document’s count with its equations', () => {
+    const measure = 'docs/concepts/measure/index.md';
+    const statement = store.ref(measure, 'statement', 'extension');
+    assert.equal(statement.target.label, '2');
+    assert.equal(statement.target.full, 'Theorem 2');
+    assert.equal(statement.target.url, '/math/concepts/measure/#statement:extension');
+    // An equation inside the statement carries on the same count.
+    assert.equal(store.ref(measure, 'equation', 'outer').target.label, '3');
+    const remote = store.ref(
+        'docs/writeups/lebesgue/index.md',
+        'statement',
+        'concepts/measure/extension',
+    );
+    assert.equal(remote.target.url, '/math/concepts/measure/#statement:extension');
+    assert.deepEqual(store.injection('docs/concepts/measure/statements/extension.md'), {
+        kind: 'theorem',
+        label: '2',
+        slug: 'extension',
+        pathname: 'concepts/measure',
+        filename: 'docs/concepts/measure/statements/extension.md',
+        title: 'Carathéodory',
+        id: 'statement:extension',
+    });
+    // The statement folds its page's macros.
+    assert.equal(
+        store.foldedMacros('docs/concepts/measure/statements/extension.md')['\\mu'],
+        '\\mathrm{m}',
+    );
+});
+
+test('a citation points at the list on its own page', () => {
+    const own = store.ref('docs/concepts/measure/index.md', 'citation', 'folland1999');
+    assert.equal(own.target.url, '#cite:folland1999');
+    assert.equal(own.target.label, 'Foll99');
+    assert.match(own.target.text, /^Gerald B\. Folland\. Real Analysis.*\. Wiley\. 1999\.$/);
+    // In a statement shown on the page, too.
+    const inside = store.ref(
+        'docs/concepts/measure/statements/extension.md',
+        'citation',
+        'billingsley1995',
+    );
+    assert.equal(inside.target.url, '#cite:billingsley1995');
+    // A description is shown on the map, so it reaches the document's page.
+    const preview = store.ref('docs/concepts/measure/description.md', 'citation', 'folland1999');
+    assert.equal(preview.target.url, '/math/concepts/measure/#cite:folland1999');
+    assert.ok(messages.some((m) => m.includes("'nobody' does not resolve to a citation")));
+});
+
+test('each page’s bibliography is what it cites, in label order', () => {
+    assert.deepEqual(
+        cms.bibliography('concepts/measure').map((c) => c.key),
+        ['billingsley1995', 'folland1999'],
+    );
+    assert.deepEqual(cms.bibliography('writeups/lebesgue'), []);
+    assert.deepEqual(cms.bibliography('concepts/sets'), []);
+});
+
+test('BibTeX text reads as a reader would see it', async () => {
+    const { detex } = await import('../src/core/bibtex.ts');
+    assert.equal(detex('Zeitschrift f{\\"u}r'), 'Zeitschrift für');
+    assert.equal(detex("Erd{\\H{o}}s and R{\\'e}nyi"), 'Erdős and Rényi');
+    assert.equal(
+        detex('The {B}rownian $\\mathbb{R}^{d}$ case'),
+        'The Brownian $\\mathbb{R}^{d}$ case',
+    );
+    assert.equal(detex('Dvoretzky--Erd\\H os'), 'Dvoretzky–Erdős');
 });

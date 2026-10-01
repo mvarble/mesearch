@@ -62,6 +62,8 @@ pnpm add @mvarble/mesearch-ui
 | `Toc`                                    | Nested contents with scroll-spy.                                                                                                                                                                 |
 | `SequenceTrack`                          | A sequence as a line of stations, with nested stops for sections and the current stop filled.                                                                                                    |
 | `Pager`, `Parts`, `Chips`                | Previous and next, a numbered list of parts, and a row of document links.                                                                                                                        |
+| `Statement`, `Proof`                     | A theorem, definition or remark spread in from its own document, with its heading running into its first line and claims set in italics; and a proof ending in ∎.                                |
+| `References`                             | A page's own short reference list, at its end. Each entry is the target of the citations to it and is highlighted on arrival.                                                                    |
 | `Graph`                                  | The map, with nodes laid out in advance by `layoutGraph`. It is drawn without JavaScript and simulated live with it. Clicking a node opens `GraphPanel` (a drawer, or a bottom sheet on phones). |
 | `Index`                                  | Every entry, with fuzzy filtering, sorting by date or title, and kind filters.                                                                                                                   |
 | `Rail`, `Palette`, `ThemeToggle`, `Icon` | The pieces `Shell` is made of, if you want to assemble them differently.                                                                                                                         |
@@ -72,6 +74,7 @@ Import these from `@mvarble/mesearch-ui/server` and run them in a `load` functio
 
 - `inlineHtml(text, macros?)`: a title or summary as HTML, with its `$...$` math rendered over the base macros.
 - `layoutGraph(documents, links, tuning?)`: runs the force simulation to rest and returns the nodes for `Graph`.
+- `referenceHtml(entry, macros?)`: a bibliography entry as one short paragraph of HTML, for `References`.
 
 ## Styling
 
