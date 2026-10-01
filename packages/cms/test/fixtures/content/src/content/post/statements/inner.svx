@@ -1,0 +1,7 @@
+---
+type: statement
+kind: remark
+slug: inner
+---
+
+Inner nested statement.

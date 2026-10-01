@@ -1,0 +1,18 @@
+---
+type: statement
+kind: theorem
+slug: outer
+---
+
+<script>
+  import Statement from '$lib/components/statement.svelte';
+  import * as inner from './inner.svx';
+</script>
+
+Outer body, containing a nested statement and an equation.
+
+$$
+p = q @tag(outer-eq)
+$$
+
+<Statement {...inner} />

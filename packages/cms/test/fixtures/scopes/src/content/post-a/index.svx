@@ -1,0 +1,19 @@
+---
+type: post
+title: Post post-a
+slug: pa
+created: 2026-01-01
+---
+
+<script>
+  import Statement from '$lib/components/statement.svelte';
+  import * as shared from './statements/shared.svx';
+</script>
+
+$$
+e = m @tag(shared-eq)
+$$
+
+<Statement {...shared} />
+
+LOCAL=[%full](statement:shared) LOCALEQ=[%full](eq:shared-eq)

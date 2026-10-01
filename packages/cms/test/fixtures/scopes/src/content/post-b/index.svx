@@ -1,0 +1,19 @@
+---
+type: post
+title: Post post-b
+slug: pb
+created: 2026-01-01
+---
+
+<script>
+  import Statement from '$lib/components/statement.svelte';
+  import * as shared from './statements/shared.svx';
+</script>
+
+$$
+f = n @tag(shared-eq)
+$$
+
+<Statement {...shared} />
+
+LOCAL=[%full](statement:shared) CROSS=[%full](statement:pa/shared) CROSSEQ=[%full](eq:pa/shared-eq)

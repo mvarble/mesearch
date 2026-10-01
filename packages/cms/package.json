@@ -1,0 +1,80 @@
+{
+    "name": "@mvarble/mesearch-cms",
+    "version": "0.1.0",
+    "description": "An in-memory content database for markdown/mdsvex sites: documents, pages, numbered statements and equations, references, outlines and folded KaTeX macros, kept live by a Vite plugin.",
+    "license": "MIT",
+    "author": "Matthew Varble <matthew@rodent.club>",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mvarble/mesearch.git",
+        "directory": "packages/cms"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./model": {
+            "types": "./dist/model/index.d.ts",
+            "import": "./dist/model/index.js"
+        },
+        "./presets/blog": {
+            "types": "./dist/presets/blog/index.d.ts",
+            "import": "./dist/presets/blog/index.js"
+        },
+        "./presets/blog/runtime": {
+            "types": "./dist/presets/blog/runtime.d.ts",
+            "import": "./dist/presets/blog/runtime.js"
+        },
+        "./presets/mesearch": {
+            "types": "./dist/presets/mesearch/index.d.ts",
+            "import": "./dist/presets/mesearch/index.js"
+        },
+        "./presets/mesearch/runtime": {
+            "types": "./dist/presets/mesearch/runtime.d.ts",
+            "import": "./dist/presets/mesearch/runtime.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "engines": {
+        "node": ">=22.18"
+    },
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "check": "tsc -p tsconfig.json --noEmit",
+        "test": "node --test 'test/**/*.test.mjs'",
+        "prepare": "tsc -p tsconfig.json"
+    },
+    "dependencies": {
+        "@mvarble/mesearch-markdown": "workspace:^",
+        "bibtex": "^0.9.0",
+        "devalue": "^5.6.0",
+        "esast-util-from-js": "^2.0.1",
+        "js-yaml": "^4.1.0",
+        "rehype-parse": "^9.0.1",
+        "remark-frontmatter": "^5.0.0",
+        "remark-math": "6.0.0",
+        "remark-parse": "^11.0.0",
+        "unified": "^11.0.5",
+        "unist-util-visit": "^5.0.0"
+    },
+    "devDependencies": {
+        "@types/estree": "^1.0.8",
+        "@types/hast": "^3.0.5",
+        "@types/js-yaml": "^4.0.9",
+        "@types/mdast": "^4.0.4",
+        "@types/node": "^22.14.0",
+        "typescript": "^6.0.3",
+        "vfile": "^6.0.3",
+        "vite": "^8.0.16"
+    },
+    "peerDependencies": {
+        "vite": "^6.0.0 || ^7.0.0 || ^8.0.0"
+    }
+}

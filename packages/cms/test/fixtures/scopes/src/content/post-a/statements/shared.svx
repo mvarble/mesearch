@@ -1,0 +1,7 @@
+---
+type: statement
+kind: theorem
+slug: shared
+---
+
+Post A's shared statement.

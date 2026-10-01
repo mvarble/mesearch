@@ -1,0 +1,11 @@
+---
+title: Appendix One
+slug: appendix
+---
+
+<script>
+  import Statement from '$lib/components/statement.svelte';
+  import * as ap1 from './statements/ap1.svx';
+</script>
+
+<Statement {...ap1} />

@@ -1,0 +1,26 @@
+---
+title: Chapter A
+slug: chap-a
+---
+
+<script>
+  import Statement from '$lib/components/statement.svelte';
+  import * as a1 from './statements/a1.svx';
+  import * as a2 from './statements/a2.svx';
+</script>
+
+# First section
+
+<Statement {...a1} />
+
+## A subsection
+
+$$
+x = y @tag(a-eq)
+$$
+
+## Another subsection
+
+<Statement {...a2} />
+
+# Second section

@@ -1,0 +1,6 @@
+---
+katex_macros:
+  '\own': 'D'
+---
+
+A description linking to [%title](/posts/dpost).

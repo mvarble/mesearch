@@ -1,0 +1,11 @@
+---
+title: Chapter B
+slug: chap-b
+---
+
+<script>
+  import Statement from '$lib/components/statement.svelte';
+  import * as b1 from './statements/b1.svx';
+</script>
+
+<Statement {...b1} />

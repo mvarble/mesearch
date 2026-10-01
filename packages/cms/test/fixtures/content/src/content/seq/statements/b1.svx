@@ -1,0 +1,7 @@
+---
+type: statement
+kind: remark
+slug: b1
+---
+
+Body of b1.

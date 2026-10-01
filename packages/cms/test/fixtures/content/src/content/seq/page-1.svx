@@ -1,0 +1,11 @@
+---
+title: Page One
+slug: page-1
+---
+
+<script>
+  import Statement from '$lib/components/statement.svelte';
+  import * as p1 from './statements/p1.svx';
+</script>
+
+<Statement {...p1} />

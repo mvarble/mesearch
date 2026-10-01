@@ -1,0 +1,7 @@
+---
+type: statement
+kind: lemma
+slug: a1
+---
+
+Body of a1.

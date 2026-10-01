@@ -1,0 +1,7 @@
+---
+type: statement
+kind: definition
+slug: p1
+---
+
+Body of p1.

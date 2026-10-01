@@ -1,0 +1,14 @@
+---
+type: sequence
+title: Too deep
+slug: deep
+created: 2026-01-01
+children:
+  - filename: ./chapter.svx
+    children:
+      - filename: ./section.svx
+        children:
+          - filename: ./subsection.svx
+---
+
+A sequence whose pages nest one level further than a sequence may.

@@ -1,0 +1,30 @@
+---
+type: post
+title: Fixture post
+slug: fpost
+created: 2026-01-02
+---
+
+<script>
+  import Statement from '$lib/components/statement.svelte';
+  import * as outer from './statements/outer.svx';
+  import * as plain from './statements/plain.svx';
+</script>
+
+# Setup
+
+Intro with an equation.
+
+$$
+u = v @tag(post-eq)
+$$
+
+<Statement {...outer} />
+
+<Statement {...plain} />
+
+# Setup
+
+A repeated title, to check the anchors stay distinct.
+
+Reference check: [%full](statement:plain) and [%full](eq:post-eq).

@@ -1,0 +1,7 @@
+---
+type: statement
+kind: lemma
+slug: shared
+---
+
+Post B's shared statement.

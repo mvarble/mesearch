@@ -1,0 +1,28 @@
+---
+type: sequence
+enumerate: true
+title: Fixture sequence
+slug: fseq
+created: 2026-01-01
+children:
+  - filename: ./chap-a.svx
+    children:
+      - filename: ./page-1.svx
+      - filename: ./page-2.svx
+  - filename: ./chap-b.svx
+  - filename: ./appendix.svx
+    appendix: true
+---
+
+<script>
+  import Statement from '$lib/components/statement.svelte';
+  import * as rootStmt from './statements/root-stmt.svx';
+</script>
+
+Root text with an equation.
+
+$$
+a = b @tag(root-eq)
+$$
+
+<Statement {...rootStmt} />

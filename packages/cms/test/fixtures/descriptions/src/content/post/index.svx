@@ -1,0 +1,13 @@
+---
+type: post
+title: Described post
+slug: dpost
+created: 2026-02-01
+description: ./description.svx
+katex_macros:
+  '\owner': 'O'
+---
+
+# Body
+
+See [%title](/posts/dpost) and $\owner$.

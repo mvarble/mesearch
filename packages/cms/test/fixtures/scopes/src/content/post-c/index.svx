@@ -1,0 +1,8 @@
+---
+type: post
+title: Post post-c
+slug: pc
+created: 2026-01-01
+---
+
+DANGLING=[%full](statement:shared) BADSCOPE=[%full](statement:nope/shared)

@@ -1,0 +1,7 @@
+---
+type: statement
+kind: theorem
+slug: root-stmt
+---
+
+Body of root-stmt.
