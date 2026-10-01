@@ -39,7 +39,8 @@
             "types": "./dist/kit.d.ts",
             "import": "./dist/kit.js"
         },
-        "./tsconfig.json": "./tsconfig.project.json"
+        "./tsconfig.json": "./tsconfig.project.json",
+        "./package.json": "./package.json"
     },
     "files": [
         "dist",

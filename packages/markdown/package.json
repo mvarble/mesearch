@@ -22,7 +22,8 @@
             "types": "./dist/katex.d.ts",
             "import": "./dist/katex.js"
         },
-        "./styles/katex.css": "./styles/katex.css"
+        "./styles/katex.css": "./styles/katex.css",
+        "./package.json": "./package.json"
     },
     "files": [
         "dist",

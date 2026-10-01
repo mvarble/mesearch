@@ -37,7 +37,8 @@
         "./presets/mesearch/runtime": {
             "types": "./dist/presets/mesearch/runtime.d.ts",
             "import": "./dist/presets/mesearch/runtime.js"
-        }
+        },
+        "./package.json": "./package.json"
     },
     "files": [
         "dist"
