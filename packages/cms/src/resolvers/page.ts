@@ -12,6 +12,9 @@ export interface PageTarget {
 }
 
 export interface PageLinkOptions {
+    // Whether a link URL is one to look up at all. Absolute and dot-relative
+    // URLs by default.
+    match?(url: string): boolean;
     // The pathname and fragment a link URL names, if it names one on the site.
     locate(
         store: Store,
@@ -27,7 +30,10 @@ export interface PageLinkOptions {
 export function pageLinks(options: PageLinkOptions): Resolver<PageTarget> {
     return {
         name: 'page',
-        matchLink: (href) => (href.startsWith('/') || href.startsWith('.') ? href : undefined),
+        matchLink: (href) =>
+            (options.match ?? ((url) => url.startsWith('/') || url.startsWith('.')))(href)
+                ? href
+                : undefined,
         resolve(store, doc, written) {
             const location = options.locate(store, doc, written);
             if (!location) return undefined;
@@ -40,10 +46,12 @@ export function pageLinks(options: PageLinkOptions): Resolver<PageTarget> {
                 url: options.url?.(page.pathname, location.hash),
             };
         },
+        // A link that does not even name a place on the site --- one that
+        // climbs out of the content, say --- is left alone without comment.
         unresolved(store, doc, written) {
             const location = options.locate(store, doc, written);
-            const shown = location ? location.pathname + location.hash : written;
-            return `'${shown}' does not resolve to a page in the site (see '${doc.id}').`;
+            if (!location) return undefined;
+            return `'${location.pathname}${location.hash}' does not resolve to a page in the site (see '${doc.id}').`;
         },
         rewriteLink(node, target) {
             if (target.url !== undefined) node.url = target.url;

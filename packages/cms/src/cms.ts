@@ -18,6 +18,8 @@ export interface CmsOptions {
     // The site-wide KaTeX macros, folded under every document's own.
     macros?: KatexMacros;
     // What the queries are imported as: `import { cms } from '<virtualId>'`.
+    // `<virtualId>/loaders` default-exports a dynamic import of every document,
+    // by filename, and is safe to use in the browser.
     virtualId?: string;
     // Prefixes everything printed.
     label?: string;
@@ -53,6 +55,8 @@ export function createCms(options: CmsOptions): Cms {
     const { preset } = options;
     const virtualId = options.virtualId ?? 'virtual:mesearch-cms';
     const resolvedVirtualId = `\0${virtualId}`;
+    const loadersId = `${virtualId}/loaders`;
+    const resolvedLoadersId = `\0${loadersId}`;
     const label = options.label ?? 'cms';
     // The dev server's queries read the live snapshot through here: the module
     // runner evaluates the virtual module in this same process, but in its own
@@ -116,8 +120,10 @@ export function createCms(options: CmsOptions): Cms {
         function rebuild() {
             const before = facts;
             const beforeSnapshot = snapshotCode;
+            const beforeDocs = [...facts.keys()].join('\n');
             build();
             const changed = diffFacts(before, facts);
+            const docsChanged = beforeDocs != [...facts.keys()].join('\n');
             if (!server || (changed.length == 0 && beforeSnapshot == snapshotCode)) return;
             for (const environment of Object.values(server.environments)) {
                 const graph = environment.moduleGraph;
@@ -127,6 +133,8 @@ export function createCms(options: CmsOptions): Cms {
                 }
                 const virtual = graph.getModuleById(resolvedVirtualId);
                 if (virtual) graph.invalidateModule(virtual);
+                const loaders = graph.getModuleById(resolvedLoadersId);
+                if (loaders && docsChanged) graph.invalidateModule(loaders);
             }
             server.hot.send({ type: 'full-reload' });
         }
@@ -162,6 +170,7 @@ export function createCms(options: CmsOptions): Cms {
                 },
                 async resolveId(id) {
                     if (id == virtualId) return resolvedVirtualId;
+                    if (id == loadersId) return resolvedLoadersId;
                     // Resolved from inside this package, so a site need not
                     // depend on it directly for the import to be found.
                     if (id == RUNTIME_ID)
@@ -169,6 +178,15 @@ export function createCms(options: CmsOptions): Cms {
                     return null;
                 },
                 load(id) {
+                    if (id == resolvedLoadersId) {
+                        const entries = [...current().docs.keys()]
+                            .sort()
+                            .map(
+                                (doc) =>
+                                    `    ${JSON.stringify(doc)}: () => import(${JSON.stringify(toAbsolute(root, doc))}),`,
+                            );
+                        return `export default {\n${entries.join('\n')}\n};\n`;
+                    }
                     if (id != resolvedVirtualId) return null;
                     const consumer = (this as { environment?: { config?: { consumer?: string } } })
                         .environment?.config?.consumer;

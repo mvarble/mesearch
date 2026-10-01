@@ -34,6 +34,9 @@ export interface SequenceChild {
 
 export interface Sequence extends Post {
     enumerate: boolean;
+    // A sequence's root is never labelled; the field is here so a root and its
+    // pages can be handled alike.
+    label?: string;
     children: SequenceChild[];
 }
 
