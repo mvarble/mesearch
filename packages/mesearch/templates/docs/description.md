@@ -1,0 +1,1 @@
+What this site is for, in a paragraph or two. This text opens the home page, above the map of every concept and writeup. It is ordinary markdown: it can link to [a concept](./concepts/example-concept/) and use math like $e^{i\pi} = -1$.

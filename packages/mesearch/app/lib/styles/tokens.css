@@ -1,0 +1,111 @@
+/* Every site-wide decision is a variable here, so that a project's
+ * `mesearch.css` --- loaded after this --- can change any of them. The light
+ * theme is the default, and the one a page read without JavaScript gets; the
+ * dark theme applies when `<html data-theme="dark">`. */
+
+:root {
+    color-scheme: light;
+
+    /* Type. Body text is a serif built for long reading; the interface around
+     * it is a quiet sans. */
+    --font-serif: 'Source Serif 4 Variable', 'Source Serif Pro', Georgia, 'Times New Roman', serif;
+    --font-sans:
+        'Inter Variable', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui,
+        sans-serif;
+    --font-mono: 'Fira Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    --font-body: var(--font-serif);
+    --font-heading: var(--font-serif);
+    --font-ui: var(--font-sans);
+
+    --font-size-body: 1.0625rem;
+    --line-height-body: 1.72;
+    --font-size-small: 0.9rem;
+    --font-size-ui: 0.875rem;
+    --font-size-eyebrow: 0.72rem;
+    --font-size-title: clamp(2rem, 1.4rem + 2.4vw, 2.85rem);
+    --font-size-h1: 1.75rem;
+    --font-size-h2: 1.4rem;
+    --font-size-h3: 1.15rem;
+    --font-size-mono: 0.86em;
+    --katex-font-size: 1.04em;
+    --katex-font-size-hidpi: 1.04em;
+
+    /* Paper and ink. */
+    --paper: #fbf8f2;
+    --paper-raised: #fffdf8;
+    --paper-sunken: #f3eee3;
+    --ink: #1d1b18;
+    --ink-soft: #3b3731;
+    --muted: #6d665b;
+    --faint: #a39b8c;
+    --rule: #e6dfd2;
+    --rule-strong: #d2c8b6;
+    --selection: rgba(176, 96, 41, 0.18);
+
+    /* One accent, and a colour for each kind of document. */
+    --accent: #9c4417;
+    --accent-ink: #fffaf3;
+    --accent-soft: rgba(156, 68, 23, 0.09);
+    --concept: #2f5f8f;
+    --concept-soft: rgba(47, 95, 143, 0.1);
+    --writeup: #9c4417;
+    --writeup-soft: rgba(156, 68, 23, 0.1);
+    --sequence: #4c7a43;
+    --sequence-soft: rgba(76, 122, 67, 0.12);
+
+    /* The graph. */
+    --graph-background: var(--paper-raised);
+    --graph-grid: rgba(120, 104, 80, 0.07);
+    --graph-edge: #b8ad9a;
+    --graph-edge-strong: #6d665b;
+    --graph-node: var(--paper-raised);
+    --graph-label: var(--ink);
+
+    --code-background: #f4efe5;
+
+    /* Shape and space. */
+    --radius: 6px;
+    --radius-large: 14px;
+    --shadow: 0 1px 2px rgba(40, 30, 15, 0.06), 0 8px 24px rgba(40, 30, 15, 0.08);
+    --shadow-strong: 0 2px 6px rgba(40, 30, 15, 0.08), 0 24px 60px rgba(40, 30, 15, 0.18);
+    --measure: 42rem;
+    --rail-width: 4rem;
+    --gutter: clamp(1.1rem, 4vw, 2.5rem);
+    --sidebar-left: 15rem;
+    --sidebar-right: 14rem;
+}
+
+:root[data-theme='dark'] {
+    color-scheme: dark;
+
+    --paper: #13161b;
+    --paper-raised: #191d24;
+    --paper-sunken: #0f1216;
+    --ink: #e9e5dc;
+    --ink-soft: #cdc7bb;
+    --muted: #9b9488;
+    --faint: #6b665e;
+    --rule: #272c35;
+    --rule-strong: #384050;
+    --selection: rgba(227, 154, 107, 0.25);
+
+    --accent: #e8a173;
+    --accent-ink: #1a1410;
+    --accent-soft: rgba(232, 161, 115, 0.12);
+    --concept: #8fbbe9;
+    --concept-soft: rgba(143, 187, 233, 0.13);
+    --writeup: #e8a173;
+    --writeup-soft: rgba(232, 161, 115, 0.13);
+    --sequence: #9fcb95;
+    --sequence-soft: rgba(159, 203, 149, 0.13);
+
+    --graph-background: #161a20;
+    --graph-grid: rgba(200, 210, 230, 0.05);
+    --graph-edge: #4c5565;
+    --graph-edge-strong: #a7a091;
+
+    --code-background: #1b2028;
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.3);
+    --shadow-strong: 0 2px 6px rgba(0, 0, 0, 0.4), 0 24px 60px rgba(0, 0, 0, 0.5);
+}

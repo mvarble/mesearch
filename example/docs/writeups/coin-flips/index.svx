@@ -1,0 +1,27 @@
+---
+title: Flipping coins
+created: 2026-09-01
+depends_on: [probability-space]
+---
+
+<script>
+    import Flipper from './Flipper.svelte';
+</script>
+
+A single fair coin is the [probability space](../../concepts/probability-space/) $\Omega = \{H, T\}$ with $\PP(\{H\}) = \PP(\{T\}) = 1/2$. Flipping $n$ coins multiplies the outcomes: $\Omega_n = \{H, T\}^n$ has $2^n$ equally likely sequences.
+
+![A tree of two coin flips, branching into four equally likely outcomes.](./tree.svg)
+
+# Counting heads
+
+The number of heads $S_n$ in $n$ flips is a [random variable](../../concepts/random-variable/) on $\Omega_n$. Counting the sequences with exactly $k$ heads gives
+
+$$
+	\PP(S_n = k) = \binom{n}{k} 2^{-n}. @tag(binomial)
+$$
+
+The proportion of heads $S_n / n$ wanders for small $n$ and settles near one half as $n$ grows. Flip a few hundred coins and watch:
+
+<Flipper />
+
+That settling is the [law of large numbers](../law-of-large-numbers/), and [(1)](eq:binomial) is where its proof begins.

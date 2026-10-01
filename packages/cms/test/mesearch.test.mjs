@@ -100,7 +100,7 @@ test('links resolve the way files sit on disk, and rewrite to site URLs', () => 
 
 test('equations number per document and are reachable across documents', () => {
     const local = store.ref('docs/concepts/measure/index.md', 'equation', 'unit');
-    assert.equal(local.target.label, '0');
+    assert.equal(local.target.label, '1');
     assert.equal(local.target.url, '/math/concepts/measure/#eq:unit');
     const remote = store.ref(
         'docs/writeups/lebesgue/index.md',

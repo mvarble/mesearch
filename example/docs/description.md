@@ -1,0 +1,1 @@
+These notes build probability theory from sets upwards. Each **concept** stands on its own and says what it builds on; each **writeup** works through an idea using the concepts beneath it. Follow the arrows on the map for a reading order, or start the [first steps](./sequences/first-steps/) sequence.

@@ -6,7 +6,6 @@ import { Frontmatter } from '../../core/frontmatter.ts';
 import type { SourceFile } from '../../core/source.ts';
 import type { Store } from '../../core/store.ts';
 import { parseHeadings, walkDocument } from '../../core/walk.ts';
-import { Numbering } from '../../model/build.ts';
 import { equations, pageLinks, TAG, type PageTarget } from '../../resolvers/index.ts';
 import { gitDates, type DateProvider } from './dates.ts';
 import {
@@ -160,8 +159,8 @@ export function mesearchPreset(options: MesearchPresetOptions = {}): Preset {
 
             documents(store).set(key, entry);
 
-            // Each document numbers its own equations.
-            const numbering = new Numbering();
+            // Each document numbers its own equations, from one.
+            let equations = 0;
             walkDocument(
                 file,
                 { doc: file.id, scope: file.id, page: key, host: file.id },
@@ -172,7 +171,7 @@ export function mesearchPreset(options: MesearchPresetOptions = {}): Preset {
                                 kind: 'equation',
                                 scope: at.scope,
                                 slug: eq!,
-                                label: numbering.next(),
+                                label: String(++equations),
                                 source: at.doc,
                                 page: at.page,
                             });

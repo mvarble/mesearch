@@ -33,6 +33,16 @@ export default defineConfig(
         },
     },
     {
+        // The app renders HTML it made itself at build time --- KaTeX for the
+        // math in titles and summaries --- and builds every internal link
+        // through `href()`, which applies the configured base path.
+        files: ['packages/mesearch/app/**/*.svelte'],
+        rules: {
+            'svelte/no-at-html-tags': 'off',
+            'svelte/no-navigation-without-resolve': 'off',
+        },
+    },
+    {
         ignores: ['**/dist', '**/build', '**/.mesearch', '**/test/fixtures'],
     },
     {

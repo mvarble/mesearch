@@ -23,6 +23,12 @@ export interface CmsOptions {
     virtualId?: string;
     // Prefixes everything printed.
     label?: string;
+    // What the dev server does when content changes. `'full'` reloads the
+    // page. `'data'` hot-updates the documents whose output changed and sends
+    // `mesearch-cms:update` to the browser instead, for a site that refreshes
+    // its data in place (with SvelteKit, `invalidateAll()`) and keeps its
+    // state; a document added or removed still reloads the page.
+    reload?: 'full' | 'data';
 }
 
 export interface Cms {
@@ -125,18 +131,30 @@ export function createCms(options: CmsOptions): Cms {
             const changed = diffFacts(before, facts);
             const docsChanged = beforeDocs != [...facts.keys()].join('\n');
             if (!server || (changed.length == 0 && beforeSnapshot == snapshotCode)) return;
+            const inPlace = options.reload == 'data' && !docsChanged;
             for (const environment of Object.values(server.environments)) {
                 const graph = environment.moduleGraph;
                 for (const id of changed) {
                     const module = graph.getModuleById(toAbsolute(root, id));
-                    if (module) graph.invalidateModule(module);
+                    if (!module) continue;
+                    // Hot-updated where the browser has it, and recompiled on
+                    // next use everywhere else.
+                    const reload = (
+                        environment as { reloadModule?: (m: typeof module) => Promise<void> }
+                    ).reloadModule;
+                    if (inPlace && environment.name == 'client' && reload) {
+                        void reload.call(environment, module);
+                    } else {
+                        graph.invalidateModule(module);
+                    }
                 }
                 const virtual = graph.getModuleById(resolvedVirtualId);
                 if (virtual) graph.invalidateModule(virtual);
                 const loaders = graph.getModuleById(resolvedLoadersId);
                 if (loaders && docsChanged) graph.invalidateModule(loaders);
             }
-            server.hot.send({ type: 'full-reload' });
+            if (inPlace) server.hot.send({ type: 'custom', event: 'mesearch-cms:update' });
+            else server.hot.send({ type: 'full-reload' });
         }
 
         return [
@@ -188,9 +206,16 @@ export function createCms(options: CmsOptions): Cms {
                         return `export default {\n${entries.join('\n')}\n};\n`;
                     }
                     if (id != resolvedVirtualId) return null;
-                    const consumer = (this as { environment?: { config?: { consumer?: string } } })
-                        .environment?.config?.consumer;
-                    if (consumer == 'client') {
+                    // An SSR build that Vite runs the legacy way is still
+                    // called the client environment, so `build.ssr` decides.
+                    const environment = (
+                        this as {
+                            environment?: {
+                                config?: { consumer?: string; build?: { ssr?: unknown } };
+                            };
+                        }
+                    ).environment?.config;
+                    if (environment?.consumer == 'client' && !environment.build?.ssr) {
                         throw new Error(
                             `${label}: \`${virtualId}\` is server-only; import it from a ` +
                                 '`+page.server` or `+layout.server` module.',

@@ -1,0 +1,200 @@
+/* A document's rendered content. Its headings arrive one level down --- a `#`
+ * is an <h2> --- since the page's <h1> is its title. Body text is justified, with hyphenation to
+ * keep the gaps even, and inline math never breaks across a line (see the
+ * shared KaTeX stylesheet). */
+
+.prose {
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    hanging-punctuation: first;
+    overflow-wrap: break-word;
+}
+
+/* A full-width filler after the content, as mkdoc has: whatever inline content
+ * sits directly in the container then ends on a justified line too. */
+.prose::after {
+    content: '';
+    display: inline-block;
+    width: 100%;
+}
+
+.prose > :first-child {
+    margin-top: 0;
+}
+
+.prose p,
+.prose ul,
+.prose ol,
+.prose dl {
+    margin: 0 0 1em;
+}
+
+.prose li {
+    margin-bottom: 0.35em;
+}
+
+.prose li > p {
+    margin-bottom: 0.4em;
+}
+
+.prose :is(h1, h2, h3, h4, h5, h6) {
+    font-family: var(--font-heading);
+    color: var(--ink);
+    text-align: left;
+    hyphens: manual;
+    line-height: 1.25;
+    margin: 2.1em 0 0.6em;
+    scroll-margin-top: 1.5rem;
+    text-wrap: balance;
+}
+
+.prose h2 {
+    font-size: var(--font-size-h1);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.prose h3 {
+    font-size: var(--font-size-h2);
+    font-weight: 600;
+}
+
+.prose h4 {
+    font-size: var(--font-size-h3);
+    font-weight: 600;
+}
+
+.prose :is(h5, h6) {
+    font-size: 1em;
+    font-weight: 700;
+}
+
+.prose a {
+    color: var(--accent);
+    text-decoration-line: underline;
+    text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+    transition: text-decoration-color 120ms;
+}
+
+.prose a:hover {
+    text-decoration-color: var(--accent);
+}
+
+.prose strong {
+    font-weight: 650;
+}
+
+.prose blockquote {
+    margin: 1.6em 0;
+    padding: 0.1em 0 0.1em 1.25em;
+    border-left: 2px solid var(--rule-strong);
+    color: var(--ink-soft);
+    font-style: italic;
+}
+
+.prose hr {
+    border: none;
+    height: 1px;
+    background: var(--rule);
+    margin: 2.8em auto;
+    width: 40%;
+}
+
+.prose img,
+.prose video {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1.8em auto;
+    border-radius: var(--radius);
+}
+
+.prose figure {
+    margin: 2em 0;
+}
+
+.prose figcaption {
+    font: var(--font-size-small) / 1.5 var(--font-ui);
+    color: var(--muted);
+    text-align: center;
+    margin-top: 0.6em;
+}
+
+.prose table {
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+    margin: 1.8em 0;
+    font-size: var(--font-size-small);
+    text-align: left;
+    hyphens: manual;
+}
+
+.prose th,
+.prose td {
+    padding: 0.5em 0.9em;
+    border-bottom: 1px solid var(--rule);
+}
+
+.prose th {
+    font: 600 var(--font-size-ui) / 1.4 var(--font-ui);
+    color: var(--muted);
+    border-bottom-color: var(--rule-strong);
+}
+
+.prose code {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-mono);
+    background: var(--code-background);
+    border-radius: 4px;
+    padding: 0.08em 0.32em;
+    hyphens: none;
+}
+
+.prose pre.shiki {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.65;
+    text-align: left;
+    hyphens: none;
+    margin: 1.6em 0;
+    padding: 1em 1.2em;
+    overflow-x: auto;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    background: var(--code-background) !important;
+}
+
+.prose pre.shiki code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+}
+
+/* Shiki emits both themes at once, as `--shiki-dark` custom properties on
+ * every token; the dark theme switches to them. */
+:root[data-theme='dark'] .prose .shiki,
+:root[data-theme='dark'] .prose .shiki span {
+    color: var(--shiki-dark) !important;
+    font-style: var(--shiki-dark-font-style) !important;
+    font-weight: var(--shiki-dark-font-weight) !important;
+    text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+.prose .math-scroll-container {
+    margin: 0.4em 0;
+}
+
+.prose .katex-display {
+    text-align: center;
+}
+
+/* Footnotes, as mdsvex renders them. */
+.prose .footnotes {
+    margin-top: 3em;
+    font-size: var(--font-size-small);
+    color: var(--ink-soft);
+}

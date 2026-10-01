@@ -1,0 +1,51 @@
+# @mvarble/mesearch-cms
+
+A content database for sites built from markdown and mdsvex documents. It is an in-memory store, rebuilt from the content on every change, holding:
+
+- documents and the pages they are shown on;
+- numbered equations and statements, scoped to a post or sequence;
+- references between documents, resolved by pluggable resolvers;
+- each document's outline;
+- KaTeX macros, folded down the tree of documents.
+
+A Vite plugin keeps it current during development and serves it to routes as a server-only virtual module of typed queries.
+
+```js
+// vite.config.ts
+import { createCms } from '@mvarble/mesearch-cms';
+import { blogPreset } from '@mvarble/mesearch-cms/presets/blog';
+import { markdownPreprocessors } from '@mvarble/mesearch-markdown';
+
+const cms = createCms({ preset: blogPreset(), virtualId: '$cms' });
+
+export default defineConfig({
+    plugins: [
+        ...cms.vite(),
+        sveltekit({
+            preprocess: markdownPreprocessors({
+                remarkPlugins: [cms.remark],
+                katex: { macros: cms.macrosFor },
+            }),
+        }),
+    ],
+});
+```
+
+```ts
+// +page.server.ts
+import { cms } from '$cms';
+export const load = () => ({ posts: cms.posts.list({ limit: 3 }) });
+```
+
+`$cms/loaders` default-exports a dynamic import of every document's component, keyed by filename, and is safe to use in the browser.
+
+## Presets
+
+- **`mesearchPreset`** --- `docs/{concepts,writeups,sequences}/<slug>/index.{md,svx}`. It reads `depends_on` and sequence membership, takes dates from git, numbers equations per document, resolves links written as paths on disk, and builds the dependency graph.
+- **`blogPreset`** --- the blog's `type: post | sequence | statement` documents and `.bib` bibliographies. Statements and equations share one counter per post or sequence, and the preset provides the `cite:`, `eq:` and `statement:` references and the `%title`, `%label`, `%sequence` and `%full` link text.
+
+A preset is a list of doctypes and resolvers (see `Doctype` and `Resolver`). A doctype registers what a file contributes in a first pass, then resolves what it refers to in a second, once every document is known, so the result never depends on the order the files are read in.
+
+## How changes propagate
+
+Every document has _facts_: everything the markdown plugins and module injection read for it, such as its labels, resolved references, headings and folded macros. When the content changes, the store is rebuilt and the facts compared. Only the documents whose facts changed are recompiled, even when the file that changed was a different one: inserting a statement renumbers every later statement in its scope.

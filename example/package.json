@@ -1,0 +1,12 @@
+{
+    "name": "mesearch-example",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "mesearch dev",
+        "build": "mesearch build"
+    },
+    "dependencies": {
+        "@mvarble/mesearch": "workspace:*"
+    }
+}

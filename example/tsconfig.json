@@ -1,0 +1,3 @@
+{
+    "extends": "@mvarble/mesearch/tsconfig.json"
+}

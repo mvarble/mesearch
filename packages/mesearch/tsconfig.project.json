@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "target": "es2023",
+        "lib": ["es2023", "dom", "dom.iterable"],
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
+        "strict": true,
+        "skipLibCheck": true,
+        "allowJs": true,
+        "checkJs": false,
+        "noEmit": true,
+        "allowImportingTsExtensions": true,
+        "verbatimModuleSyntax": true
+    },
+    "include": ["${configDir}/mesearch.config.ts", "${configDir}/docs/**/*"]
+}

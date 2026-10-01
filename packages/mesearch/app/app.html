@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="%mesearch.lang%" data-theme="light">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="%sveltekit.assets%/favicon.svg" />
+        <script>
+            // Before anything paints: the stored theme, or else the system's.
+            // A page read without JavaScript keeps the light theme it ships with.
+            (function () {
+                var root = document.documentElement;
+                var theme;
+                root.classList.add('js');
+                try {
+                    theme = localStorage.getItem('mesearch:theme');
+                } catch (e) {}
+                if (theme !== 'light' && theme !== 'dark') {
+                    theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                root.dataset.theme = theme;
+            })();
+        </script>
+        %sveltekit.head%
+    </head>
+    <body data-sveltekit-preload-data="hover">
+        <div style="display: contents">%sveltekit.body%</div>
+    </body>
+</html>

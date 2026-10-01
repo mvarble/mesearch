@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 150" font-family="Georgia, serif" font-size="14">
+  <g stroke="#b8ad9a" stroke-width="1.5" fill="none">
+    <path d="M40 75 120 35M40 75 120 115M140 35 220 15M140 35 220 55M140 115 220 95M140 115 220 135"/>
+  </g>
+  <g fill="#9c4417">
+    <circle cx="40" cy="75" r="5"/>
+    <text x="126" y="40">H</text><text x="126" y="120">T</text>
+    <text x="226" y="20">HH</text><text x="226" y="60">HT</text><text x="226" y="100">TH</text><text x="226" y="140">TT</text>
+  </g>
+</svg>
