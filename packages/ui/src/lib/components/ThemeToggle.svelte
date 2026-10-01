@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { theme } from '$lib/theme.svelte';
+    import { theme } from '../theme.svelte.js';
     import Icon from './Icon.svelte';
 
     const labels = {

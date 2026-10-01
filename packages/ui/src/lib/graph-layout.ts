@@ -22,10 +22,15 @@ import {
 // respond.
 
 export interface GraphTuning {
+    // Repulsion between every pair of nodes. More negative spreads them out.
     charge: number;
+    // The resting length of a solid edge; a dashed one rests twice as long.
     linkDistance: number;
+    // The pull towards the centre that keeps unconnected nodes in view.
     gravity: number;
 }
+
+export const DEFAULT_TUNING: GraphTuning = { charge: -900, linkDistance: 80, gravity: 0.02 };
 
 export interface LayoutNode extends SimulationNodeDatum {
     id: string;

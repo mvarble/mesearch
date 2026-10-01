@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { validate } from '../src/config.ts';
-import { initProject, userStylesheet } from '../src/init.ts';
+import { initProject, tokensFile, userStylesheet } from '../src/init.ts';
 import { rehypeDemoteHeadings } from '../src/headings.ts';
 
 test('a config is filled in with defaults', () => {
@@ -91,10 +91,7 @@ test('init scaffolds a project and never overwrites without --force', () => {
 
 test('the stylesheet lists every variable, commented out', () => {
     const css = userStylesheet();
-    const tokens = fs.readFileSync(
-        new URL('../app/lib/styles/tokens.css', import.meta.url),
-        'utf8',
-    );
+    const tokens = fs.readFileSync(tokensFile(), 'utf8');
     const names = [...tokens.matchAll(/^\s*(--[\w-]+)\s*:/gm)].map((match) => match[1]);
     assert.ok(names.length > 30);
     for (const name of new Set(names)) assert.ok(css.includes(`/* ${name}:`), `${name} is listed`);

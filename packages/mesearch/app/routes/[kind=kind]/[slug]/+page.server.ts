@@ -2,8 +2,7 @@ import { error } from '@sveltejs/kit';
 import type { OutlineEntry } from '@mvarble/mesearch-cms/presets/mesearch';
 import { cms } from '$cms';
 
-import { inlineHtml } from '$lib/server/inline';
-import { toIndexEntry, toRef } from '$lib/server/refs';
+import { inlineHtml, toIndexEntry, toRef } from '$lib/server/refs';
 import type { TocEntry } from '$lib/types';
 
 export const entries = () =>
@@ -20,7 +19,7 @@ export const load = ({ params }) => {
     const toc = (entry: OutlineEntry): TocEntry => ({
         slug: entry.slug,
         depth: entry.depth,
-        titleHtml: inlineHtml(entry.title, doc.katexMacros),
+        titleHtml: inlineHtml(doc, entry.title),
         children: entry.children.map(toc),
     });
 

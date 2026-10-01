@@ -1,8 +1,8 @@
 import { json } from '@sveltejs/kit';
 import { cms } from '$cms';
 
-import { plain } from '$lib/format';
-import { inlineHtml } from '$lib/server/inline';
+import { href, plain } from '$lib/format';
+import { inlineHtml } from '$lib/server/refs';
 import type { SearchEntry } from '$lib/types';
 
 export const prerender = true;
@@ -16,9 +16,10 @@ export const GET = () => {
         (doc) => ({
             key: doc.key,
             kind: doc.kind,
+            url: href(doc.key),
             title: plain(doc.title),
             summary: plain(doc.summary),
-            summaryHtml: inlineHtml(doc.summary, doc.katexMacros),
+            summaryHtml: inlineHtml(doc, doc.summary),
             headings: cms.headings(doc.filename).map((heading) => ({
                 title: plain(heading.title),
                 slug: heading.slug,

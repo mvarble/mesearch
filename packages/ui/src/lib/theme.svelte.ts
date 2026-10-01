@@ -1,6 +1,8 @@
 // The reader's theme: 'light', 'dark', or 'system' to follow the device.
-// `app.html` applies the stored choice before the first paint; this keeps it
-// applied afterwards and tracks the device while following it.
+// `THEME_SCRIPT`, inlined in the page's `<head>`, applies the stored choice
+// before the first paint; `theme` keeps it applied afterwards and tracks the
+// device while following it. The theme is `data-theme` on `<html>`, and a page
+// read without JavaScript keeps the light theme it ships with.
 
 export type ThemeChoice = 'system' | 'light' | 'dark';
 
@@ -15,7 +17,23 @@ function stored(): ThemeChoice {
     }
 }
 
+// For `app.html`: paste inside a `<script>` in the `<head>`, before anything
+// that paints. It also adds the `js` class that the `needs-js` utility uses.
+export const THEME_SCRIPT = `(function () {
+    var root = document.documentElement;
+    var theme;
+    root.classList.add('js');
+    try {
+        theme = localStorage.getItem('${KEY}');
+    } catch (e) {}
+    if (theme !== 'light' && theme !== 'dark') {
+        theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    root.dataset.theme = theme;
+})();`;
+
 class Theme {
+    #started = false;
     choice = $state<ThemeChoice>('system');
     systemDark = $state(false);
     resolved = $derived<'light' | 'dark'>(
@@ -23,6 +41,8 @@ class Theme {
     );
 
     start() {
+        if (this.#started) return;
+        this.#started = true;
         this.choice = stored();
         const query = matchMedia('(prefers-color-scheme: dark)');
         this.systemDark = query.matches;

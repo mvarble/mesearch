@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "es2023",
+        "lib": ["es2023", "dom", "dom.iterable"],
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "strict": true,
+        "noUncheckedIndexedAccess": true,
+        "skipLibCheck": true,
+        "declaration": true,
+        "verbatimModuleSyntax": true,
+        "types": ["node"]
+    },
+    "include": ["src/**/*.ts", "src/**/*.svelte"]
+}

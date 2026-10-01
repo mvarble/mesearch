@@ -112,4 +112,4 @@ The site in `build/` is plain files: serve it from anywhere.
 
 mesearch is a SvelteKit app shipped as source in this package. On every run the CLI writes a small `.mesearch/` folder into the project, holding a `svelte.config.js` and a `vite.config.js` that each call into this package, and runs SvelteKit from there with its routes pointed at the app here. The project needs no SvelteKit of its own; Svelte and SvelteKit always resolve to mesearch's copies, so a project cannot end up with two of them.
 
-The content goes through [`@mvarble/mesearch-cms`](https://github.com/mvarble/mesearch/tree/main/packages/cms) and [`@mvarble/mesearch-markdown`](https://github.com/mvarble/mesearch/tree/main/packages/markdown), which the blog shares.
+The content goes through [`@mvarble/mesearch-cms`](https://github.com/mvarble/mesearch/tree/main/packages/cms) and [`@mvarble/mesearch-markdown`](https://github.com/mvarble/mesearch/tree/main/packages/markdown). The pages are built from [`@mvarble/mesearch-ui`](https://github.com/mvarble/mesearch/tree/main/packages/ui). The blog shares all three.

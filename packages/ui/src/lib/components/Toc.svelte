@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import type { TocEntry } from '$lib/types';
+    import type { TocEntry } from '../types.js';
 
     // The document's headings, with the one being read marked. Without
     // JavaScript it is a plain list of anchors.

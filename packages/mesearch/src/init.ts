@@ -1,7 +1,8 @@
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 
-import { appDir, packageDir, templatesDir } from './paths.ts';
+import { packageDir, templatesDir } from './paths.ts';
 
 export interface InitOptions {
     // Overwrite files that already exist.
@@ -119,11 +120,17 @@ function updateGitignore(dir: string, written: string[]) {
     written.push(current ? '.gitignore (entries added)' : '.gitignore');
 }
 
+// The UI library's stylesheet of variables.
+export function tokensFile(): string {
+    const ui = createRequire(import.meta.url).resolve('@mvarble/mesearch-ui/package.json');
+    return path.join(path.dirname(ui), 'dist', 'styles', 'tokens.css');
+}
+
 // `mesearch.css`: every variable the site is styled with, commented out, so
 // that overriding one is a matter of uncommenting it. Generated from the
 // stylesheet the site actually uses, so the list cannot fall out of date.
 export function userStylesheet(): string {
-    const tokens = fs.readFileSync(path.join(appDir, 'lib', 'styles', 'tokens.css'), 'utf8');
+    const tokens = fs.readFileSync(tokensFile(), 'utf8');
     const body = tokens
         // The file's own preamble is replaced by the one below.
         .replace(/^\/\*[\s\S]*?\*\/\s*/, '')

@@ -58,21 +58,17 @@
         "prepare": "tsc -p tsconfig.json"
     },
     "dependencies": {
-        "@fontsource-variable/inter": "^5.3.0",
-        "@fontsource-variable/source-serif-4": "^5.3.0",
-        "@fontsource/fira-mono": "^5.3.0",
         "@mvarble/mesearch-cms": "workspace:^",
         "@mvarble/mesearch-markdown": "workspace:^",
+        "@mvarble/mesearch-ui": "workspace:^",
         "@sveltejs/adapter-static": "^3.0.10",
         "@sveltejs/kit": "^2.70.3",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
-        "d3-force": "^3.0.0",
         "katex": "^0.18.4",
         "svelte": "^5.57.1",
         "vite": "^8.3.2"
     },
     "devDependencies": {
-        "@types/d3-force": "^3.0.10",
         "@types/hast": "^3.0.5",
         "@types/node": "^22.14.0",
         "typescript": "^6.0.3"

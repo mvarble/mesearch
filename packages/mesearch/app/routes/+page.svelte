@@ -1,7 +1,6 @@
 <script lang="ts">
+    import { Graph, Index } from '@mvarble/mesearch-ui';
     import site from '$site';
-    import Graph from '$lib/components/Graph.svelte';
-    import Index from '$lib/components/Index.svelte';
     import { href } from '$lib/format';
 
     let { data } = $props();
@@ -50,6 +49,7 @@
             links={data.graph.links}
             {entries}
             descriptions={data.descriptions}
+            tuning={site.graph}
         />
     </section>
 

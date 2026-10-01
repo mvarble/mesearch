@@ -1,15 +1,25 @@
 <script lang="ts">
-    import { bestMatch, highlight } from '$lib/fuzzy';
-    import { formatDate, href, isoDate, kindLabel } from '$lib/format';
-    import type { IndexEntry } from '$lib/types';
+    import { bestMatch, highlight } from '../fuzzy.js';
+    import { formatDate, isoDate, kindLabel } from '../settings.js';
+    import type { IndexEntry, Kind } from '../types.js';
 
     // Every concept and writeup, as a ledger: newest change first, with a
     // fuzzy filter over titles and summaries. Without JavaScript it is the
     // same list in the same order, minus the controls.
-    let { entries }: { entries: IndexEntry[] } = $props();
+    //
+    // `kinds` are the kinds a reader can narrow the list to; with fewer than
+    // two there is nothing to choose, and the control is left out.
+    let {
+        entries,
+        kinds = [
+            ['concept', 'Concepts'],
+            ['writeup', 'Writeups'],
+        ],
+        empty = 'Nothing has been written yet.',
+    }: { entries: IndexEntry[]; kinds?: Array<[Kind, string]>; empty?: string } = $props();
 
     type Sort = 'updated' | 'created' | 'title';
-    type Filter = 'all' | 'concept' | 'writeup';
+    type Filter = 'all' | Kind;
     let query = $state('');
     let sort = $state<Sort>('updated');
     let filter = $state<Filter>('all');
@@ -19,11 +29,7 @@
         ['created', 'Created'],
         ['title', 'A–Z'],
     ];
-    const filters: Array<[Filter, string]> = [
-        ['all', 'All'],
-        ['concept', 'Concepts'],
-        ['writeup', 'Writeups'],
-    ];
+    let filters = $derived<Array<[Filter, string]>>([['all', 'All'], ...kinds]);
 
     let shown = $derived.by(() => {
         const kept = entries.filter((entry) => filter == 'all' || entry.kind == filter);
@@ -70,18 +76,20 @@
             />
         </label>
         <div class="toggles">
-            <div class="segmented" role="radiogroup" aria-label="Show">
-                {#each filters as [value, label] (value)}
-                    <button
-                        type="button"
-                        role="radio"
-                        aria-checked={filter == value}
-                        onclick={() => (filter = value)}
-                    >
-                        {label}
-                    </button>
-                {/each}
-            </div>
+            {#if kinds.length > 1}
+                <div class="segmented" role="radiogroup" aria-label="Show">
+                    {#each filters as [value, label] (value)}
+                        <button
+                            type="button"
+                            role="radio"
+                            aria-checked={filter == value}
+                            onclick={() => (filter = value)}
+                        >
+                            {label}
+                        </button>
+                    {/each}
+                </div>
+            {/if}
             <div class="segmented" role="radiogroup" aria-label="Sort by">
                 {#each sorts as [value, label] (value)}
                     <button
@@ -106,11 +114,11 @@
                 >
                 <div class="text">
                     <p class="eyebrow kind">
-                        {kindLabel(entry.kind)}<span class="minutes">
-                            · {entry.readingMinutes} min</span
-                        >
+                        {kindLabel(entry.kind)}{#if entry.readingMinutes}<span class="minutes">
+                                · {entry.readingMinutes} min</span
+                            >{/if}
                     </p>
-                    <a class="title" href={href(entry.key)}>
+                    <a class="title" href={entry.url}>
                         {#if indices.length}
                             {#each highlight(entry.title, indices) as part, i (i)}
                                 {#if part.hit}<mark>{part.text}</mark>{:else}{part.text}{/if}
@@ -124,7 +132,7 @@
             </li>
         {:else}
             <li class="none">
-                {entries.length ? `Nothing matches “${query}”.` : 'Nothing has been written yet.'}
+                {entries.length ? `Nothing matches “${query}”.` : empty}
             </li>
         {/each}
     </ol>

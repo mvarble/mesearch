@@ -1,47 +1,59 @@
 <script lang="ts">
-    import site from '$site';
-    import { href } from '$lib/format';
+    import type { RailLink } from '../types.js';
     import Icon from './Icon.svelte';
     import ThemeToggle from './ThemeToggle.svelte';
 
-    // The site has one real index, so instead of a header across the top
-    // every page has this: a slim spine down the left edge on wide screens,
-    // and a floating dock at the bottom on narrow ones. Search, the two views
-    // of the library, and the theme --- and on a document, how far along the
-    // reader is.
-    let { onsearch, progress = null }: { onsearch: () => void; progress?: number | null } =
-        $props();
+    // Instead of a header across the top every page has this: a slim spine
+    // down the left edge on wide screens, and a floating dock at the bottom on
+    // narrow ones. The site's monogram, search, a few links, and the theme ---
+    // and on a document, how far along the reader is.
+    let {
+        title,
+        home,
+        links = [],
+        onsearch,
+        progress = null,
+    }: {
+        // The site's name; its initials make the monogram.
+        title: string;
+        home: string;
+        links?: RailLink[];
+        // Left out, there is no search button.
+        onsearch?: () => void;
+        progress?: number | null;
+    } = $props();
 
-    const monogram = site.title
-        .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((word) => word[0]!.toUpperCase())
-        .join('');
-
-    const home = href('');
+    let monogram = $derived(
+        title
+            .split(/\s+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((word) => word[0]!.toUpperCase())
+            .join(''),
+    );
 </script>
 
 <nav class="rail" aria-label="Site">
-    <a class="monogram" href={home} title={site.title} aria-label={`${site.title}, home`}>
+    <a class="monogram" href={home} {title} aria-label={`${title}, home`}>
         {monogram}
     </a>
     <div class="actions">
-        <button
-            class="rail-button needs-js"
-            type="button"
-            onclick={onsearch}
-            aria-label="Search"
-            title="Search  ( / )"
-        >
-            <Icon name="search" />
-        </button>
-        <a class="rail-button" href="{home}#atlas" aria-label="Graph" title="Graph"
-            ><Icon name="graph" /></a
-        >
-        <a class="rail-button" href="{home}#index" aria-label="Index" title="Index"
-            ><Icon name="list" /></a
-        >
+        {#if onsearch}
+            <button
+                class="rail-button needs-js"
+                type="button"
+                onclick={onsearch}
+                aria-label="Search"
+                title="Search  ( / )"
+            >
+                <Icon name="search" />
+            </button>
+        {/if}
+        {#each links as link (link.url)}
+            <a class="rail-button" href={link.url} aria-label={link.label} title={link.label}
+                ><Icon name={link.icon} /></a
+            >
+        {/each}
     </div>
     <div class="end">
         <ThemeToggle />

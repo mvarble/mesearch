@@ -1,0 +1,6 @@
+/* Everything a page needs to look like mesearch: the variables, the base
+ * styles, and the styles of rendered documents. Fonts and KaTeX's own
+ * stylesheet are imported separately, so a site can choose its own. */
+@import './tokens.css';
+@import './base.css';
+@import './prose.css';

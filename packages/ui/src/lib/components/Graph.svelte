@@ -1,15 +1,16 @@
 <script lang="ts">
     import { onMount, type Component } from 'svelte';
-    import site from '$site';
     import {
         boxExit,
         createSimulation,
+        DEFAULT_TUNING,
         NODE_HEIGHT,
+        type GraphTuning,
         type LayoutEdge,
         type LayoutNode,
-    } from '$lib/graph-layout';
-    import { href } from '$lib/format';
-    import type { GraphLink, GraphNode, IndexEntry } from '$lib/types';
+    } from '../graph-layout.js';
+    import { kindLabel } from '../settings.js';
+    import type { GraphLink, GraphNode, IndexEntry } from '../types.js';
     import GraphPanel from './GraphPanel.svelte';
     import Icon from './Icon.svelte';
 
@@ -21,16 +22,22 @@
     // comes alive: drag a node and the rest make room, pan and zoom, and a
     // click opens the document's description beside the graph rather than
     // leaving the page.
+    //
+    // The nodes arrive with positions: lay them out at build time with
+    // `layout` from `@mvarble/mesearch-ui/server`. `entries` and
+    // `descriptions` feed the preview panel, by node key.
     let {
         nodes: given,
         links,
         entries,
-        descriptions,
+        descriptions = {},
+        tuning = DEFAULT_TUNING,
     }: {
         nodes: GraphNode[];
         links: GraphLink[];
         entries: Record<string, IndexEntry>;
-        descriptions: Record<string, Component>;
+        descriptions?: Record<string, Component>;
+        tuning?: GraphTuning;
     } = $props();
 
     type SimNode = LayoutNode & GraphNode;
@@ -113,7 +120,7 @@
             target: e.to,
             style: e.style,
         }));
-        simulation = createSimulation(nodes, simEdges, site.graph)
+        simulation = createSimulation(nodes, simEdges, tuning)
             .alpha(0.12)
             .alphaDecay(0.04)
             .on('tick', () => frame++);
@@ -385,7 +392,7 @@
                     {#each nodes as node (node.key)}
                         {@const p = at(node.key)}
                         <a
-                            href={href(node.key)}
+                            href={node.url}
                             class="node kind-{node.kind}"
                             class:selected={selected == node.key}
                             class:dim={lit && !lit.has(node.key)}
@@ -397,9 +404,7 @@
                             onpointerleave={() => (hovered = null)}
                             onfocus={() => (hovered = node.key)}
                             onblur={() => (hovered = null)}
-                            aria-label="{node.kind == 'concept'
-                                ? 'Concept'
-                                : 'Writeup'}: {node.title}"
+                            aria-label="{kindLabel(node.kind)}: {node.title}"
                         >
                             <g transform="translate({p.x} {p.y})">
                                 <title>{node.title}</title>

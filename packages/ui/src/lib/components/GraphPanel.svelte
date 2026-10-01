@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Component } from 'svelte';
-    import { formatDate, href, isoDate, kindLabel } from '$lib/format';
-    import type { GraphLink, IndexEntry } from '$lib/types';
+    import { formatDate, isoDate, kindLabel } from '../settings.js';
+    import type { GraphLink, IndexEntry } from '../types.js';
     import Icon from './Icon.svelte';
 
     // A selected node's preview. Beside a wide graph it is a drawer that slides
@@ -122,7 +122,7 @@
         <h3 class="title">{@html entry.titleHtml}</h3>
         <p class="meta">
             Updated <time datetime={isoDate(entry.updated)}>{formatDate(entry.updated)}</time>
-            · {entry.readingMinutes} min read
+            {#if entry.readingMinutes}· {entry.readingMinutes} min read{/if}
         </p>
         <div class="body prose">
             {#if Description}
@@ -153,8 +153,8 @@
             {/if}
         {/each}
 
-        <a class="read" href={href(entry.key)}>
-            Read the {entry.kind}
+        <a class="read" href={entry.url}>
+            Read the {kindLabel(entry.kind).toLowerCase()}
             <Icon name="arrow-right" size={18} />
         </a>
     {/if}

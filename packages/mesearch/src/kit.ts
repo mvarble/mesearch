@@ -89,10 +89,11 @@ export async function viteConfig(root: string): Promise<UserConfig> {
                 '@mvarble/mesearch',
                 '@mvarble/mesearch-cms',
                 '@mvarble/mesearch-markdown',
+                '@mvarble/mesearch-ui',
                 'svelte',
             ],
         },
-        ssr: { noExternal: ['@mvarble/mesearch'] },
+        ssr: { noExternal: ['@mvarble/mesearch', '@mvarble/mesearch-ui'] },
         build: {
             chunkSizeWarningLimit: 2000,
             // A report on how long each plugin took is for whoever works on
@@ -159,16 +160,28 @@ const isInside = (dir: string, file: string) => file == dir || file.startsWith(d
 // Under pnpm they sit beside this package rather than inside it.
 function dependencyRoots(): string[] {
     const roots = new Set<string>();
-    for (const name of [
-        'katex',
-        '@fontsource-variable/inter',
-        '@fontsource-variable/source-serif-4',
-        '@fontsource/fira-mono',
-    ]) {
+    const add = (from: NodeJS.Require, name: string) => {
         try {
-            roots.add(path.dirname(require.resolve(`${name}/package.json`)));
+            const root = path.dirname(from.resolve(`${name}/package.json`));
+            roots.add(root);
+            return root;
         } catch {
             // Not installed where expected; Vite will say so if it matters.
+            return undefined;
+        }
+    };
+    add(require, 'katex');
+    // The fonts are the UI package's dependencies, found from there.
+    const ui = add(require, '@mvarble/mesearch-ui');
+    if (ui) {
+        const fromUi = createRequire(path.join(ui, 'package.json'));
+        for (const name of [
+            'katex',
+            '@fontsource-variable/inter',
+            '@fontsource-variable/source-serif-4',
+            '@fontsource/fira-mono',
+        ]) {
+            add(fromUi, name);
         }
     }
     return [...roots];

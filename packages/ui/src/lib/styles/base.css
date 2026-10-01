@@ -68,6 +68,12 @@ html:not(.js) .needs-js {
     color: var(--muted);
 }
 
+/* Every kind of document has a colour; one without its own takes the accent. */
+[class*='kind-'] {
+    --kind: var(--accent);
+    --kind-soft: var(--accent-soft);
+}
+
 .kind-concept {
     --kind: var(--concept);
     --kind-soft: var(--concept-soft);

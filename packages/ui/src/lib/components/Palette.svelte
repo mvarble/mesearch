@@ -1,23 +1,36 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
-    import { base } from '$app/paths';
-    import { bestMatch, highlight } from '$lib/fuzzy';
-    import { href, kindLabel } from '$lib/format';
-    import type { SearchEntry } from '$lib/types';
+    import { bestMatch, highlight } from '../fuzzy.js';
+    import { kindLabel } from '../settings.js';
+    import type { SearchEntry } from '../types.js';
 
     // Search across the whole library from anywhere: `/` or Ctrl/⌘-K opens
     // it, arrows move, Enter goes, Escape closes. Documents match on their
     // titles and summaries; a heading inside one is its own result, so a
     // search can land on a section.
-    let { open = $bindable(false) }: { open?: boolean } = $props();
+    //
+    // `index` is where the entries come from: the URL of a JSON array of
+    // them, fetched the first time the palette opens, or a function that
+    // returns them. `navigate` follows a result --- SvelteKit's `goto`, say;
+    // without it the browser navigates the ordinary way.
+    let {
+        index,
+        navigate = (url: string) => location.assign(url),
+        open = $bindable(false),
+    }: {
+        index: string | (() => Promise<SearchEntry[]>);
+        navigate?: (url: string) => unknown;
+        open?: boolean;
+    } = $props();
 
-    // The index is fetched the first time the palette opens.
     let entries = $state<SearchEntry[]>([]);
     let loading: Promise<void> | undefined;
     $effect(() => {
         if (open && !loading) {
-            loading = fetch(`${base}/search.json`)
-                .then((response) => response.json())
+            const load =
+                typeof index == 'string'
+                    ? () => fetch(index).then((response) => response.json())
+                    : index;
+            loading = load()
                 .then((loaded: SearchEntry[]) => void (entries = loaded))
                 .catch(() => (loading = undefined));
         }
@@ -46,7 +59,7 @@
                 kind: entry.kind,
                 title: entry.title,
                 contextHtml: entry.summaryHtml,
-                url: href(entry.key),
+                url: entry.url,
                 score: 0,
                 indices: [],
             }));
@@ -63,7 +76,7 @@
                     kind: entry.kind,
                     title: entry.title,
                     contextHtml: entry.summaryHtml,
-                    url: href(entry.key),
+                    url: entry.url,
                     score: match.score,
                     indices: match.field == 0 ? match.indices : [],
                 });
@@ -76,7 +89,7 @@
                         kind: entry.kind,
                         title: heading.title,
                         context: entry.title,
-                        url: `${href(entry.key)}#${heading.slug}`,
+                        url: `${entry.url}#${heading.slug}`,
                         score: hit.score,
                         indices: hit.indices,
                     });
@@ -110,7 +123,7 @@
         if (!result) return;
         open = false;
         query = '';
-        void goto(result.url);
+        void navigate(result.url);
     }
 
     function onkeydown(event: KeyboardEvent) {
