@@ -1,0 +1,71 @@
+/* How rendered math sits in prose. `katex/dist/katex.min.css` itself is
+ * imported by each site's entry, which is what makes the bundler emit the KaTeX
+ * fonts alongside the page.
+ *
+ * Sizes are variables so that a site can tune them to its body font:
+ *   --katex-font-size         (default 1rem)
+ *   --katex-font-size-hidpi   (default 1.32rem, on screens of 1.75x and up) */
+
+/* Display math is one unbreakable box. `rehypeMathBox` wraps it in these two
+ * containers so a long equation slides sideways on its own, fading out at the
+ * edges rather than being clipped. */
+.math-scroll-container {
+    overflow-x: auto;
+    flex-grow: 1;
+    --fading-size: 3em;
+    mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black var(--fading-size),
+        black calc(100% - var(--fading-size)),
+        transparent
+    );
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black var(--fading-size),
+        black calc(100% - var(--fading-size)),
+        transparent
+    );
+}
+
+/* A `\tag` lifted out of the scroll box by `rehypeMathBox({ liftTags: true })`
+ * stays in view beside it. */
+.math-tag-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.math-tag {
+    margin-left: 2em !important;
+}
+
+/* An inline expression never breaks across lines: justified prose stretches
+ * the spaces around it instead. */
+.katex-html {
+    display: inline-block;
+}
+
+.katex {
+    line-height: 1;
+    font-size: var(--katex-font-size, 1rem);
+}
+
+.katex-display {
+    margin: 0.5em 0 !important;
+
+    & .katex-base:first-child {
+        margin-left: var(--fading-size) !important;
+    }
+
+    & .katex-base:last-child {
+        margin-right: var(--fading-size) !important;
+    }
+}
+
+@media (min-resolution: 1.75x) {
+    .katex {
+        font-size: var(--katex-font-size-hidpi, 1.32rem);
+    }
+}

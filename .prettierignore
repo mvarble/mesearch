@@ -1,0 +1,5 @@
+dist/
+build/
+.mesearch/
+pnpm-lock.yaml
+**/fixtures/**

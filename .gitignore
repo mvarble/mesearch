@@ -1,0 +1,6 @@
+node_modules/
+dist/
+build/
+.mesearch/
+.svelte-kit/
+*.tgz
