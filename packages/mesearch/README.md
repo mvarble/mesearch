@@ -55,7 +55,7 @@ Link documents the way their folders sit on disk --- `[basis points](../basis-po
 
 `$$ ... @tag(slug) $$` numbers a display equation and `[](eq:slug)` refers to it as `(1)`. From another document the reference is `eq:concepts/<slug>/<eq-slug>`.
 
-A theorem, definition or remark is a small document with `type: statement` and a `kind`, shown with `<Statement {...theorem} />` (from `@mvarble/mesearch/Statement.svelte`). Statements count along with the document's equations, and `[%full](statement:slug)` refers to one as "Theorem 2". `@mvarble/mesearch/Proof.svelte` frames a proof. `AGENTS.md` has the details.
+A theorem, definition or remark is a small document with `type: statement` and a `kind`, shown with `<Statement {...theorem} />` (from `@mvarble/mesearch/Statement.svelte`). Statements count along with the document's equations, and `[%full](statement:slug)` refers to one as "Theorem 2". `@mvarble/mesearch/Proof.svelte` frames a proof.
 
 Bibliography entries go in `.bib` files anywhere under `docs/`. `[](cite:key)` renders as `[Foll99]` and `[Theorem 1.8](cite:key)` as `[Foll99, Theorem 1.8]`. Hovering a citation shows the reference. Following it jumps to a short list of references at the end of the page, which holds only what that page cites. There is no site-wide bibliography page.
 
@@ -110,7 +110,7 @@ The site in `build/` is plain files: serve it from anywhere.
 
 ## Writing with agents
 
-`AGENTS.md` describes the layout, the frontmatter, the link and math conventions and the prose register for any agent writing in the project, and ends with a section for opinions particular to the site. The [`/explain` and `/explain-concept`](https://github.com/mvarble/config/tree/main/dot_pi/agent/extensions/explain) pi commands write into this layout and defer to `AGENTS.md`.
+`AGENTS.md` describes the layout, the frontmatter, the link conventions and the prose register for any agent writing in the project, and ends with a section for opinions particular to the site. The [`/explain` and `/explain-concept`](https://github.com/mvarble/config/tree/main/dot_pi/agent/extensions/explain) pi commands write into this layout and defer to `AGENTS.md` on anything particular to the site. Their own `authoring.md` covers how to write the mathematics, numbered equations, statements, proofs and citations.
 
 ## How it works
 
