@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { Snippet } from 'svelte';
     import type { RailLink } from '../types.js';
     import Icon from './Icon.svelte';
     import ThemeToggle from './ThemeToggle.svelte';
@@ -13,6 +14,7 @@
         links = [],
         onsearch,
         progress = null,
+        logo,
     }: {
         // The site's name; its initials make the monogram.
         title: string;
@@ -21,6 +23,8 @@
         // Left out, there is no search button.
         onsearch?: () => void;
         progress?: number | null;
+        // Drawn in place of the initials.
+        logo?: Snippet;
     } = $props();
 
     let monogram = $derived(
@@ -35,7 +39,7 @@
 
 <nav class="rail" aria-label="Site">
     <a class="monogram" href={home} {title} aria-label={`${title}, home`}>
-        {monogram}
+        {#if logo}{@render logo()}{:else}{monogram}{/if}
     </a>
     <div class="actions">
         {#if onsearch}

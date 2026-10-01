@@ -15,6 +15,7 @@
         links = [],
         search,
         navigate,
+        logo,
         children,
     }: {
         title: string;
@@ -23,6 +24,8 @@
         // Where the palette's entries come from; without it there is no search.
         search?: string | (() => Promise<SearchEntry[]>);
         navigate?: (url: string) => unknown;
+        // The rail's mark, instead of the title's initials.
+        logo?: Snippet;
         children: Snippet;
     } = $props();
 
@@ -38,6 +41,7 @@
     {links}
     onsearch={search ? () => (searching = true) : undefined}
     progress={reading.progress}
+    {logo}
 />
 {#if search}
     <Palette index={search} {navigate} bind:open={searching} />

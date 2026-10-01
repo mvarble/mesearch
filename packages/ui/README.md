@@ -56,7 +56,7 @@ pnpm add @mvarble/mesearch-ui
 
 | component                                | what it is                                                                                                                                                                                       |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `Shell`                                  | Rail, palette, skip link, and the margin the rail needs. Starts the theme.                                                                                                                       |
+| `Shell`                                  | Rail, palette, skip link, and the margin the rail needs. Starts the theme. A `logo` snippet replaces the title's initials on the rail.                                                           |
 | `Article`                                | A document page. The header, the prose, then `after` and a `footer`. `left` and `right` snippets sit in the margins on wide screens and fold into disclosures under the header otherwise.        |
 | `ArticleHeader`                          | Breadcrumbs, title, dates, reading time, and "Builds on" chips.                                                                                                                                  |
 | `Toc`                                    | Nested contents with scroll-spy.                                                                                                                                                                 |
