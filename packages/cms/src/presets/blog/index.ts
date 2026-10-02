@@ -15,7 +15,7 @@ import {
     TAG,
     type Citation,
 } from '../../resolvers/index.ts';
-import type { BlogSnapshot, Post, Sequence, SequenceChild } from './types.ts';
+import type { BlogSnapshot, PageLink, Post, Sequence, SequenceChild } from './types.ts';
 
 export type * from './types.ts';
 export type { BlogCms } from './runtime.ts';
@@ -293,8 +293,37 @@ export function blogPreset(options: BlogPresetOptions = {}): Preset {
             headings: Object.fromEntries([...store.docs].map(([id, doc]) => [id, doc.headings])),
             citations: [...store.collection<Citation>('citations').values()],
             bibliography: bibliographies(store),
+            links: pageLinks(store),
         }),
     };
+}
+
+// Which pages refer to which: by a link, or to an equation or a statement
+// shown on the other page. Once per pair and direction, in the order found.
+function pageLinks(store: Store): PageLink[] {
+    const seen = new Set<string>();
+    const links: PageLink[] = [];
+    for (const id of store.docs.keys()) {
+        const from = store.pathnameOf(id);
+        if (from === undefined) continue;
+        for (const ref of store.refsOf(id)) {
+            const target = ref.target as { pathname?: string; scope?: string; slug?: string };
+            const to =
+                ref.resolver == 'page'
+                    ? target.pathname?.replace(/\/+$/, '')
+                    : (ref.resolver == 'statement' || ref.resolver == 'equation') &&
+                        target.scope !== undefined &&
+                        target.slug !== undefined
+                      ? store.anchor(ref.resolver, target.scope, target.slug)?.page
+                      : undefined;
+            if (to === undefined || to == from || !store.pages.has(to)) continue;
+            const key = `${from}\0${to}`;
+            if (seen.has(key)) continue;
+            seen.add(key);
+            links.push({ from, to });
+        }
+    }
+    return links;
 }
 
 interface ChildInput extends PageTree {

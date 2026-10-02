@@ -58,3 +58,14 @@ test('a local and a cross-scope reference can coexist in one document', () => {
     assert.equal(cross.slug, 'shared');
     assert.notEqual(local.kind, cross.kind);
 });
+
+test('reaching into another post links the two pages, once', async () => {
+    const { buildStore } = await import('../src/core/build.ts');
+    const { blogPreset } = await import('../src/presets/blog/index.ts');
+    const { fixtureRoot } = await import('./harness.mjs');
+    const preset = blogPreset();
+    const store = buildStore({ root: fixtureRoot('scopes'), preset });
+    // A statement and an equation in `pa`, from `pb`; nothing from a dangling
+    // or unknown reference, and nothing from a page to itself.
+    assert.deepEqual(preset.snapshot(store).links, [{ from: 'posts/pb', to: 'posts/pa' }]);
+});

@@ -62,6 +62,9 @@ export function bind(snapshot: BlogSnapshot) {
         },
         // The references a page cites, for the list at its end.
         bibliography: (pathname: string) => snapshot.bibliography[pathname] ?? [],
+        // Which pages refer to which: by a link, or to an equation or a
+        // statement on the other page.
+        links: () => snapshot.links,
     };
 }
 

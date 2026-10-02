@@ -1,3 +1,21 @@
+<script lang="ts" module>
+    import type { GraphLegend as Legend } from '../types.js';
+
+    export const MESEARCH_LEGEND: Legend = {
+        kinds: [
+            { kind: 'concept', label: 'Concept', shape: 'pill' },
+            { kind: 'writeup', label: 'Writeup', shape: 'card' },
+        ],
+        solid: 'builds on',
+        dashed: 'related',
+        sequenced: 'in a sequence',
+        from: 'Builds on',
+        to: 'Leads to',
+        related: 'Related',
+        empty: 'Concepts and writeups will appear here as they are written.',
+    };
+</script>
+
 <script lang="ts">
     import { onMount, type Component } from 'svelte';
     import {
@@ -10,7 +28,7 @@
         type LayoutNode,
     } from '../graph-layout.js';
     import { kindLabel } from '../settings.js';
-    import type { GraphLink, GraphNode, IndexEntry } from '../types.js';
+    import type { GraphLegend, GraphLink, GraphNode, IndexEntry } from '../types.js';
     import GraphPanel from './GraphPanel.svelte';
     import Icon from './Icon.svelte';
 
@@ -32,12 +50,15 @@
         entries,
         descriptions = {},
         tuning = DEFAULT_TUNING,
+        legend = MESEARCH_LEGEND,
     }: {
         nodes: GraphNode[];
         links: GraphLink[];
         entries: Record<string, IndexEntry>;
         descriptions?: Record<string, Component>;
         tuning?: GraphTuning;
+        // What the kinds and the lines mean; mesearch's own by default.
+        legend?: GraphLegend;
     } = $props();
 
     type SimNode = LayoutNode & GraphNode;
@@ -293,6 +314,9 @@
     }
 
     // Positions, reread on every frame of the simulation.
+    // Drawn round, as concepts are; anything else is a card.
+    const pill = (kind: string) => legend.kinds.find((k) => k.kind == kind)?.shape == 'pill';
+
     const at = (key: string) => {
         void frame;
         const node = byKey.get(key)!;
@@ -315,6 +339,7 @@
 
 <div
     class="graph"
+    style:aspect-ratio="{box.width} / {box.height}"
     class:live
     class:has-selection={selected}
     bind:this={container}
@@ -322,7 +347,7 @@
     aria-label="Graph of the library"
 >
     {#if nodes.length == 0}
-        <p class="empty">Concepts and writeups will appear here as they are written.</p>
+        <p class="empty">{legend.empty}</p>
     {:else}
         <svg
             bind:this={svg}
@@ -413,9 +438,9 @@
                                     y={-p.height / 2}
                                     width={p.width}
                                     height={p.height}
-                                    rx={node.kind == 'concept' ? p.height / 2 : 5}
+                                    rx={pill(node.kind) ? p.height / 2 : 5}
                                 />
-                                {#if node.sequenced}
+                                {#if node.sequenced && legend.sequenced}
                                     <circle
                                         class="tick"
                                         cx={-p.width / 2 + 2}
@@ -434,11 +459,14 @@
         </svg>
 
         <div class="legend" aria-hidden="true">
-            <span><i class="swatch concept"></i>Concept</span>
-            <span><i class="swatch writeup"></i>Writeup</span>
-            <span><i class="line solid"></i>builds on</span>
-            <span><i class="line dashed"></i>related</span>
-            <span><i class="swatch sequence"></i>in a sequence</span>
+            {#each legend.kinds as { kind, label } (kind)}
+                <span><i class="swatch kind-{kind}" class:pill={pill(kind)}></i>{label}</span>
+            {/each}
+            <span><i class="line solid"></i>{legend.solid}</span>
+            <span><i class="line dashed"></i>{legend.dashed}</span>
+            {#if legend.sequenced}
+                <span><i class="mark"></i>{legend.sequenced}</span>
+            {/if}
         </div>
 
         <div class="controls needs-js">
@@ -466,15 +494,22 @@
                 links={edges}
                 {entries}
                 onselect={select}
+                headings={legend}
             />
         {/if}
     {/if}
 </div>
 
 <style>
+    /* As tall as the map's own proportions ask, within limits: a wide,
+     * shallow map gets a shorter box rather than empty space. */
     .graph {
         position: relative;
-        height: clamp(26rem, 72vh, 46rem);
+        /* Set, so that only the height follows the proportions: with an
+         * automatic width, the minimum height would widen the box instead. */
+        width: 100%;
+        min-height: 26rem;
+        max-height: clamp(26rem, 72vh, 46rem);
         border: 1px solid var(--rule);
         border-radius: var(--radius-large);
         background: var(--graph-background);
@@ -601,16 +636,15 @@
     .swatch {
         width: 0.7rem;
         height: 0.7rem;
-        border-radius: 50%;
-        border: 1.5px solid var(--concept);
-    }
-
-    .swatch.writeup {
         border-radius: 2px;
-        border-color: var(--writeup);
+        border: 1.5px solid var(--kind);
     }
 
-    .swatch.sequence {
+    .swatch.pill {
+        border-radius: 50%;
+    }
+
+    .mark {
         width: 0.5rem;
         height: 0.5rem;
         border: none;

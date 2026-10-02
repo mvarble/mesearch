@@ -43,6 +43,23 @@ export interface GraphNode extends DocumentRef {
     sequenced: boolean;
 }
 
+// How a site's map describes itself: its kinds of document, what its two
+// kinds of line mean, and what the preview panel calls a node's neighbours.
+export interface GraphLegend {
+    kinds: Array<{ kind: Kind; label: string; shape?: 'pill' | 'card' }>;
+    solid: string;
+    dashed: string;
+    // What the small mark on a node means; left out, there is no mark.
+    sequenced?: string;
+    // The panel's headings: what a node's solid arrows come from and go to,
+    // and what its dashed lines join it to.
+    from: string;
+    to: string;
+    related: string;
+    // Shown when there is nothing to draw.
+    empty: string;
+}
+
 export interface GraphLink {
     from: string;
     to: string;

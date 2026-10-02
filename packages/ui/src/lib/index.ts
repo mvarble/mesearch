@@ -9,7 +9,7 @@
 export { default as Article } from './components/Article.svelte';
 export { default as ArticleHeader } from './components/ArticleHeader.svelte';
 export { default as Chips } from './components/Chips.svelte';
-export { default as Graph } from './components/Graph.svelte';
+export { default as Graph, MESEARCH_LEGEND } from './components/Graph.svelte';
 export { default as GraphPanel } from './components/GraphPanel.svelte';
 export { default as Icon } from './components/Icon.svelte';
 export { default as Index } from './components/Index.svelte';

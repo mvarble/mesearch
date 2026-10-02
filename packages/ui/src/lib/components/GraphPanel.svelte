@@ -16,12 +16,14 @@
         links,
         entries,
         onselect,
+        headings = { from: 'Builds on', to: 'Leads to', related: 'Related' },
     }: {
         entry: IndexEntry | undefined;
         Description: Component | undefined;
         links: GraphLink[];
         entries: Record<string, IndexEntry>;
         onselect: (key: string | null) => void;
+        headings?: { from: string; to: string; related: string };
     } = $props();
 
     let panel: HTMLElement | undefined = $state();
@@ -132,7 +134,7 @@
             {/if}
         </div>
 
-        {#each [['Builds on', buildsOn], ['Leads to', leadsTo], ['Related', related]] as const as [heading, list] (heading)}
+        {#each [[headings.from, buildsOn], [headings.to, leadsTo], [headings.related, related]] as const as [heading, list] (heading)}
             {#if list.length}
                 <section>
                     <h4 class="eyebrow">{heading}</h4>

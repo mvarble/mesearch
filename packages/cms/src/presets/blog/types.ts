@@ -50,6 +50,13 @@ export interface BlogSnapshot {
     citations: Citation[];
     // What each page cites, by pathname, in label order.
     bibliography: Record<string, Citation[]>;
+    // Which pages refer to which, by pathname.
+    links: PageLink[];
+}
+
+export interface PageLink {
+    from: string;
+    to: string;
 }
 
 export type { Citation, CitationAuthor } from '../../resolvers/citation.ts';
