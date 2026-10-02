@@ -54,10 +54,12 @@ class Theme {
         });
     }
 
-    // system → light → dark → system.
-    cycle() {
-        this.choice =
-            this.choice == 'system' ? 'light' : this.choice == 'light' ? 'dark' : 'system';
+    // Light and dark, in turn: every click changes what the page shows. A
+    // choice that matches the device's own setting is not remembered, so
+    // from then on the page follows the device again.
+    toggle() {
+        const next = this.resolved == 'dark' ? 'light' : 'dark';
+        this.choice = next == (this.systemDark ? 'dark' : 'light') ? 'system' : next;
         try {
             if (this.choice == 'system') localStorage.removeItem(KEY);
             else localStorage.setItem(KEY, this.choice);

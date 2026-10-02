@@ -2,20 +2,18 @@
     import { theme } from '../theme.svelte.js';
     import Icon from './Icon.svelte';
 
-    const labels = {
-        system: 'Theme: following the device',
-        light: 'Theme: light',
-        dark: 'Theme: dark',
-    };
-    const icons = { system: 'auto', light: 'sun', dark: 'moon' } as const;
+    // Shows the theme in use; a click switches to the other one.
+    let label = $derived(
+        theme.resolved == 'dark' ? 'Dark theme: switch to light' : 'Light theme: switch to dark',
+    );
 </script>
 
 <button
     class="rail-button needs-js"
     type="button"
-    onclick={() => theme.cycle()}
-    aria-label={labels[theme.choice]}
-    title={`${labels[theme.choice]} (click to change)`}
+    onclick={() => theme.toggle()}
+    aria-label={label}
+    title={label}
 >
-    <Icon name={icons[theme.choice]} />
+    <Icon name={theme.resolved == 'dark' ? 'moon' : 'sun'} />
 </button>
