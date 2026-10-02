@@ -133,7 +133,10 @@
         background: var(--rule-strong);
     }
 
-    li.done::before {
+    /* Filled once the stop it leads to is reached, so a chapter the reader is
+     * partway through does not look finished. */
+    li:has(+ li.done)::before,
+    li:has(+ li.current)::before {
         background: var(--kind);
     }
 
@@ -150,13 +153,15 @@
         font-variant-numeric: tabular-nums;
     }
 
-    .done .station {
+    /* A stop's own station and title only: its sections are stops of their
+     * own, behind or ahead of the reader independently. */
+    li.done > .station {
         border-color: var(--kind);
         background: var(--kind);
         color: var(--paper);
     }
 
-    .current .station {
+    li.current > .station {
         border-color: var(--kind);
         color: var(--kind);
         box-shadow: 0 0 0 4px var(--kind-soft);
@@ -174,7 +179,7 @@
         color: var(--ink);
     }
 
-    .current .title {
+    li.current > .title {
         color: var(--ink);
         font-weight: 600;
     }
