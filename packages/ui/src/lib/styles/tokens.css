@@ -31,43 +31,43 @@
     --katex-font-size-hidpi: 1.04em;
 
     /* Paper and ink. */
-    --paper: #fbf8f2;
-    --paper-raised: #fffdf8;
-    --paper-sunken: #f3eee3;
-    --ink: #1d1b18;
-    --ink-soft: #3b3731;
-    --muted: #6d665b;
-    --faint: #a39b8c;
-    --rule: #e6dfd2;
-    --rule-strong: #d2c8b6;
-    --selection: rgba(176, 96, 41, 0.18);
+    --paper: #f9f8f3;
+    --paper-raised: #fefdf9;
+    --paper-sunken: #f0efe6;
+    --ink: #1a1d1c;
+    --ink-soft: #343a38;
+    --muted: #626a63;
+    --faint: #9aa096;
+    --rule: #e2e2d6;
+    --rule-strong: #cbcdbd;
+    --selection: rgba(61, 58, 140, 0.16);
 
     /* One accent, and a colour for each kind of document. */
-    --accent: #9c4417;
-    --accent-ink: #fffaf3;
-    --accent-soft: rgba(156, 68, 23, 0.09);
-    --concept: #2f5f8f;
-    --concept-soft: rgba(47, 95, 143, 0.1);
-    --writeup: #9c4417;
-    --writeup-soft: rgba(156, 68, 23, 0.1);
-    --sequence: #4c7a43;
-    --sequence-soft: rgba(76, 122, 67, 0.12);
+    --accent: #3d3a8c;
+    --accent-ink: #f8f7ff;
+    --accent-soft: rgba(61, 58, 140, 0.09);
+    --concept: #24668f;
+    --concept-soft: rgba(36, 102, 143, 0.1);
+    --writeup: #9a3a63;
+    --writeup-soft: rgba(154, 58, 99, 0.1);
+    --sequence: #3d7046;
+    --sequence-soft: rgba(61, 112, 70, 0.12);
 
     /* The graph. */
     --graph-background: var(--paper-raised);
-    --graph-grid: rgba(120, 104, 80, 0.07);
-    --graph-edge: #b8ad9a;
-    --graph-edge-strong: #6d665b;
+    --graph-grid: rgba(90, 104, 90, 0.07);
+    --graph-edge: #b0b4a4;
+    --graph-edge-strong: #626a63;
     --graph-node: var(--paper-raised);
     --graph-label: var(--ink);
 
-    --code-background: #f4efe5;
+    --code-background: #f1f0e7;
 
     /* Shape and space. */
     --radius: 6px;
     --radius-large: 14px;
-    --shadow: 0 1px 2px rgba(40, 30, 15, 0.06), 0 8px 24px rgba(40, 30, 15, 0.08);
-    --shadow-strong: 0 2px 6px rgba(40, 30, 15, 0.08), 0 24px 60px rgba(40, 30, 15, 0.18);
+    --shadow: 0 1px 2px rgba(20, 28, 30, 0.06), 0 8px 24px rgba(20, 28, 30, 0.08);
+    --shadow-strong: 0 2px 6px rgba(20, 28, 30, 0.08), 0 24px 60px rgba(20, 28, 30, 0.18);
     --measure: 42rem;
     --rail-width: 4rem;
     --gutter: clamp(1.1rem, 4vw, 2.5rem);
@@ -78,33 +78,33 @@
 :root[data-theme='dark'] {
     color-scheme: dark;
 
-    --paper: #13161b;
-    --paper-raised: #191d24;
-    --paper-sunken: #0f1216;
-    --ink: #e9e5dc;
-    --ink-soft: #cdc7bb;
-    --muted: #9b9488;
-    --faint: #6b665e;
-    --rule: #272c35;
-    --rule-strong: #384050;
-    --selection: rgba(227, 154, 107, 0.25);
+    --paper: #12141c;
+    --paper-raised: #181b25;
+    --paper-sunken: #0d0f15;
+    --ink: #e7e6df;
+    --ink-soft: #c9c9c0;
+    --muted: #969a95;
+    --faint: #666a6b;
+    --rule: #262a38;
+    --rule-strong: #383e54;
+    --selection: rgba(169, 168, 240, 0.25);
 
-    --accent: #e8a173;
-    --accent-ink: #1a1410;
-    --accent-soft: rgba(232, 161, 115, 0.12);
-    --concept: #8fbbe9;
-    --concept-soft: rgba(143, 187, 233, 0.13);
-    --writeup: #e8a173;
-    --writeup-soft: rgba(232, 161, 115, 0.13);
-    --sequence: #9fcb95;
-    --sequence-soft: rgba(159, 203, 149, 0.13);
+    --accent: #a9a8f0;
+    --accent-ink: #14132b;
+    --accent-soft: rgba(169, 168, 240, 0.12);
+    --concept: #86bfe6;
+    --concept-soft: rgba(134, 191, 230, 0.13);
+    --writeup: #eb9bb8;
+    --writeup-soft: rgba(235, 155, 184, 0.13);
+    --sequence: #98cc9a;
+    --sequence-soft: rgba(152, 204, 154, 0.13);
 
-    --graph-background: #161a20;
+    --graph-background: #151822;
     --graph-grid: rgba(200, 210, 230, 0.05);
-    --graph-edge: #4c5565;
-    --graph-edge-strong: #a7a091;
+    --graph-edge: #4a5168;
+    --graph-edge-strong: #a3a69f;
 
-    --code-background: #1b2028;
+    --code-background: #1a1e2a;
 
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.3);
     --shadow-strong: 0 2px 6px rgba(0, 0, 0, 0.4), 0 24px 60px rgba(0, 0, 0, 0.5);
