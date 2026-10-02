@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mvarble/mesearch/main/logo.svg" alt="mesearch logo; man on toilet looking at phone" width="128">
+</p>
+
 # mesearch
 
 An opinionated static site for a library of notes --- the kind an agent writes for you while you learn something. You keep documents in a fixed layout under `content/`; mesearch turns them into a site that reads like a textbook, with the math rendered, a map of how the documents depend on one another, an index, and sequences to read in order.

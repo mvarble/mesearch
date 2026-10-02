@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mvarble/mesearch/main/logo.svg" alt="mesearch logo; man on toilet looking at phone" width="128">
+</p>
+
 # mesearch
 
 An opinionated static site for a library of notes: concepts, writeups and sequences under `content/`, rendered as a textbook with KaTeX, a dependency map and an index. See [packages/mesearch](./packages/mesearch/README.md) for what it does and how to use it.
