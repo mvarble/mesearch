@@ -192,6 +192,15 @@
     }
 
     @media (min-width: 1280px) {
+        /* The sidebars keep their room, and a little air outside them: a
+         * measure wider than what is left between them narrows to fit. */
+        .page {
+            grid-template-columns:
+                minmax(calc(var(--sidebar-left) + 4.5rem), 1fr)
+                minmax(0, var(--measure))
+                minmax(calc(var(--sidebar-right) + 4.5rem), 1fr);
+        }
+
         .left {
             display: block;
             grid-column: 1;
