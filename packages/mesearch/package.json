@@ -54,6 +54,7 @@
         "dist",
         "app",
         "templates",
+        "skills",
         "tsconfig.project.json"
     ],
     "engines": {

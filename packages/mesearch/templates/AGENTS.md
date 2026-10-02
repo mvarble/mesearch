@@ -4,6 +4,15 @@ This repository is a [mesearch](https://github.com/mvarble/mesearch) site: a lib
 
 These instructions apply to every agent writing here. They sit alongside any procedure you were given for the task (an `/explain` run, say); where the two disagree about this site's layout or conventions, this file wins.
 
+## Skills
+
+Two [agent skills](https://agentskills.io) in `.agents/skills/` hold the procedures for writing here. If your harness has not already loaded the one that fits the task, read its `SKILL.md` and follow it.
+
+- `.agents/skills/explain/`: explain a document in `source/`, as a companion writeup in `content/writeups/` and the concepts it needs.
+- `.agents/skills/explain-concept/`: teach a concept, as one or more documents in `content/concepts/`.
+
+Beside each is `authoring.md`: how mathematics, numbered equations, statements, proofs and citations are written. Follow it for any document, whether or not a skill is in use.
+
 ## Layout
 
 ```

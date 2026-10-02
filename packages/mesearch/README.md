@@ -8,7 +8,7 @@ An opinionated static site for a library of notes --- the kind an agent writes f
 
 ```sh
 pnpm add @mvarble/mesearch
-pnpm exec mesearch init      # content/, config, stylesheet, AGENTS.md, lint config
+pnpm exec mesearch init      # content/, config, stylesheet, AGENTS.md, agent skills, lint config
 pnpm dev                     # live site while you write
 pnpm build                   # static site in build/
 ```
@@ -21,6 +21,8 @@ Where [mkdoc](https://github.com/mvarble/mkdoc) renders one document without a p
 project/
     package.json            depends on @mvarble/mesearch
     AGENTS.md               how agents should write for this site
+    .agents/skills/         the procedures agents write with: explain, explain-concept
+    .claude/skills/         links to the same skills, for Claude Code
     mesearch.config.ts      title, base path, KaTeX macros
     mesearch.css            optional: overrides for any of the site's variables
     content/
@@ -114,7 +116,31 @@ The site in `build/` is plain files: serve it from anywhere.
 
 ## Writing with agents
 
-`AGENTS.md` describes the layout, the frontmatter, the link conventions and the prose register for any agent writing in the project, and ends with a section for opinions particular to the site. The [`/explain` and `/explain-concept`](https://github.com/mvarble/config/tree/main/dot_pi/agent/extensions/explain) pi commands write into this layout and defer to `AGENTS.md` on anything particular to the site. Their own `authoring.md` covers how to write the mathematics, numbered equations, statements, proofs and citations.
+`mesearch init` sets a project up to be written by an agent, in whichever harness you use. It writes two things.
+
+`AGENTS.md` describes the layout, the frontmatter, the link conventions and the prose register for any agent writing in the project, and ends with a section for opinions particular to the site.
+
+`.agents/skills/` holds two [agent skills](https://agentskills.io), the procedures an agent follows to write a document:
+
+| skill             | what it does                                                                                                                                                                                             |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `explain`         | Reads a document you have saved in `source/`, asks what you already know of what it assumes, and writes a companion in `content/writeups/`, with a document in `content/concepts/` for each new concept. |
+| `explain-concept` | Asks what you already know of a concept and its prerequisites, and writes one or more documents in `content/concepts/` that teach it.                                                                    |
+
+Each skill is a folder with a `SKILL.md` and an `authoring.md`, which covers how to write the mathematics, numbered equations, statements, proofs and citations. They are plain markdown and yours to edit, and they defer to `AGENTS.md` on anything particular to the site.
+
+A harness that follows the Agent Skills convention, such as pi, finds them in `.agents/skills/`. Claude Code reads only `.claude/skills/`, so `init` links each skill there as well (or copies it, where links cannot be made). Ask for one in plain words, or by name:
+
+```
+/explain bayes-rule                             Claude Code
+/explain-concept covered interest parity
+
+/skill:explain bayes-rule                       pi
+```
+
+In a harness without skills, `AGENTS.md` points the agent at the same files, so asking it to explain `source/2026-09-30-bayes-rule.md` works there too.
+
+`mesearch init` never overwrites a skill that is already there, so a project made before the skills existed gets them by running it again. To take the skills of a newer mesearch, delete `.agents/skills/` and run `mesearch init`: the links in `.claude/skills/` are kept and point at the new copies. Avoid `--force` for this, since it rewrites everything `init` writes, `AGENTS.md` and `mesearch.config.ts` included.
 
 ## How it works
 

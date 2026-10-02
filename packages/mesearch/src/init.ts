@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 
-import { packageDir, templatesDir } from './paths.ts';
+import { packageDir, skillsDir, templatesDir } from './paths.ts';
 
 export interface InitOptions {
     // Overwrite files that already exist.
@@ -55,6 +55,7 @@ export function initProject(dir: string, options: InitOptions = {}) {
         write(name, fill(fs.readFileSync(path.join(templatesDir, name), 'utf8')));
     }
     write('content/sequences/.gitkeep', '');
+    installSkills(dir, write, written, skipped, options.force);
     write('mesearch.css', userStylesheet());
     write(
         'tsconfig.json',
@@ -62,10 +63,15 @@ export function initProject(dir: string, options: InitOptions = {}) {
     );
     write('prettier.config.js', PRETTIER);
     write('eslint.config.js', ESLINT);
-    write('.prettierignore', 'build/\n.mesearch/\npnpm-lock.yaml\npackage-lock.json\n');
 
     updatePackageJson(dir, title, written);
-    updateGitignore(dir, written);
+    addLines(
+        dir,
+        '.prettierignore',
+        ['build/', '.mesearch/', '.agents/', '.claude/', 'pnpm-lock.yaml', 'package-lock.json'],
+        written,
+    );
+    addLines(dir, '.gitignore', ['node_modules/', '.mesearch/', 'build/'], written);
 
     for (const name of written) console.log(`  wrote    ${name}`);
     for (const name of skipped) console.log(`  kept     ${name} (exists; --force to overwrite)`);
@@ -73,6 +79,60 @@ export function initProject(dir: string, options: InitOptions = {}) {
         `\nmesearch: ${path.relative(process.cwd(), dir) || '.'} is ready.\n` +
             'Install the dependencies (`pnpm install`, or npm or yarn), then `pnpm dev` to start writing.',
     );
+}
+
+// Where harnesses look for a project's skills. `.agents/skills/` is the Agent
+// Skills convention, which most read. Those that only read a directory of their
+// own are given a link to each skill there.
+const SKILLS_DIR = '.agents/skills';
+const LINKED_SKILLS_DIRS = ['.claude/skills'];
+
+// The skills an agent writes documents with: `/explain` and `/explain-concept`.
+// Each is a folder with a `SKILL.md` and the shared `authoring.md`.
+function installSkills(
+    dir: string,
+    write: (name: string, contents: string) => void,
+    written: string[],
+    skipped: string[],
+    force = false,
+) {
+    const authoring = fs.readFileSync(path.join(skillsDir, 'authoring.md'), 'utf8');
+    const skills = fs
+        .readdirSync(skillsDir, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => entry.name);
+
+    for (const skill of skills) {
+        for (const name of listFiles(path.join(skillsDir, skill))) {
+            write(
+                `${SKILLS_DIR}/${skill}/${name}`,
+                fs.readFileSync(path.join(skillsDir, skill, name), 'utf8'),
+            );
+        }
+        write(`${SKILLS_DIR}/${skill}/authoring.md`, authoring);
+
+        for (const linked of LINKED_SKILLS_DIRS) {
+            const name = `${linked}/${skill}`;
+            const link = path.join(dir, name);
+            const stat = fs.lstatSync(link, { throwIfNoEntry: false });
+            // Only a link is ever replaced: a folder there is somebody's own.
+            if (stat && !(force && stat.isSymbolicLink())) {
+                if (!stat.isSymbolicLink()) console.log(`  kept     ${name} (exists)`);
+                else skipped.push(name);
+                continue;
+            }
+            if (stat) fs.unlinkSync(link);
+            fs.mkdirSync(path.dirname(link), { recursive: true });
+            const target = path.join(dir, SKILLS_DIR, skill);
+            try {
+                fs.symlinkSync(path.relative(path.dirname(link), target), link, 'dir');
+            } catch {
+                // Where links cannot be made (Windows without the privilege), a copy.
+                fs.cpSync(target, link, { recursive: true });
+            }
+            written.push(name);
+        }
+    }
 }
 
 // Adds mesearch's scripts and dependencies to the project's manifest, making
@@ -107,17 +167,19 @@ function updatePackageJson(dir: string, title: string, written: string[]) {
     written.push(exists ? 'package.json (scripts and dependencies added)' : 'package.json');
 }
 
-function updateGitignore(dir: string, written: string[]) {
-    const file = path.join(dir, '.gitignore');
+// Adds to an ignore file the entries it lacks, making the file if there is
+// none, so that a project made by an earlier version picks up new ones.
+function addLines(dir: string, name: string, entries: string[], written: string[]) {
+    const file = path.join(dir, name);
     const current = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '';
     const lines = current.split(/\r?\n/);
-    const missing = ['node_modules/', '.mesearch/', 'build/'].filter(
+    const missing = entries.filter(
         (entry) => !lines.includes(entry) && !lines.includes(entry.replace(/\/$/, '')),
     );
     if (!missing.length) return;
     const prefix = current && !current.endsWith('\n') ? '\n' : '';
     fs.writeFileSync(file, current + prefix + missing.join('\n') + '\n');
-    written.push(current ? '.gitignore (entries added)' : '.gitignore');
+    written.push(current ? `${name} (entries added)` : name);
 }
 
 // The UI library's stylesheet of variables.

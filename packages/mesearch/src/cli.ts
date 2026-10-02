@@ -11,7 +11,7 @@ import { exportOptions, findRoot, openProject, type Project } from './project.ts
 const USAGE = `
 mesearch --- an opinionated site for a library of notes.
 
-  mesearch init [dir]     scaffold a project: content/, config, stylesheet, AGENTS.md
+  mesearch init [dir]     scaffold a project: content/, config, stylesheet, AGENTS.md, agent skills
   mesearch dev            serve the site, updating as documents change
   mesearch build          write the static site
 

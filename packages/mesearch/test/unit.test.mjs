@@ -57,9 +57,19 @@ test('init scaffolds a project and never overwrites without --force', () => {
             'content/concepts/example-concept/description.md',
             'content/writeups/example-writeup/index.md',
             'content/sequences/.gitkeep',
+            '.agents/skills/explain/SKILL.md',
+            '.agents/skills/explain/authoring.md',
+            '.agents/skills/explain-concept/SKILL.md',
+            '.agents/skills/explain-concept/authoring.md',
+            '.claude/skills/explain/SKILL.md',
+            '.claude/skills/explain-concept/authoring.md',
         ]) {
             assert.ok(fs.existsSync(path.join(dir, file)), `${file} is written`);
         }
+        // A skill is handed over as written: nothing in it is a template.
+        const skill = fs.readFileSync(path.join(dir, '.agents/skills/explain/SKILL.md'), 'utf8');
+        assert.match(skill, /^---\nname: explain\ndescription: .+\n---\n/);
+        assert.doesNotMatch(skill, /\{\{/);
         assert.match(
             fs.readFileSync(path.join(dir, 'mesearch.config.ts'), 'utf8'),
             /title: 'My notes'/,
@@ -74,13 +84,24 @@ test('init scaffolds a project and never overwrites without --force', () => {
         );
 
         fs.writeFileSync(path.join(dir, 'AGENTS.md'), 'mine');
+        fs.writeFileSync(path.join(dir, '.agents/skills/explain/SKILL.md'), 'mine');
+        // As a project made before the skills were would have it.
+        fs.writeFileSync(path.join(dir, '.prettierignore'), 'build/\nmine/\n');
         manifest.scripts.dev = 'custom';
         fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify(manifest));
         initProject(dir);
         assert.equal(fs.readFileSync(path.join(dir, 'AGENTS.md'), 'utf8'), 'mine');
         assert.equal(
+            fs.readFileSync(path.join(dir, '.agents/skills/explain/SKILL.md'), 'utf8'),
+            'mine',
+        );
+        assert.equal(
             JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8')).scripts.dev,
             'custom',
+        );
+        assert.deepEqual(
+            fs.readFileSync(path.join(dir, '.prettierignore'), 'utf8').split('\n').slice(0, 5),
+            ['build/', 'mine/', '.mesearch/', '.agents/', '.claude/'],
         );
         initProject(dir, { force: true });
         assert.notEqual(fs.readFileSync(path.join(dir, 'AGENTS.md'), 'utf8'), 'mine');
