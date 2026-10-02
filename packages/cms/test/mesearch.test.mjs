@@ -22,13 +22,13 @@ test('documents are found by folder, with their frontmatter', () => {
     const measure = cms.documents.get('concepts/measure');
     assert.equal(measure.title, 'Measure');
     assert.equal(measure.kind, 'concept');
-    assert.equal(measure.descriptionFilename, 'docs/concepts/measure/description.md');
+    assert.equal(measure.descriptionFilename, 'content/concepts/measure/description.md');
     assert.equal(measure.summary, 'Sizes of sets, as in [Foll99].');
     assert.equal(measure.updated.toISOString().slice(0, 10), '2026-03-01');
     assert.deepEqual(measure.dependsOn, ['concepts/sets']);
     // No description: the first paragraph stands in.
     assert.equal(cms.documents.get('concepts/sets').summary, 'A set is a collection.');
-    assert.equal(cms.description(), 'docs/description.md');
+    assert.equal(cms.description(), 'content/description.md');
 });
 
 test('a missing updated date falls back to created', () => {
@@ -89,21 +89,21 @@ test('links make dashed edges only where no dependency exists either way', () =>
 });
 
 test('links resolve the way files sit on disk, and rewrite to site URLs', () => {
-    const refs = store.refsOf('docs/concepts/measure/index.md');
+    const refs = store.refsOf('content/concepts/measure/index.md');
     const page = refs.find((r) => r.written == '../../writeups/lebesgue/index.md#start');
     assert.equal(page.target.url, '/math/writeups/lebesgue/#start');
-    const site = store.refsOf('docs/description.md').find((r) => r.resolver == 'page');
+    const site = store.refsOf('content/description.md').find((r) => r.resolver == 'page');
     assert.equal(site.target.url, '/math/concepts/measure/');
     assert.ok(messages.some((m) => m.includes("'writeups/nowhere' does not resolve to a page")));
     assert.ok(!messages.some((m) => m.includes('figure.png')), 'assets are not pages');
 });
 
 test('equations number per document and are reachable across documents', () => {
-    const local = store.ref('docs/concepts/measure/index.md', 'equation', 'unit');
+    const local = store.ref('content/concepts/measure/index.md', 'equation', 'unit');
     assert.equal(local.target.label, '1');
     assert.equal(local.target.url, '/math/concepts/measure/#eq:unit');
     const remote = store.ref(
-        'docs/writeups/lebesgue/index.md',
+        'content/writeups/lebesgue/index.md',
         'equation',
         'concepts/measure/unit',
     );
@@ -111,7 +111,7 @@ test('equations number per document and are reachable across documents', () => {
 });
 
 test('headings reach h3 and keep inline math delimited', () => {
-    const outline = cms.outline('docs/concepts/sets/index.md');
+    const outline = cms.outline('content/concepts/sets/index.md');
     assert.equal(outline[0].title, 'Notation');
     assert.equal(outline[0].children[0].title, 'Membership with $x \\in A$');
     assert.equal(outline[0].children[0].slug, 'membership-with-x-in-a');
@@ -119,11 +119,11 @@ test('headings reach h3 and keep inline math delimited', () => {
 });
 
 test('a description folds its document macros over the site', () => {
-    assert.deepEqual(store.foldedMacros('docs/concepts/measure/description.md'), {
+    assert.deepEqual(store.foldedMacros('content/concepts/measure/description.md'), {
         '\\global': 'G',
         '\\mu': '\\mathrm{m}',
     });
-    assert.equal(store.foldedMacros('docs/description.md')['\\site'], 'S');
+    assert.equal(store.foldedMacros('content/description.md')['\\site'], 'S');
 });
 
 test('the loaders module imports every document', async () => {
@@ -131,12 +131,12 @@ test('the loaders module imports every document', async () => {
     const [plugin] = cms.vite();
     const id = await plugin.resolveId.call({}, 'virtual:mesearch-cms/loaders');
     const code = plugin.load.call({}, id);
-    assert.match(code, /"docs\/concepts\/measure\/description\.md": \(\) => import\(/);
-    assert.ok(code.includes(path.join(root, 'docs/writeups/notes/index.md')));
+    assert.match(code, /"content\/concepts\/measure\/description\.md": \(\) => import\(/);
+    assert.ok(code.includes(path.join(root, 'content/writeups/notes/index.md')));
 });
 
 test('statements share a document’s count with its equations', () => {
-    const measure = 'docs/concepts/measure/index.md';
+    const measure = 'content/concepts/measure/index.md';
     const statement = store.ref(measure, 'statement', 'extension');
     assert.equal(statement.target.label, '2');
     assert.equal(statement.target.full, 'Theorem 2');
@@ -144,41 +144,41 @@ test('statements share a document’s count with its equations', () => {
     // An equation inside the statement carries on the same count.
     assert.equal(store.ref(measure, 'equation', 'outer').target.label, '3');
     const remote = store.ref(
-        'docs/writeups/lebesgue/index.md',
+        'content/writeups/lebesgue/index.md',
         'statement',
         'concepts/measure/extension',
     );
     assert.equal(remote.target.url, '/math/concepts/measure/#statement:extension');
-    assert.deepEqual(store.injection('docs/concepts/measure/statements/extension.md'), {
+    assert.deepEqual(store.injection('content/concepts/measure/statements/extension.md'), {
         kind: 'theorem',
         label: '2',
         slug: 'extension',
         pathname: 'concepts/measure',
-        filename: 'docs/concepts/measure/statements/extension.md',
+        filename: 'content/concepts/measure/statements/extension.md',
         title: 'Carathéodory',
         id: 'statement:extension',
     });
     // The statement folds its page's macros.
     assert.equal(
-        store.foldedMacros('docs/concepts/measure/statements/extension.md')['\\mu'],
+        store.foldedMacros('content/concepts/measure/statements/extension.md')['\\mu'],
         '\\mathrm{m}',
     );
 });
 
 test('a citation points at the list on its own page', () => {
-    const own = store.ref('docs/concepts/measure/index.md', 'citation', 'folland1999');
+    const own = store.ref('content/concepts/measure/index.md', 'citation', 'folland1999');
     assert.equal(own.target.url, '#cite:folland1999');
     assert.equal(own.target.label, 'Foll99');
     assert.match(own.target.text, /^Gerald B\. Folland\. Real Analysis.*\. Wiley\. 1999\.$/);
     // In a statement shown on the page, too.
     const inside = store.ref(
-        'docs/concepts/measure/statements/extension.md',
+        'content/concepts/measure/statements/extension.md',
         'citation',
         'billingsley1995',
     );
     assert.equal(inside.target.url, '#cite:billingsley1995');
     // A description is shown on the map, so it reaches the document's page.
-    const preview = store.ref('docs/concepts/measure/description.md', 'citation', 'folland1999');
+    const preview = store.ref('content/concepts/measure/description.md', 'citation', 'folland1999');
     assert.equal(preview.target.url, '/math/concepts/measure/#cite:folland1999');
     assert.ok(messages.some((m) => m.includes("'nobody' does not resolve to a citation")));
 });

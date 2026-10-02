@@ -11,7 +11,7 @@ import { exportOptions, findRoot, openProject, type Project } from './project.ts
 const USAGE = `
 mesearch --- an opinionated site for a library of notes.
 
-  mesearch init [dir]     scaffold a project: docs/, config, stylesheet, AGENTS.md
+  mesearch init [dir]     scaffold a project: content/, config, stylesheet, AGENTS.md
   mesearch dev            serve the site, updating as documents change
   mesearch build          write the static site
 
@@ -32,7 +32,7 @@ Build options
   -v, --version       show the version
 
 Run inside a project: the nearest directory up from here whose package.json
-depends on @mvarble/mesearch, or that has a docs/ folder.
+depends on @mvarble/mesearch, or that has a content/ folder.
 `.trim();
 
 const OPTIONS = {
@@ -65,9 +65,9 @@ async function main() {
     }
 
     const root = findRoot(process.cwd());
-    if (!fs.existsSync(path.join(root, 'docs'))) {
+    if (!fs.existsSync(path.join(root, 'content'))) {
         throw new Error(
-            `mesearch: \`${root}\` has no docs/ folder. Run \`mesearch init\` to make one.`,
+            `mesearch: \`${root}\` has no content/ folder. Run \`mesearch init\` to make one.`,
         );
     }
 

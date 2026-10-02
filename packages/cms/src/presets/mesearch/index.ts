@@ -34,7 +34,7 @@ export { gitDates, type DateProvider, type Dates } from './dates.ts';
 
 export interface MesearchPresetOptions {
     // Where the documents live, relative to the project root.
-    docsDir?: string;
+    contentDir?: string;
     // The URL prefix the site is served under, as SvelteKit's `paths.base`:
     // empty, or starting with a slash and not ending in one.
     base?: string;
@@ -50,7 +50,7 @@ const BIBTEX = /\.bib$/;
 export const STATEMENT_COMPONENT = '@mvarble/mesearch/Statement.svelte';
 const KINDS: Kind[] = ['concept', 'writeup', 'sequence'];
 
-// mesearch's opinionated layout, under `docs/`:
+// mesearch's opinionated layout, under `content/`:
 //
 //     description.{md,svx}                 the site's own description
 //     concepts/<slug>/index.{md,svx}       one concept per folder
@@ -65,27 +65,27 @@ const KINDS: Kind[] = ['concept', 'writeup', 'sequence'];
 // `eq:slug` or `statement:slug` from within it, or `concepts/<slug>/slug` from
 // elsewhere.
 //
-// Every `.bib` file under `docs/` adds to one bibliography. A `cite:key` link
+// Every `.bib` file under `content/` adds to one bibliography. A `cite:key` link
 // points at the reference list at the end of the page it is on, which holds
 // exactly what that page cites.
 export function mesearchPreset(options: MesearchPresetOptions = {}): Preset {
-    const docsDir = (options.docsDir ?? 'docs').replace(/\/+$/, '');
+    const contentDir = (options.contentDir ?? 'content').replace(/\/+$/, '');
     const base = options.base ?? '';
     let dates = options.dates;
 
     const url = (pathname: string, hash = '') => `${base}/${pathname ? pathname + '/' : ''}${hash}`;
 
-    // `<docsDir>/<folder>/<slug>/<name>.{md,svx}`, taken apart.
+    // `<contentDir>/<folder>/<slug>/<name>.{md,svx}`, taken apart.
     const placeOf = (id: string) => {
         const match = new RegExp(
-            `^${escape(docsDir)}/(concepts|writeups|sequences)/([^/]+)/(index|description)\\.(md|svx)$`,
+            `^${escape(contentDir)}/(concepts|writeups|sequences)/([^/]+)/(index|description)\\.(md|svx)$`,
         ).exec(id);
         if (!match) return undefined;
         const kind = KINDS.find((kind) => FOLDERS[kind] == match[1])!;
         return { kind, slug: match[2]!, name: match[3] as 'index' | 'description' };
     };
     const isSiteDescription = (id: string) =>
-        new RegExp(`^${escape(docsDir)}/description\\.(md|svx)$`).test(id);
+        new RegExp(`^${escape(contentDir)}/description\\.(md|svx)$`).test(id);
 
     const documents = (store: Store) => store.collection<MesearchDocument>('documents');
 
@@ -108,7 +108,7 @@ export function mesearchPreset(options: MesearchPresetOptions = {}): Preset {
             const key = `${FOLDERS[kind]}/${slug}`;
             const fm = new Frontmatter(store.root, file.id, file.frontmatter, capitalize(kind));
             const folder = path.posix.dirname(file.id);
-            dates ??= gitDates(store.root, docsDir);
+            dates ??= gitDates(store.root, contentDir);
             const known = dates(folder);
 
             const title = fm.has('title') ? fm.requiredString('title') : firstHeading(file);
@@ -330,7 +330,7 @@ export function mesearchPreset(options: MesearchPresetOptions = {}): Preset {
 
     return {
         name: 'mesearch',
-        contentDir: docsDir,
+        contentDir,
         include: (id) => MARKDOWN.test(id) || BIBTEX.test(id),
         doctypes: [site, document, bibliography],
         resolvers: [
@@ -390,7 +390,7 @@ export function mesearchPreset(options: MesearchPresetOptions = {}): Preset {
             rel = withoutBase.replace(/^\/+/, '');
         } else {
             const file = path.posix.normalize(path.posix.join(path.posix.dirname(from), target));
-            rel = path.posix.relative(docsDir, file);
+            rel = path.posix.relative(contentDir, file);
             if (rel.startsWith('..')) return undefined;
         }
         const pathname = rel

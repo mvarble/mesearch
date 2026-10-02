@@ -1,10 +1,10 @@
 # mesearch
 
-An opinionated static site for a library of notes --- the kind an agent writes for you while you learn something. You keep documents in a fixed layout under `docs/`; mesearch turns them into a site that reads like a textbook, with the math rendered, a map of how the documents depend on one another, an index, and sequences to read in order.
+An opinionated static site for a library of notes --- the kind an agent writes for you while you learn something. You keep documents in a fixed layout under `content/`; mesearch turns them into a site that reads like a textbook, with the math rendered, a map of how the documents depend on one another, an index, and sequences to read in order.
 
 ```sh
 pnpm add @mvarble/mesearch
-pnpm exec mesearch init      # docs/, config, stylesheet, AGENTS.md, lint config
+pnpm exec mesearch init      # content/, config, stylesheet, AGENTS.md, lint config
 pnpm dev                     # live site while you write
 pnpm build                   # static site in build/
 ```
@@ -19,7 +19,7 @@ project/
     AGENTS.md               how agents should write for this site
     mesearch.config.ts      title, base path, KaTeX macros
     mesearch.css            optional: overrides for any of the site's variables
-    docs/
+    content/
         description.md                  what the site is about; opens the home page
         concepts/<slug>/index.md        one concept per folder
         concepts/<slug>/description.md  optional preview, for the map and the index
@@ -57,7 +57,7 @@ Link documents the way their folders sit on disk --- `[basis points](../basis-po
 
 A theorem, definition or remark is a small document with `type: statement` and a `kind`, shown with `<Statement {...theorem} />` (from `@mvarble/mesearch/Statement.svelte`). Statements count along with the document's equations, and `[%full](statement:slug)` refers to one as "Theorem 2". `@mvarble/mesearch/Proof.svelte` frames a proof.
 
-Bibliography entries go in `.bib` files anywhere under `docs/`. `[](cite:key)` renders as `[Foll99]` and `[Theorem 1.8](cite:key)` as `[Foll99, Theorem 1.8]`. Hovering a citation shows the reference. Following it jumps to a short list of references at the end of the page, which holds only what that page cites. There is no site-wide bibliography page.
+Bibliography entries go in `.bib` files anywhere under `content/`. `[](cite:key)` renders as `[Foll99]` and `[Theorem 1.8](cite:key)` as `[Foll99, Theorem 1.8]`. Hovering a citation shows the reference. Following it jumps to a short list of references at the end of the page, which holds only what that page cites. There is no site-wide bibliography page.
 
 The map on the home page is drawn from all of this:
 

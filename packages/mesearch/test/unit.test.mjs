@@ -52,11 +52,11 @@ test('init scaffolds a project and never overwrites without --force', () => {
             'tsconfig.json',
             'prettier.config.js',
             'eslint.config.js',
-            'docs/description.md',
-            'docs/concepts/example-concept/index.md',
-            'docs/concepts/example-concept/description.md',
-            'docs/writeups/example-writeup/index.md',
-            'docs/sequences/.gitkeep',
+            'content/description.md',
+            'content/concepts/example-concept/index.md',
+            'content/concepts/example-concept/description.md',
+            'content/writeups/example-writeup/index.md',
+            'content/sequences/.gitkeep',
         ]) {
             assert.ok(fs.existsSync(path.join(dir, file)), `${file} is written`);
         }

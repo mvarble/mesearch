@@ -1,6 +1,6 @@
 # mesearch
 
-An opinionated static site for a library of notes: concepts, writeups and sequences under `docs/`, rendered as a textbook with KaTeX, a dependency map and an index. See [packages/mesearch](./packages/mesearch/README.md) for what it does and how to use it.
+An opinionated static site for a library of notes: concepts, writeups and sequences under `content/`, rendered as a textbook with KaTeX, a dependency map and an index. See [packages/mesearch](./packages/mesearch/README.md) for what it does and how to use it.
 
 ```sh
 pnpm add @mvarble/mesearch && pnpm exec mesearch init && pnpm dev

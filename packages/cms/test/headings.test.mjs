@@ -15,14 +15,14 @@ const headingsIn = (filename) =>
         .map(({ depth, title, slug }) => [depth, title, slug]);
 
 test('a post records its own headings in order', () => {
-    assert.deepEqual(headingsIn('src/content/post/index.svx'), [
+    assert.deepEqual(headingsIn('content/post/index.svx'), [
         [1, 'Setup', 'setup'],
         [1, 'Setup', 'setup-2'],
     ]);
 });
 
 test('both heading levels are recorded, with their depth', () => {
-    assert.deepEqual(headingsIn('src/content/seq/chap-a.svx'), [
+    assert.deepEqual(headingsIn('content/seq/chap-a.svx'), [
         [1, 'First section', 'first-section'],
         [2, 'A subsection', 'a-subsection'],
         [2, 'Another subsection', 'another-subsection'],
@@ -31,7 +31,7 @@ test('both heading levels are recorded, with their depth', () => {
 });
 
 test('a page with no headings records none', () => {
-    assert.deepEqual(headingsIn('src/content/seq/index.svx'), []);
+    assert.deepEqual(headingsIn('content/seq/index.svx'), []);
 });
 
 test('a statement imported into a page contributes nothing to its outline', () => {

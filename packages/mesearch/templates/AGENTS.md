@@ -7,7 +7,7 @@ These instructions apply to every agent writing here. They sit alongside any pro
 ## Layout
 
 ```
-docs/
+content/
     description.md                  what the site is about; opens the home page
     concepts/<slug>/index.md        one concept per folder
     concepts/<slug>/description.md  optional one- or two-sentence preview
@@ -19,7 +19,7 @@ docs/
 - A **concept** explains a single idea on its own terms. A **writeup** works through something --- a source document, a problem, a topic --- using concepts.
 - The folder name is the slug: lowercase words joined by hyphens, named after the idea (`net-interest-margin`), never dated.
 - Documents may be `.md` or `.svx` ([mdsvex](https://mdsvex.pngwn.io/): markdown that can import and use Svelte components). Anything else a document uses --- images, data, components --- goes in its own folder and is referenced relatively, as `![A tree of outcomes](./tree.svg)`.
-- Before creating a concept, check `docs/concepts/`: if it exists, link to it and never rewrite or duplicate it. If a concept a document needs is missing, create it.
+- Before creating a concept, check `content/concepts/`: if it exists, link to it and never rewrite or duplicate it. If a concept a document needs is missing, create it.
 
 ## Frontmatter
 
@@ -40,7 +40,7 @@ katex_macros:
 - `created` and `updated` are dates. Without them the site falls back to the git history of the document's folder.
 - `depends_on` lists what a reader must understand first, by slug. A bare slug names a concept or a writeup; write `concepts/<slug>` or `writeups/<slug>` when both exist. These become the solid arrows of the map, so they should be the real prerequisites --- the documents a reader would otherwise be lost without --- not everything mentioned.
 - `katex_macros` are added to the site-wide macros in `mesearch.config.ts` for this document only.
-- A sequence (`docs/sequences/<slug>/index.md`) also has `documents:`, the writeups in reading order. Its body introduces the sequence.
+- A sequence (`content/sequences/<slug>/index.md`) also has `documents:`, the writeups in reading order. Its body introduces the sequence.
 
 A `description.md` has no frontmatter beyond optional `katex_macros`. It is one or two plain sentences saying what the document covers, for the map's preview panel and the index; without one, the document's first paragraph is used.
 

@@ -15,7 +15,7 @@ const BARE_IMPORT = /^(?![a-zA-Z]:)[\w@](?!.*:\/\/)/;
 
 const isInside = (dir: string, file: string) => file == dir || file.startsWith(dir + path.sep);
 
-// A site's documents live in its own `docs/`, and SvelteKit's generated files
+// A site's documents live in its own `content/`, and SvelteKit's generated files
 // in `.mesearch/` --- neither of which has mesearch's dependencies above it
 // when a package manager keeps them private, as pnpm does.
 //

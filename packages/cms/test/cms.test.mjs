@@ -21,7 +21,7 @@ test('a description folds its owner macros and resolves its links', () => {
         preset: blogPreset(),
         macros: { '\\site': 'S' },
     });
-    const id = 'src/content/post/description.svx';
+    const id = 'content/post/description.svx';
     assert.deepEqual(store.foldedMacros(id), { '\\site': 'S', '\\owner': 'O', '\\own': 'D' });
     assert.equal(store.refsOf(id).length, 2);
     assert.equal(store.pathnameOf(id), 'posts/dpost');
@@ -30,11 +30,11 @@ test('a description folds its owner macros and resolves its links', () => {
 test('a citation points at the list at the end of its page', () => {
     const preset = blogPreset();
     const store = buildStore({ root: fixtureRoot('descriptions'), preset });
-    const body = store.ref('src/content/post/index.svx', 'citation', 'lee2012');
+    const body = store.ref('content/post/index.svx', 'citation', 'lee2012');
     assert.equal(body.target.url, '#cite:lee2012');
     assert.equal(body.target.label, 'Lee12');
     // A description is shown on the listings, so it reaches the post's page.
-    const preview = store.ref('src/content/post/description.svx', 'citation', 'lee2018');
+    const preview = store.ref('content/post/description.svx', 'citation', 'lee2018');
     assert.equal(preview.target.url, '/posts/dpost/#cite:lee2018');
     const cms = bind(preset.snapshot(store));
     assert.deepEqual(
@@ -51,9 +51,9 @@ test('inserting a statement changes the facts of every later document in the sco
 
     // A new statement at the very top of the sequence root shifts every label
     // after it --- including those defined in other files.
-    const root = path.join(tmp, 'src/content/seq/index.svx');
+    const root = path.join(tmp, 'content/seq/index.svx');
     fs.writeFileSync(
-        path.join(tmp, 'src/content/seq/statements/first.svx'),
+        path.join(tmp, 'content/seq/statements/first.svx'),
         '---\ntype: statement\nkind: lemma\n---\n\nFirst.\n',
     );
     fs.writeFileSync(
@@ -71,15 +71,9 @@ test('inserting a statement changes the facts of every later document in the sco
     );
     const after = allFacts(buildStore({ root: tmp, preset: blogPreset() }));
     const changed = diffFacts(before, after);
-    assert.ok(changed.includes('src/content/seq/statements/first.svx'));
-    assert.ok(
-        changed.includes('src/content/seq/statements/a1.svx'),
-        'a later statement is relabelled',
-    );
-    assert.ok(
-        !changed.includes('src/content/post/statements/plain.svx'),
-        'another scope is untouched',
-    );
+    assert.ok(changed.includes('content/seq/statements/first.svx'));
+    assert.ok(changed.includes('content/seq/statements/a1.svx'), 'a later statement is relabelled');
+    assert.ok(!changed.includes('content/post/statements/plain.svx'), 'another scope is untouched');
     fs.rmSync(tmp, { recursive: true, force: true });
 });
 
@@ -95,11 +89,9 @@ test('the snapshot survives the trip through the virtual module', () => {
         ['chap-a', 'chap-b', 'appendix'],
         'children keep the order the sequence declares',
     );
-    assert.equal(cms.pages.get('sequences/fseq/chap-a').filename, 'src/content/seq/chap-a.svx');
+    assert.equal(cms.pages.get('sequences/fseq/chap-a').filename, 'content/seq/chap-a.svx');
     assert.deepEqual(
-        cms
-            .outline('src/content/seq/chap-a.svx')
-            .map((entry) => [entry.slug, entry.children.length]),
+        cms.outline('content/seq/chap-a.svx').map((entry) => [entry.slug, entry.children.length]),
         [
             ['first-section', 2],
             ['second-section', 0],
@@ -130,7 +122,7 @@ test('the remark plugin rewrites references and anchors headings', () => {
             },
         ],
     };
-    cms.remark()(tree, { filename: path.join(root, 'src/content/post/index.svx') });
+    cms.remark()(tree, { filename: path.join(root, 'content/post/index.svx') });
     const [h1, h2, paragraph, math] = tree.children;
     assert.equal(h1.data.hProperties.id, 'setup');
     assert.equal(h2.data.hProperties.id, 'setup-2');
@@ -147,7 +139,7 @@ test('the remark plugin rewrites references and anchors headings', () => {
 test('macrosFor folds a known document and falls back to frontmatter otherwise', () => {
     const root = fixtureRoot('descriptions');
     const cms = createCms({ root, preset: blogPreset(), macros: { '\\site': 'S' } });
-    assert.deepEqual(cms.macrosFor({ filename: path.join(root, 'src/content/post/index.svx') }), {
+    assert.deepEqual(cms.macrosFor({ filename: path.join(root, 'content/post/index.svx') }), {
         '\\site': 'S',
         '\\owner': 'O',
     });

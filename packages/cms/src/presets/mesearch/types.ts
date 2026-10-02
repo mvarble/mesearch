@@ -5,7 +5,7 @@ import type { Citation } from '../../resolvers/citation.ts';
 
 export type Kind = 'concept' | 'writeup' | 'sequence';
 
-// The folder each kind of document lives in under `docs/`, which is also the
+// The folder each kind of document lives in under `content/`, which is also the
 // first segment of its URL.
 export const FOLDERS: Record<Kind, string> = {
     concept: 'concepts',

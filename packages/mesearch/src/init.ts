@@ -54,7 +54,7 @@ export function initProject(dir: string, options: InitOptions = {}) {
     for (const name of listFiles(templatesDir)) {
         write(name, fill(fs.readFileSync(path.join(templatesDir, name), 'utf8')));
     }
-    write('docs/sequences/.gitkeep', '');
+    write('content/sequences/.gitkeep', '');
     write('mesearch.css', userStylesheet());
     write(
         'tsconfig.json',

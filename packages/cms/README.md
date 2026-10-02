@@ -41,7 +41,7 @@ export const load = () => ({ posts: cms.posts.list({ limit: 3 }) });
 
 ## Presets
 
-- **`mesearchPreset`** --- `docs/{concepts,writeups,sequences}/<slug>/index.{md,svx}`. It reads `depends_on` and sequence membership, takes dates from git, resolves links written as paths on disk, and builds the dependency graph. Equations and the statements a document shows share one count per document. Every `.bib` file under `docs/` adds to one bibliography.
+- **`mesearchPreset`** --- `content/{concepts,writeups,sequences}/<slug>/index.{md,svx}`. It reads `depends_on` and sequence membership, takes dates from git, resolves links written as paths on disk, and builds the dependency graph. Equations and the statements a document shows share one count per document. Every `.bib` file under `content/` adds to one bibliography.
 - In both presets a `cite:` link points at the reference list at the end of its own page, and `cms.bibliography(page)` gives what that list holds: everything the page, its statements and its description cite.
 - Both presets share the statement registration (`core/statements.ts`) and the BibTeX reader (`core/bibtex.ts`). The reader decodes LaTeX accents and drops protective braces.
 - **`blogPreset`** --- the blog's `type: post | sequence | statement` documents and `.bib` bibliographies. Statements and equations share one counter per post or sequence, and the preset provides the `cite:`, `eq:` and `statement:` references and the `%title`, `%label`, `%sequence` and `%full` link text.

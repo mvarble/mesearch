@@ -53,7 +53,7 @@ export async function svelteConfig(root: string): Promise<Config> {
                 assets: fs.existsSync(staticDir) ? staticDir : path.join(appDir, 'static'),
             },
             paths: { base: config.base as '' | `/${string}` },
-            alias: { $docs: project.docsDir },
+            alias: { $content: project.contentDir },
             prerender: {
                 entries: ['*'],
                 // A broken link in a document is the author's to fix, not a

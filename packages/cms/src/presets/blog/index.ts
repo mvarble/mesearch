@@ -43,7 +43,7 @@ export interface BlogPresetOptions {
 // Statements and equations share one counter per post, or per sequence, and
 // their slugs are unique within it.
 export function blogPreset(options: BlogPresetOptions = {}): Preset {
-    const contentDir = options.contentDir ?? 'src/content';
+    const contentDir = options.contentDir ?? 'content';
     const statementComponent = options.statementComponent ?? '$lib/components/statement.svelte';
     const statementComponentFile =
         options.statementComponentFile ?? 'src/lib/components/statement.svelte';

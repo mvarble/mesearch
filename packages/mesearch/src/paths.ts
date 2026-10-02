@@ -14,6 +14,6 @@ export const templatesDir = path.join(packageDir, 'templates');
 // and where a build writes the site by default.
 export const WORK_DIR = '.mesearch';
 export const BUILD_DIR = 'build';
-export const DOCS_DIR = 'docs';
+export const CONTENT_DIR = 'content';
 export const CONFIG_FILES = ['mesearch.config.ts', 'mesearch.config.js', 'mesearch.config.mjs'];
 export const USER_CSS = 'mesearch.css';

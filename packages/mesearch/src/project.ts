@@ -5,11 +5,11 @@ import { createCms, type Cms } from '@mvarble/mesearch-cms';
 import { mesearchPreset } from '@mvarble/mesearch-cms/presets/mesearch';
 
 import { loadConfig, type ResolvedConfig } from './config.ts';
-import { BUILD_DIR, DOCS_DIR, USER_CSS, WORK_DIR } from './paths.ts';
+import { BUILD_DIR, CONTENT_DIR, USER_CSS, WORK_DIR } from './paths.ts';
 
 export interface Project {
     root: string;
-    docsDir: string;
+    contentDir: string;
     workDir: string;
     config: ResolvedConfig;
     cms: Cms;
@@ -38,7 +38,7 @@ export function exportOptions(options: ProjectOptions) {
 }
 
 // The project a directory belongs to: the nearest one up the tree with a
-// `package.json` that depends on mesearch, or with a `docs/` folder, or else
+// `package.json` that depends on mesearch, or with a `content/` folder, or else
 // the directory itself.
 export function findRoot(from: string): string {
     for (let dir = path.resolve(from); ; dir = path.dirname(dir)) {
@@ -58,7 +58,7 @@ export function findRoot(from: string): string {
                 // An unreadable manifest is not this project's.
             }
         }
-        if (fs.existsSync(path.join(dir, DOCS_DIR))) return dir;
+        if (fs.existsSync(path.join(dir, CONTENT_DIR))) return dir;
         if (path.dirname(dir) == dir) return path.resolve(from);
     }
 }
@@ -85,7 +85,7 @@ export async function openProject(root: string, given: ProjectOptions = {}): Pro
             config.base = options.base == '/' ? '' : options.base.replace(/\/+$/, '');
         const cms = createCms({
             root,
-            preset: mesearchPreset({ docsDir: DOCS_DIR, base: config.base }),
+            preset: mesearchPreset({ contentDir: CONTENT_DIR, base: config.base }),
             macros: config.katexMacros,
             virtualId: '$cms',
             label: 'mesearch',
@@ -94,7 +94,7 @@ export async function openProject(root: string, given: ProjectOptions = {}): Pro
         const userCss = path.join(root, USER_CSS);
         return {
             root,
-            docsDir: path.join(root, DOCS_DIR),
+            contentDir: path.join(root, CONTENT_DIR),
             workDir: path.join(root, WORK_DIR),
             config,
             cms,
