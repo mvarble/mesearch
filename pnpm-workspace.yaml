@@ -1,6 +1,9 @@
 packages:
-    - packages/*
-    - example
+  - packages/*
+  - example
+
+minimumReleaseAgeExclude:
+  - vite@8.3.2
 
 onlyBuiltDependencies:
-    - esbuild
+  - esbuild
