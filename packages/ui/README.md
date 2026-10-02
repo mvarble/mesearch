@@ -13,7 +13,7 @@ You get:
 Nothing here knows how a site stores content or lays out its URLs. Every component is handed its data, with each link's `url` already worked out.
 
 ```sh
-pnpm add @mvarble/mesearch-ui
+npm install @mvarble/mesearch-ui
 ```
 
 ## Setting up a site

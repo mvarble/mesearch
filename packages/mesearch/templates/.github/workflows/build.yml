@@ -1,0 +1,43 @@
+# Builds the site on every push and pull request, with the version of
+# @mvarble/mesearch the project depends on, and keeps the result as an artifact.
+name: build
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+              with:
+                  # The whole history: documents without dates take them from it.
+                  fetch-depth: 0
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: 24
+                  package-manager-cache: false
+            - name: Install dependencies
+              run: |
+                  if [ -f pnpm-lock.yaml ]; then
+                      npm install --global pnpm
+                      pnpm install --frozen-lockfile
+                  elif [ -f yarn.lock ]; then
+                      corepack enable
+                      case "$(yarn --version)" in
+                          1.*) yarn install --frozen-lockfile ;;
+                          *) yarn install --immutable ;;
+                      esac
+                  elif [ -f package-lock.json ]; then
+                      npm ci
+                  else
+                      npm install
+                  fi
+            # `--no`: the project's own mesearch, never one fetched from the registry.
+            - name: Build the site
+              run: npx --no -- mesearch build
+            - uses: actions/upload-artifact@v7
+              with:
+                  name: site
+                  path: build/

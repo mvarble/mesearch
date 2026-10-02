@@ -23,6 +23,9 @@ const DEV_DEPENDENCIES: Record<string, string> = {
     'typescript-eslint': '^8.71.0',
 };
 
+// Every package manager's lockfile, since the project may use any of them.
+const LOCKFILES = ['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock'];
+
 const SCRIPTS: Record<string, string> = {
     dev: 'mesearch dev',
     build: 'mesearch build',
@@ -68,7 +71,7 @@ export function initProject(dir: string, options: InitOptions = {}) {
     addLines(
         dir,
         '.prettierignore',
-        ['build/', '.mesearch/', '.agents/', '.claude/', 'pnpm-lock.yaml', 'package-lock.json'],
+        ['build/', '.mesearch/', '.agents/', '.claude/', ...LOCKFILES, 'pnpm-workspace.yaml'],
         written,
     );
     addLines(dir, '.gitignore', ['node_modules/', '.mesearch/', 'build/'], written);
@@ -77,7 +80,7 @@ export function initProject(dir: string, options: InitOptions = {}) {
     for (const name of skipped) console.log(`  kept     ${name} (exists; --force to overwrite)`);
     console.log(
         `\nmesearch: ${path.relative(process.cwd(), dir) || '.'} is ready.\n` +
-            'Install the dependencies (`pnpm install`, or npm or yarn), then `pnpm dev` to start writing.',
+            'Install the dependencies with your package manager (`npm install`, say), then run its `dev` script (`npm run dev`) to start writing.',
     );
 }
 
@@ -224,7 +227,7 @@ export function userStylesheet(): string {
  *     }
  *
  * An \`@import\` has to come before every other rule in the file. A font
- * installed with npm (\`pnpm add @fontsource/eb-garamond\`) can be imported
+ * installed from npm (\`@fontsource/eb-garamond\`, say) can be imported
  * the same way: \`@import '@fontsource/eb-garamond';\`.
  */
 

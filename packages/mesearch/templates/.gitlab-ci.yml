@@ -1,0 +1,28 @@
+# Builds the site in every pipeline, with the version of @mvarble/mesearch the
+# project depends on, and keeps the result as an artifact.
+build:
+    image: node:24
+    variables:
+        # The whole history: documents without dates take them from it.
+        GIT_DEPTH: 0
+    script:
+        - |
+            if [ -f pnpm-lock.yaml ]; then
+                npm install --global pnpm
+                pnpm install --frozen-lockfile
+            elif [ -f yarn.lock ]; then
+                corepack enable
+                case "$(yarn --version)" in
+                    1.*) yarn install --frozen-lockfile ;;
+                    *) yarn install --immutable ;;
+                esac
+            elif [ -f package-lock.json ]; then
+                npm ci
+            else
+                npm install
+            fi
+        # `--no`: the project's own mesearch, never one fetched from the registry.
+        - npx --no -- mesearch build
+    artifacts:
+        paths:
+            - build/

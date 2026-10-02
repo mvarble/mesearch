@@ -57,6 +57,8 @@ test('init scaffolds a project and never overwrites without --force', () => {
             'content/concepts/example-concept/description.md',
             'content/writeups/example-writeup/index.md',
             'content/sequences/.gitkeep',
+            '.github/workflows/build.yml',
+            '.gitlab-ci.yml',
             '.agents/skills/explain/SKILL.md',
             '.agents/skills/explain/authoring.md',
             '.agents/skills/explain-concept/SKILL.md',
@@ -65,6 +67,16 @@ test('init scaffolds a project and never overwrites without --force', () => {
             '.claude/skills/explain-concept/authoring.md',
         ]) {
             assert.ok(fs.existsSync(path.join(dir, file)), `${file} is written`);
+        }
+        for (const file of ['.github/workflows/build.yml', '.gitlab-ci.yml']) {
+            const ci = fs.readFileSync(path.join(dir, file), 'utf8');
+            assert.match(ci, /npx --no -- mesearch build/, `${file} builds the site`);
+            assert.match(ci, /pnpm install --frozen-lockfile/);
+            assert.match(ci, /npm ci/);
+        }
+        const ignored = fs.readFileSync(path.join(dir, '.prettierignore'), 'utf8').split('\n');
+        for (const entry of ['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', '.agents/']) {
+            assert.ok(ignored.includes(entry), `${entry} is not formatted`);
         }
         // A skill is handed over as written: nothing in it is a template.
         const skill = fs.readFileSync(path.join(dir, '.agents/skills/explain/SKILL.md'), 'utf8');

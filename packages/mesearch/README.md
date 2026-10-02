@@ -7,11 +7,14 @@
 An opinionated static site for a library of notes --- the kind an agent writes for you while you learn something. You keep documents in a fixed layout under `content/`; mesearch turns them into a site that reads like a textbook, with the math rendered, a map of how the documents depend on one another, an index, and sequences to read in order.
 
 ```sh
-pnpm add @mvarble/mesearch
-pnpm exec mesearch init      # content/, config, stylesheet, AGENTS.md, agent skills, lint config
-pnpm dev                     # live site while you write
-pnpm build                   # static site in build/
+npm install @mvarble/mesearch
+npx mesearch init            # content/, config, stylesheet, AGENTS.md, agent skills, CI, lint config
+npm install                  # the lint and format tools init added to package.json
+npm run dev                  # live site while you write
+npm run build                # static site in build/
 ```
+
+The commands here are npm's, since it comes with Node, but nothing depends on it: pnpm and yarn work the same way (`pnpm add`, `pnpm exec mesearch init`, `pnpm install`, `pnpm dev`). The one exception is Yarn's Plug'n'Play, which mesearch does not build under: with Yarn 2 or later, set `nodeLinker: node-modules` in `.yarnrc.yml`.
 
 Where [mkdoc](https://github.com/mvarble/mkdoc) renders one document without a project around it, mesearch is installed in a `package.json` and builds a whole site. Where [the blog](https://github.com/mvarble/blog) is a SvelteKit app you maintain, mesearch is the SvelteKit app: a project holds only documents and a little configuration, and everything about how the site looks and works ships in this package.
 
@@ -23,6 +26,8 @@ project/
     AGENTS.md               how agents should write for this site
     .agents/skills/         the procedures agents write with: explain, explain-concept
     .claude/skills/         links to the same skills, for Claude Code
+    .github/workflows/      builds the site on GitHub
+    .gitlab-ci.yml          builds the site on GitLab
     mesearch.config.ts      title, base path, KaTeX macros
     mesearch.css            optional: overrides for any of the site's variables
     content/
@@ -114,6 +119,12 @@ mesearch build          write the static site
 
 The site in `build/` is plain files: serve it from anywhere.
 
+## Continuous integration
+
+`mesearch init` writes a GitHub Actions workflow (`.github/workflows/build.yml`) and a GitLab CI configuration (`.gitlab-ci.yml`). Each installs the project's dependencies and runs `mesearch build`, so the site is built with whichever version of `@mvarble/mesearch` the project's `package.json` and lockfile name, and each keeps `build/` as an artifact. GitHub runs it on every push and pull request, GitLab in every pipeline. Delete whichever you do not use; running `mesearch init` again writes it back, as it does anything else it finds missing, and lists what it wrote.
+
+Both install with the package manager whose lockfile is committed (`pnpm-lock.yaml`, `yarn.lock` or `package-lock.json`), and fail if it does not match `package.json`, so commit the lockfile, after the install that follows `init`, to have CI build with exactly the versions you do. Both also fetch the whole git history, since a document without `created` and `updated` takes its dates from it.
+
 ## Writing with agents
 
 `mesearch init` sets a project up to be written by an agent, in whichever harness you use. It writes two things.
@@ -140,7 +151,7 @@ A harness that follows the Agent Skills convention, such as pi, finds them in `.
 
 In a harness without skills, `AGENTS.md` points the agent at the same files, so asking it to explain `source/2026-09-30-bayes-rule.md` works there too.
 
-`mesearch init` never overwrites a skill that is already there, so a project made before the skills existed gets them by running it again. To take the skills of a newer mesearch, delete `.agents/skills/` and run `mesearch init`: the links in `.claude/skills/` are kept and point at the new copies. Avoid `--force` for this, since it rewrites everything `init` writes, `AGENTS.md` and `mesearch.config.ts` included.
+`mesearch init` never overwrites a skill that is already there, so a project made before the skills existed gets them by running it again. To take the skills of a newer mesearch, delete `.agents/skills/` and run `mesearch init`: the links in `.claude/skills/` are kept and point at the new copies. Where `init` had to copy instead of link, delete `.claude/skills/explain` and `.claude/skills/explain-concept` as well. Avoid `--force` for this, since it rewrites everything `init` writes, `AGENTS.md` and `mesearch.config.ts` included.
 
 ## How it works
 
