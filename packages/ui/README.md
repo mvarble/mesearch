@@ -8,7 +8,7 @@ You get:
 - the force-laid-out map of documents and its detail panel;
 - the fuzzy index;
 - a three-column article layout with a scroll-spied table of contents and a sequence track;
-- the light and dark tokens behind all of it.
+- the light and dark tokens behind all of it, and `palette`, the same colours for plots drawn by script.
 
 Nothing here knows how a site stores content or lays out its URLs. Every component is handed its data, with each link's `url` already worked out.
 
@@ -83,3 +83,71 @@ Everything is drawn from CSS variables defined in `styles/tokens.css`: fonts, th
 - To restyle a site, override any of them after the stylesheet loads. Override dark values under `:root[data-theme='dark']`.
 - `styles/index.css` is the tokens, `base.css` and `prose.css` together. Import them separately to leave one out.
 - A kind of document gets its colour from a `.kind-<name>` class. Any kind without one of its own takes the accent colour.
+- `--series-1` to `--series-8` colour the series of a chart, in that order. They are chosen so that each can be told from its neighbours with any colour vision, and are stepped separately for each theme.
+
+## Colours for plots
+
+A chart drawn in markup can use the variables directly (`fill="var(--series-1)"`) and follows the theme by itself. A plotting library such as [Plotly](https://plotly.com/javascript/), a canvas or WebGL needs the colours as strings instead. `palette` holds them:
+
+```ts
+import { palette } from '@mvarble/mesearch-ui';
+
+palette.theme; // 'light' or 'dark'
+palette.series; // ['#2a78d6', '#eb6834', ...], from --series-1 to --series-8
+palette.ink; // text
+palette.paperRaised; // a surface to draw on
+```
+
+It is reactive state that follows `data-theme` on `<html>` and is read from the page's computed styles, so a site's own overrides of the variables come through. Draw in an `$effect` that reads it, and the plot is drawn again when the reader switches theme:
+
+```svelte
+<script>
+    import { palette } from '@mvarble/mesearch-ui';
+
+    let { x, y } = $props();
+    let plot;
+
+    $effect(() => {
+        const data = [
+            { x, y, type: 'scatter', mode: 'lines', line: { color: palette.series[0], width: 2 } },
+        ];
+        const axis = {
+            color: palette.muted,
+            gridcolor: palette.rule,
+            zerolinecolor: palette.ruleStrong,
+        };
+        const layout = {
+            paper_bgcolor: palette.paperRaised,
+            plot_bgcolor: palette.paperRaised,
+            font: { family: palette.fontUi, color: palette.ink },
+            xaxis: axis,
+            yaxis: axis,
+            margin: { t: 16, r: 16, b: 40, l: 48 },
+        };
+        // Plotly needs a browser, so it is loaded only in one. `react`
+        // updates the plot in place when the effect runs again.
+        import('plotly.js-dist-min').then(({ default: Plotly }) =>
+            Plotly.react(plot, data, layout),
+        );
+    });
+</script>
+
+<div bind:this={plot}></div>
+```
+
+The effect reads the palette synchronously, before anything is awaited; a colour first read inside the `then` would not be tracked.
+
+| field                                 | variable                                      |
+| ------------------------------------- | --------------------------------------------- |
+| `paper`, `paperRaised`, `paperSunken` | `--paper`, `--paper-raised`, `--paper-sunken` |
+| `ink`, `inkSoft`, `muted`, `faint`    | `--ink`, `--ink-soft`, `--muted`, `--faint`   |
+| `rule`, `ruleStrong`                  | `--rule`, `--rule-strong` (gridlines, axes)   |
+| `accent`, `accentSoft`                | `--accent`, `--accent-soft`                   |
+| `concept`, `writeup`, `sequence`      | the colour of each kind of document           |
+| `series`                              | `--series-1` to `--series-8`                  |
+| `fontBody`, `fontUi`, `fontMono`      | `--font-body`, `--font-ui`, `--font-mono`     |
+
+- On the server, `palette` holds the light theme's defaults from `tokens.css`, as a page read without JavaScript shows. In the browser, a variable the stylesheets have not set yet keeps its default for the theme in use. `DEFAULT_PALETTES.light` and `DEFAULT_PALETTES.dark` are those defaults.
+- Only `data-theme`, `class` and `style` on `<html>` are watched. After changing a variable some other way from a script, call `refreshPalette()`.
+- The palette follows `data-theme` whoever sets it, so it works on a site with a theme switch of its own as well as with `Shell`.
+- Its type is `ThemePalette` (`Palette` is the search component).

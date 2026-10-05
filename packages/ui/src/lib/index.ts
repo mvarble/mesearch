@@ -27,6 +27,7 @@ export { default as Toc } from './components/Toc.svelte';
 
 export { configure, formatDate, isoDate, kindLabel, plain, settings } from './settings.js';
 export { theme, THEME_SCRIPT, type ThemeChoice } from './theme.svelte.js';
+export { DEFAULT_PALETTES, palette, refreshPalette, type ThemePalette } from './palette.svelte.js';
 export { reading } from './reading.svelte.js';
 export { bestMatch, fuzzy, highlight } from './fuzzy.js';
 export { DEFAULT_TUNING, type GraphTuning } from './graph-layout.js';

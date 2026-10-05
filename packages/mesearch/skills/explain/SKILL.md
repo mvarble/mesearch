@@ -93,7 +93,7 @@ Beside each new `index.md`, write a `description.md`: one or two plain sentences
 
 ## Mathematics, statements and citations
 
-Before writing anything, read `authoring.md`, which sits beside this file, and follow it: it says how mathematics, numbered equations, statements, proofs and citations are written in a mesearch site.
+Before writing anything, read `authoring.md`, which sits beside this file, and follow it: it says how mathematics, numbered equations, statements, proofs, citations and plots are written in a mesearch site.
 
 ## Structure and prose
 

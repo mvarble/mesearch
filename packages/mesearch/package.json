@@ -1,6 +1,6 @@
 {
     "name": "@mvarble/mesearch",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "description": "An opinionated static site for a library of agent-written notes: concepts, writeups and sequences under content/, rendered as a textbook with KaTeX, a dependency graph and an index.",
     "license": "MIT",
     "author": "Matthew Varble <matthew@rodent.club>",
@@ -46,6 +46,10 @@
         "./Proof.svelte": {
             "svelte": "./app/components/Proof.svelte",
             "default": "./app/components/Proof.svelte"
+        },
+        "./palette": {
+            "types": "./app/palette.ts",
+            "default": "./app/palette.ts"
         },
         "./tsconfig.json": "./tsconfig.project.json",
         "./package.json": "./package.json"

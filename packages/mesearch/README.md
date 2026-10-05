@@ -70,6 +70,49 @@ A theorem, definition or remark is a small document with `type: statement` and a
 
 Bibliography entries go in `.bib` files anywhere under `content/`. `[](cite:key)` renders as `[Foll99]` and `[Theorem 1.8](cite:key)` as `[Foll99, Theorem 1.8]`. Hovering a citation shows the reference. Following it jumps to a short list of references at the end of the page, which holds only what that page cites. There is no site-wide bibliography page.
 
+### Plots
+
+A plot is a Svelte component in the document's folder, imported by a `.svx` document. To read in both themes it takes its colours from the site's variables: `var(--series-1)` to `var(--series-8)` for its series, in that order, and `var(--ink)`, `var(--muted)`, `var(--rule)` and `var(--paper-raised)` for text, labels, gridlines and background. Markup that uses them follows the theme by itself.
+
+A plotting library such as [Plotly](https://plotly.com/javascript/), or a canvas, needs the colours as strings. `@mvarble/mesearch/palette` holds them, read from the page, so a project's `mesearch.css` comes through, and kept current as the reader switches theme. A component that draws with it in an `$effect` draws again on every switch:
+
+```svelte
+<script>
+    import { palette } from '@mvarble/mesearch/palette';
+
+    let { x, y } = $props();
+    let plot;
+
+    $effect(() => {
+        const data = [
+            { x, y, type: 'scatter', mode: 'lines', line: { color: palette.series[0], width: 2 } },
+        ];
+        const axis = {
+            color: palette.muted,
+            gridcolor: palette.rule,
+            zerolinecolor: palette.ruleStrong,
+        };
+        const layout = {
+            paper_bgcolor: palette.paperRaised,
+            plot_bgcolor: palette.paperRaised,
+            font: { family: palette.fontUi, color: palette.ink },
+            xaxis: axis,
+            yaxis: axis,
+            margin: { t: 16, r: 16, b: 40, l: 48 },
+        };
+        // Plotly needs a browser, so it is loaded only in one. `react`
+        // updates the plot in place when the effect runs again.
+        import('plotly.js-dist-min').then(({ default: Plotly }) =>
+            Plotly.react(plot, data, layout),
+        );
+    });
+</script>
+
+<div bind:this={plot}></div>
+```
+
+Install `plotly.js-dist-min` in the project like any other package a document uses. Read the palette in the effect itself, not in a callback after something is awaited, or the effect will not know to run again. The palette also has `theme` (`'light'` or `'dark'`), `paper`, `paperSunken`, `inkSoft`, `faint`, `ruleStrong`, `accent`, the colours of the three kinds, and the typefaces as `fontBody`, `fontUi` and `fontMono`; [`@mvarble/mesearch-ui`](https://github.com/mvarble/mesearch/tree/main/packages/ui#colours-for-plots) lists them all. The `coin-flips` writeup in [`example/`](https://github.com/mvarble/mesearch/tree/main/example) draws on a canvas this way.
+
 The map on the home page is drawn from all of this:
 
 - Every concept and writeup is a node.

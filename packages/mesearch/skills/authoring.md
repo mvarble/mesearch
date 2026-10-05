@@ -1,6 +1,6 @@
 # Authoring in a mesearch site
 
-How documents are written in a mesearch site: mathematics, numbered equations, statements and proofs, and citations.
+How documents are written in a mesearch site: mathematics, numbered equations, statements and proofs, citations, and plots.
 
 ## Mathematics
 
@@ -90,3 +90,37 @@ Bibliography entries go in BibTeX files anywhere under `content/`, usually `cont
 - Each document ends with a list of exactly what it cites, and each citation jumps to its entry there. Cite in the sentence that relies on the source; never write a reference list or a "Further reading" section of your own.
 - Cite only sources you are certain of, with their real titles, authors, years and DOIs. Never invent or guess a reference: leave the citation out rather than risk a wrong one.
 - A file or an address a writeup is about is linked, not cited. A published work it is about, such as a textbook or a paper, is cited.
+
+## Plots
+
+A plot is a Svelte component in the document's folder, shown by a `.svx` document that imports it, as `import Growth from './Growth.svelte';`. Its colours come from the site's theme, never from fixed values, so that it reads in light and dark alike.
+
+- In markup and styles, use the site's variables: `var(--series-1)` to `var(--series-8)` for series, taken in that order, and `var(--ink)`, `var(--muted)`, `var(--rule)` and `var(--paper-raised)` for text, labels, gridlines and background.
+- A plotting library or a canvas takes the same colours as strings from `palette`, and draws in an `$effect`, so that it draws again when the reader switches theme. Read the palette in the effect itself, before anything is awaited:
+
+```svelte
+<script>
+	import { palette } from '@mvarble/mesearch/palette';
+
+	let { x, y } = $props();
+	let plot;
+
+	$effect(() => {
+		const data = [{ x, y, type: 'scatter', mode: 'lines', line: { color: palette.series[0] } }];
+		const axis = { color: palette.muted, gridcolor: palette.rule };
+		const layout = {
+			paper_bgcolor: palette.paperRaised,
+			plot_bgcolor: palette.paperRaised,
+			font: { family: palette.fontUi, color: palette.ink },
+			xaxis: axis,
+			yaxis: axis,
+		};
+		import('plotly.js-dist-min').then(({ default: Plotly }) => Plotly.react(plot, data, layout));
+	});
+</script>
+
+<div bind:this={plot}></div>
+```
+
+- Load a plotting library with `import()` inside the effect, as above: it needs a browser, and the page is first rendered without one. Install it in the project if `package.json` does not already list it.
+- Text stays in `palette.ink` and `palette.muted`; a series colour marks the series, never its label. With two or more series, give the plot a legend.

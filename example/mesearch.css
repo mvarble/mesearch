@@ -78,6 +78,18 @@
 
     /* --code-background: #f1f0e7; */
 
+    /* Plots. Colours for the series of a chart a document draws, to be used
+     * in this order: each is told from its neighbours with any colour vision.
+     * In JavaScript, `palette.series` holds them as the theme sets them. */
+    /* --series-1: #2a78d6; */
+    /* --series-2: #eb6834; */
+    /* --series-3: #1baf7a; */
+    /* --series-4: #eda100; */
+    /* --series-5: #e87ba4; */
+    /* --series-6: #008300; */
+    /* --series-7: #4a3aa7; */
+    /* --series-8: #e34948; */
+
     /* Shape and space. */
     /* --radius: 6px; */
     /* --radius-large: 14px; */
@@ -120,6 +132,15 @@
     /* --graph-edge-strong: #a3a69f; */
 
     /* --code-background: #1a1e2a; */
+
+    /* --series-1: #3987e5; */
+    /* --series-2: #d95926; */
+    /* --series-3: #199e70; */
+    /* --series-4: #c98500; */
+    /* --series-5: #d55181; */
+    /* --series-6: #008300; */
+    /* --series-7: #9085e9; */
+    /* --series-8: #e66767; */
 
     /* --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.3); */
     /* --shadow-strong: 0 2px 6px rgba(0, 0, 0, 0.4), 0 24px 60px rgba(0, 0, 0, 0.5); */

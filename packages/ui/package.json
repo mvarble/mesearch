@@ -1,6 +1,6 @@
 {
     "name": "@mvarble/mesearch-ui",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "The Svelte components and styles mesearch sites are made of: the map, the index, search, the rail, contents, sequences, and a textbook look. Data and URLs come in as props, so any SvelteKit site can use them.",
     "license": "MIT",
     "author": "Matthew Varble <matthew@rodent.club>",
