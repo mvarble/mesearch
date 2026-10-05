@@ -90,7 +90,7 @@ export function initProject(dir: string, options: InitOptions = {}) {
 const SKILLS_DIR = '.agents/skills';
 const LINKED_SKILLS_DIRS = ['.claude/skills'];
 
-// The skills an agent writes documents with: `/explain` and `/explain-concept`.
+// The skills an agent writes documents with, of which there is one: `/explain`.
 // Each is a folder with a `SKILL.md` and the shared `authoring.md`.
 function installSkills(
     dir: string,

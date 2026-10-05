@@ -6,12 +6,11 @@ These instructions apply to every agent writing here. They sit alongside any pro
 
 ## Skills
 
-Two [agent skills](https://agentskills.io) in `.agents/skills/` hold the procedures for writing here. If your harness has not already loaded the one that fits the task, read its `SKILL.md` and follow it.
+An [agent skill](https://agentskills.io) in `.agents/skills/` holds the procedure for writing here. If your harness has not already loaded it, read its `SKILL.md` and follow it.
 
-- `.agents/skills/explain/`: explain a document in `source/`, as a companion writeup in `content/writeups/` and the concepts it needs.
-- `.agents/skills/explain-concept/`: teach a concept, as one or more documents in `content/concepts/`.
+- `.agents/skills/explain/`: explain whatever is asked for --- a concept, a document in `source/` or elsewhere, an algorithm, a theorem, a textbook chapter --- as documents in `content/concepts/` and, where there is something to work through, a writeup in `content/writeups/`.
 
-Beside each is `authoring.md`: how mathematics, numbered equations, statements, proofs and citations are written. Follow it for any document, whether or not a skill is in use.
+Beside it is `authoring.md`: how mathematics, numbered equations, statements, proofs and citations are written. Follow it for any document, whether or not a skill is in use.
 
 ## Layout
 

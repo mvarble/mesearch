@@ -24,8 +24,8 @@ Where [mkdoc](https://github.com/mvarble/mkdoc) renders one document without a p
 project/
     package.json            depends on @mvarble/mesearch
     AGENTS.md               how agents should write for this site
-    .agents/skills/         the procedures agents write with: explain, explain-concept
-    .claude/skills/         links to the same skills, for Claude Code
+    .agents/skills/         the procedure agents write with: explain
+    .claude/skills/         a link to the same skill, for Claude Code
     .github/workflows/      builds the site on GitHub
     .gitlab-ci.yml          builds the site on GitLab
     mesearch.config.ts      title, base path, KaTeX macros
@@ -131,27 +131,34 @@ Both install with the package manager whose lockfile is committed (`pnpm-lock.ya
 
 `AGENTS.md` describes the layout, the frontmatter, the link conventions and the prose register for any agent writing in the project, and ends with a section for opinions particular to the site.
 
-`.agents/skills/` holds two [agent skills](https://agentskills.io), the procedures an agent follows to write a document:
+`.agents/skills/` holds an [agent skill](https://agentskills.io), `explain`: the procedure an agent follows to write documents. It takes any prompt, works out what the prompt points at, asks what you already know of the subject and of what it rests on, and then writes.
 
-| skill             | what it does                                                                                                                                                                                             |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `explain`         | Reads a document you have saved in `source/`, asks what you already know of what it assumes, and writes a companion in `content/writeups/`, with a document in `content/concepts/` for each new concept. |
-| `explain-concept` | Asks what you already know of a concept and its prerequisites, and writes one or more documents in `content/concepts/` that teach it.                                                                    |
+| the prompt is                                                                                 | what gets written                                                                                       |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| a single idea: a concept, a definition, a term                                                | One or more documents in `content/concepts/` that teach it, prerequisites first.                        |
+| something to work through: a document, a paper, an algorithm, a theorem, a chapter, a problem | A writeup in `content/writeups/`, with a document in `content/concepts/` for each new concept it needs. |
 
-Each skill is a folder with a `SKILL.md` and an `authoring.md`, which covers how to write the mathematics, numbered equations, statements, proofs and citations. They are plain markdown and yours to edit, and they defer to `AGENTS.md` on anything particular to the site.
+A document can be a file you have saved in `source/`, named by its title or its path, a file anywhere else, or an address. A textbook or a long paper is taken a chapter or a part at a time.
 
-A harness that follows the Agent Skills convention, such as pi, finds them in `.agents/skills/`. Claude Code reads only `.claude/skills/`, so `init` links each skill there as well (or copies it, where links cannot be made). Ask for one in plain words, or by name:
+The skill is a folder with a `SKILL.md` and an `authoring.md`, which covers how to write the mathematics, numbered equations, statements, proofs and citations. Both are plain markdown and yours to edit, and they defer to `AGENTS.md` on anything particular to the site.
+
+A harness that follows the Agent Skills convention, such as pi, finds the skill in `.agents/skills/`. Claude Code reads only `.claude/skills/`, so `init` links it there as well (or copies it, where links cannot be made). Ask for it in plain words, or by name:
 
 ```
-/explain bayes-rule                             Claude Code
-/explain-concept covered interest parity
+/explain covered interest parity                Claude Code
+/explain bayes-rule
+/explain source/2026-09-30-bayes-rule.md
+/explain how Dijkstra's algorithm finds shortest paths
+/explain chapter 2 of Folland's Real Analysis
 
-/skill:explain bayes-rule                       pi
+/skill:explain covered interest parity          pi
 ```
 
 In a harness without skills, `AGENTS.md` points the agent at the same files, so asking it to explain `source/2026-09-30-bayes-rule.md` works there too.
 
-`mesearch init` never overwrites a skill that is already there, so a project made before the skills existed gets them by running it again. To take the skills of a newer mesearch, delete `.agents/skills/` and run `mesearch init`: the links in `.claude/skills/` are kept and point at the new copies. Where `init` had to copy instead of link, delete `.claude/skills/explain` and `.claude/skills/explain-concept` as well. Avoid `--force` for this, since it rewrites everything `init` writes, `AGENTS.md` and `mesearch.config.ts` included.
+`mesearch init` never overwrites a skill that is already there, so a project made before the skills existed gets them by running it again. To take the skills of a newer mesearch, delete `.agents/skills/` and run `mesearch init`: the link in `.claude/skills/` is kept and points at the new copy. Where `init` had to copy instead of link, delete `.claude/skills/explain` as well. Avoid `--force` for this, since it rewrites everything `init` writes, `AGENTS.md` and `mesearch.config.ts` included.
+
+Before 0.2.1 there were two skills, `explain` for a document in `source/` and `explain-concept` for a concept. `explain` now does both, so a project made with an earlier version should also delete `.claude/skills/explain-concept`, which `init` no longer writes and which would otherwise be left pointing at nothing.
 
 ## How it works
 

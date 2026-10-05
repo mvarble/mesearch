@@ -61,10 +61,8 @@ test('init scaffolds a project and never overwrites without --force', () => {
             '.gitlab-ci.yml',
             '.agents/skills/explain/SKILL.md',
             '.agents/skills/explain/authoring.md',
-            '.agents/skills/explain-concept/SKILL.md',
-            '.agents/skills/explain-concept/authoring.md',
             '.claude/skills/explain/SKILL.md',
-            '.claude/skills/explain-concept/authoring.md',
+            '.claude/skills/explain/authoring.md',
         ]) {
             assert.ok(fs.existsSync(path.join(dir, file)), `${file} is written`);
         }

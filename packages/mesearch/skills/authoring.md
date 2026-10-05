@@ -89,4 +89,4 @@ Bibliography entries go in BibTeX files anywhere under `content/`, usually `cont
 - `[](cite:folland1999)` cites an entry as `[Foll99]`, and `[Theorem 1.8](cite:folland1999)` as `[Foll99, Theorem 1.8]`. Point at the exact theorem, section or page whenever possible.
 - Each document ends with a list of exactly what it cites, and each citation jumps to its entry there. Cite in the sentence that relies on the source; never write a reference list or a "Further reading" section of your own.
 - Cite only sources you are certain of, with their real titles, authors, years and DOIs. Never invent or guess a reference: leave the citation out rather than risk a wrong one.
-- The source document a companion writeup is about is linked, not cited.
+- A file or an address a writeup is about is linked, not cited. A published work it is about, such as a textbook or a paper, is cited.
