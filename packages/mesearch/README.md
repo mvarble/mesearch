@@ -151,7 +151,8 @@ Every colour, font, size and spacing is a CSS variable. `mesearch init` writes a
 ## Commands
 
 ```
-mesearch init [dir]     scaffold a project (never overwrites without --force)
+mesearch init [dir]     scaffold a project, or bring one up to date
+    --force             overwrite the project's own files too
 mesearch dev            serve the site, updating as documents change
     -p, --port <n>  --host [addr]  --open
 mesearch build          write the static site
@@ -164,26 +165,28 @@ The site in `build/` is plain files: serve it from anywhere.
 
 ## Continuous integration
 
-`mesearch init` writes a GitHub Actions workflow (`.github/workflows/build.yml`) and a GitLab CI configuration (`.gitlab-ci.yml`). Each installs the project's dependencies and runs `mesearch build`, so the site is built with whichever version of `@mvarble/mesearch` the project's `package.json` and lockfile name, and each keeps `build/` as an artifact. GitHub runs it on every push and pull request, GitLab in every pipeline. Delete whichever you do not use; running `mesearch init` again writes it back, as it does anything else it finds missing, and lists what it wrote.
+`mesearch init` writes a GitHub Actions workflow (`.github/workflows/build.yml`) and a GitLab CI configuration (`.gitlab-ci.yml`). Each installs the project's dependencies and runs `mesearch build`, so the site is built with whichever version of `@mvarble/mesearch` the project's `package.json` and lockfile name, and each keeps `build/` as an artifact. GitHub runs it on every push and pull request, GitLab in every pipeline. Delete whichever you do not use. Running `mesearch init` again writes it back, as it does anything else of its own that it finds missing other than the example documents in `content/`, and lists what it wrote.
 
 Both install with the package manager whose lockfile is committed (`pnpm-lock.yaml`, `yarn.lock` or `package-lock.json`), and fail if it does not match `package.json`, so commit the lockfile, after the install that follows `init`, to have CI build with exactly the versions you do. Both also fetch the whole git history, since a document without `created` and `updated` takes its dates from it.
 
 ## Writing with agents
 
-`mesearch init` sets a project up to be written by an agent, in whichever harness you use. It writes two things.
+`mesearch init` sets a project up to be written by an agent, in whichever harness you use. It writes two things, one of them yours and one of them mesearch's.
 
-`AGENTS.md` describes the layout, the frontmatter, the link conventions and the prose register for any agent writing in the project, and ends with a section for opinions particular to the site.
+`AGENTS.md` is yours. It says that the project is a mesearch site, points the agent at the conventions below, and has a section for opinions particular to the site: its subject, its reader, its notation, anything it does differently. `init` writes it once and never touches it again.
 
-`.agents/skills/` holds an [agent skill](https://agentskills.io), `explain`: the procedure an agent follows to write documents. It takes any prompt, works out what the prompt points at, asks what you already know of the subject and of what it rests on, and then writes.
+`.agents/skills/` holds an [agent skill](https://agentskills.io), `explain`: the procedure an agent follows to write documents. It takes any prompt, searches the site for what it already explains, works out what the prompt points at, asks what you already know of the subject and of what it rests on, and then writes one document.
 
-| the prompt is                                                                                 | what gets written                                                                                       |
-| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| a single idea: a concept, a definition, a term                                                | One or more documents in `content/concepts/` that teach it, prerequisites first.                        |
-| something to work through: a document, a paper, an algorithm, a theorem, a chapter, a problem | A writeup in `content/writeups/`, with a document in `content/concepts/` for each new concept it needs. |
+| the prompt is                                                                                 | what gets written                  |
+| --------------------------------------------------------------------------------------------- | ---------------------------------- |
+| a single idea: a concept, a definition, a term                                                | A document in `content/concepts/`. |
+| something to work through: a document, a paper, an algorithm, a theorem, a chapter, a problem | A writeup in `content/writeups/`.  |
+
+The concepts that document needs are explained in sections of it. Two kinds of concept are kept out: one the site already explains, in a document of its own or in a section of another, is linked where it is; and one that takes several sections to explain gets its own document in `content/concepts/`. So the library grows by documents worth reading alone, and not by one small page per term.
 
 A document can be a file you have saved in `source/`, named by its title or its path, a file anywhere else, or an address. A textbook or a long paper is taken a chapter or a part at a time.
 
-The skill is a folder with a `SKILL.md` and an `authoring.md`, which covers how to write the mathematics, numbered equations, statements, proofs and citations. Both are plain markdown and yours to edit, and they defer to `AGENTS.md` on anything particular to the site.
+The skill is a folder with a `SKILL.md` and an `authoring.md`. The second holds mesearch's conventions for any document, whether or not the skill is in use: the layout, the frontmatter, links and prose, and how to write the mathematics, numbered equations, statements, proofs, citations and plots. `AGENTS.md` points at it. Both files are mesearch's, and are replaced as described below, so do not edit them: they defer to `AGENTS.md` on anything particular to the site, and that is where to say what your site does differently.
 
 A harness that follows the Agent Skills convention, such as pi, finds the skill in `.agents/skills/`. Claude Code reads only `.claude/skills/`, so `init` links it there as well (or copies it, where links cannot be made). Ask for it in plain words, or by name:
 
@@ -199,9 +202,15 @@ A harness that follows the Agent Skills convention, such as pi, finds the skill 
 
 In a harness without skills, `AGENTS.md` points the agent at the same files, so asking it to explain `source/2026-09-30-bayes-rule.md` works there too.
 
-`mesearch init` never overwrites a skill that is already there, so a project made before the skills existed gets them by running it again. To take the skills of a newer mesearch, delete `.agents/skills/` and run `mesearch init`: the link in `.claude/skills/` is kept and points at the new copy. Where `init` had to copy instead of link, delete `.claude/skills/explain` as well. Avoid `--force` for this, since it rewrites everything `init` writes, `AGENTS.md` and `mesearch.config.ts` included.
+### Updating
 
-Before 0.2.1 there were two skills, `explain` for a document in `source/` and `explain-concept` for a concept. `explain` now does both, so a project made with an earlier version should also delete `.claude/skills/explain-concept`, which `init` no longer writes and which would otherwise be left pointing at nothing.
+After updating `@mvarble/mesearch`, run `mesearch init` again. It replaces `.agents/skills/explain/` with the new version's whenever the two differ, so the project gets the newest procedure and conventions, and it lists the folder as `updated` when it does. A skill of your own beside it in `.agents/skills/` is left alone, as is `AGENTS.md`, along with everything else `init` wrote for you to change. It does write back a file of its own that has been deleted, such as the CI configuration you do not use, but never the example documents: a project that already has a `content/` folder gets nothing added to it. The link in `.claude/skills/` follows along, and where `init` had to copy instead of link, the copy is replaced too unless it has been edited.
+
+Nothing is refreshed by `mesearch dev` or `mesearch build`: the files in `.agents/skills/` are committed with the project, and only `init` writes them.
+
+A project made before 0.2.3 has mesearch's conventions written out in its `AGENTS.md`, which wins over the skill and so would keep it writing the old way: 0.2.2 and earlier gave every concept a document of its own, where the skill now explains a concept in a section of the document that needs it. Cut that `AGENTS.md` down to what [the current template](https://github.com/mvarble/mesearch/blob/main/packages/mesearch/templates/AGENTS.md) has, keeping your own "Site-specific opinions", and from then on updating is `mesearch init` alone.
+
+Before 0.2.1 there were two skills, `explain` for a document in `source/` and `explain-concept` for a concept. `explain` now does both, so a project made with an earlier version should also delete `.agents/skills/explain-concept` and `.claude/skills/explain-concept`, which `init` no longer writes.
 
 ## How it works
 

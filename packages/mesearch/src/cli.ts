@@ -16,7 +16,11 @@ mesearch --- an opinionated site for a library of notes.
   mesearch build          write the static site
 
 Init options
-      --force         overwrite files that already exist
+      --force         overwrite the project's own files that already exist
+
+Run init again after updating mesearch: it writes whatever is missing and
+brings the agent skills, which are mesearch's, up to date. AGENTS.md and the
+rest of the project's own files are left as they are.
 
 Dev options
   -p, --port <n>      port to listen on

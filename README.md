@@ -12,7 +12,7 @@ npm install @mvarble/mesearch && npx mesearch init && npm install && npm run dev
 
 The second install is for the lint and format tools `init` adds to `package.json`. npm is used here because it comes with Node; pnpm and yarn work too.
 
-`mesearch init` also sets the project up for an agent to write in: an `AGENTS.md` with the site's conventions, and an [agent skill](https://agentskills.io) in `.agents/skills/` (linked into `.claude/skills/` for Claude Code), `explain`, which takes any prompt --- a concept, a document, an algorithm, a textbook --- and works in any harness that reads it. See [Writing with agents](./packages/mesearch/README.md#writing-with-agents). It writes a GitHub Actions workflow and a GitLab CI configuration too, which build the site with the version of `@mvarble/mesearch` the project depends on.
+`mesearch init` also sets the project up for an agent to write in: an `AGENTS.md` for what is particular to your site, and an [agent skill](https://agentskills.io) in `.agents/skills/` (linked into `.claude/skills/` for Claude Code), `explain`, which takes any prompt --- a concept, a document, an algorithm, a textbook --- and works in any harness that reads it. The skill carries mesearch's conventions, and running `mesearch init` again after an update brings it up to date without touching `AGENTS.md`. See [Writing with agents](./packages/mesearch/README.md#writing-with-agents). It writes a GitHub Actions workflow and a GitLab CI configuration too, which build the site with the version of `@mvarble/mesearch` the project depends on.
 
 This repository is a pnpm workspace of the packages mesearch is built from, which [mkdoc](https://github.com/mvarble/mkdoc) and [the blog](https://github.com/mvarble/blog) use too:
 

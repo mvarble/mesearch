@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 
-import { packageDir, skillsDir, templatesDir } from './paths.ts';
+import { CONTENT_DIR, packageDir, skillsDir, templatesDir } from './paths.ts';
 
 export interface InitOptions {
     // Overwrite files that already exist.
@@ -33,11 +33,15 @@ const SCRIPTS: Record<string, string> = {
     format: 'prettier --write .',
 };
 
-// `mesearch init`: everything a project needs, written only where nothing is
-// already, so it is safe to run in a project that has some of it.
+// `mesearch init`: everything a project needs. What is the project's own is
+// written only where nothing is already, so it is safe to run in a project
+// that has some of it. The agent skills are mesearch's, and are brought up to
+// date every time: running it again is how a project takes a newer version's,
+// so it must not put back what a project is expected to have deleted.
 export function initProject(dir: string, options: InitOptions = {}) {
     fs.mkdirSync(dir, { recursive: true });
     const written: string[] = [];
+    const updated: string[] = [];
     const skipped: string[] = [];
     const title = titleFrom(dir);
     const date = new Date().toISOString().slice(0, 10);
@@ -54,11 +58,15 @@ export function initProject(dir: string, options: InitOptions = {}) {
         written.push(name);
     };
 
+    // The example documents are for a project that has none: one that already
+    // has a `content/` has had them, and may well have deleted them since.
+    const starting = options.force || !fs.existsSync(path.join(dir, CONTENT_DIR));
     for (const name of listFiles(templatesDir)) {
+        if (!starting && name.startsWith(`${CONTENT_DIR}/`)) continue;
         write(name, fill(fs.readFileSync(path.join(templatesDir, name), 'utf8')));
     }
-    write('content/sequences/.gitkeep', '');
-    installSkills(dir, write, written, skipped, options.force);
+    if (starting) write(`${CONTENT_DIR}/sequences/.gitkeep`, '');
+    installSkills(dir, written, updated, options.force);
     write('mesearch.css', userStylesheet());
     write(
         'tsconfig.json',
@@ -77,6 +85,7 @@ export function initProject(dir: string, options: InitOptions = {}) {
     addLines(dir, '.gitignore', ['node_modules/', '.mesearch/', 'build/'], written);
 
     for (const name of written) console.log(`  wrote    ${name}`);
+    for (const name of updated) console.log(`  updated  ${name} (mesearch's own)`);
     for (const name of skipped) console.log(`  kept     ${name} (exists; --force to overwrite)`);
     console.log(
         `\nmesearch: ${path.relative(process.cwd(), dir) || '.'} is ready.\n` +
@@ -91,14 +100,15 @@ const SKILLS_DIR = '.agents/skills';
 const LINKED_SKILLS_DIRS = ['.claude/skills'];
 
 // The skills an agent writes documents with, of which there is one: `/explain`.
-// Each is a folder with a `SKILL.md` and the shared `authoring.md`.
-function installSkills(
-    dir: string,
-    write: (name: string, contents: string) => void,
-    written: string[],
-    skipped: string[],
-    force = false,
-) {
+// Each is a folder with a `SKILL.md` and the shared `authoring.md`, which holds
+// the conventions `AGENTS.md` points at.
+//
+// These folders are mesearch's rather than the project's: each is replaced
+// whole whenever it differs from what this version ships, so that a file a
+// newer version no longer has does not linger. What a project wants to say
+// differently goes in its `AGENTS.md`, which is never touched. Any other
+// folder under `.agents/skills/` is the project's own and is left alone.
+function installSkills(dir: string, written: string[], updated: string[], force = false) {
     const authoring = fs.readFileSync(path.join(skillsDir, 'authoring.md'), 'utf8');
     const skills = fs
         .readdirSync(skillsDir, { withFileTypes: true })
@@ -106,27 +116,42 @@ function installSkills(
         .map((entry) => entry.name);
 
     for (const skill of skills) {
-        for (const name of listFiles(path.join(skillsDir, skill))) {
-            write(
-                `${SKILLS_DIR}/${skill}/${name}`,
+        const shipped = new Map(
+            listFiles(path.join(skillsDir, skill)).map((name) => [
+                name,
                 fs.readFileSync(path.join(skillsDir, skill, name), 'utf8'),
-            );
+            ]),
+        );
+        shipped.set('authoring.md', authoring);
+
+        const name = `${SKILLS_DIR}/${skill}`;
+        const target = path.join(dir, name);
+        const installed = readFolder(target);
+        const stale = !sameFiles(installed, shipped);
+        if (stale) {
+            writeFolder(target, shipped);
+            if (installed) updated.push(`${name}/`);
+            else for (const file of shipped.keys()) written.push(`${name}/${file}`);
         }
-        write(`${SKILLS_DIR}/${skill}/authoring.md`, authoring);
 
         for (const linked of LINKED_SKILLS_DIRS) {
             const name = `${linked}/${skill}`;
             const link = path.join(dir, name);
             const stat = fs.lstatSync(link, { throwIfNoEntry: false });
-            // Only a link is ever replaced: a folder there is somebody's own.
-            if (stat && !(force && stat.isSymbolicLink())) {
-                if (!stat.isSymbolicLink()) console.log(`  kept     ${name} (exists)`);
-                else skipped.push(name);
+            if (stat && !stat.isSymbolicLink()) {
+                // A folder is somebody's own, unless it is the copy made below
+                // where links cannot be: that one follows what it was copied from.
+                if (installed && sameFiles(readFolder(link), installed)) {
+                    if (!stale) continue;
+                    writeFolder(link, shipped);
+                    updated.push(`${name}/`);
+                } else console.log(`  kept     ${name} (exists)`);
                 continue;
             }
+            // A link already points at the folder brought up to date above.
+            if (stat && !force) continue;
             if (stat) fs.unlinkSync(link);
             fs.mkdirSync(path.dirname(link), { recursive: true });
-            const target = path.join(dir, SKILLS_DIR, skill);
             try {
                 fs.symlinkSync(path.relative(path.dirname(link), target), link, 'dir');
             } catch {
@@ -135,6 +160,28 @@ function installSkills(
             }
             written.push(name);
         }
+    }
+}
+
+// A folder's files by name, or nothing if it is not a folder.
+function readFolder(dir: string): Map<string, string> | undefined {
+    if (!fs.statSync(dir, { throwIfNoEntry: false })?.isDirectory()) return undefined;
+    return new Map(
+        listFiles(dir).map((name) => [name, fs.readFileSync(path.join(dir, name), 'utf8')]),
+    );
+}
+
+function sameFiles(a: Map<string, string> | undefined, b: Map<string, string>): boolean {
+    return !!a && a.size == b.size && [...b].every(([name, text]) => a.get(name) === text);
+}
+
+// Replaces a folder with exactly these files.
+function writeFolder(dir: string, files: Map<string, string>) {
+    fs.rmSync(dir, { recursive: true, force: true });
+    for (const [name, contents] of files) {
+        const file = path.join(dir, name);
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        fs.writeFileSync(file, contents);
     }
 }
 

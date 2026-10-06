@@ -39,7 +39,7 @@ test("a base of '/' is the root", () => {
     assert.equal(validate({ base: '/notes' }, undefined, 'x').base, '/notes');
 });
 
-test('init scaffolds a project and never overwrites without --force', () => {
+test('init scaffolds a project and never overwrites its own files without --force', () => {
     const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'mesearch-init-')), 'my-notes');
     const log = console.log;
     console.log = () => {};
@@ -80,6 +80,20 @@ test('init scaffolds a project and never overwrites without --force', () => {
         const skill = fs.readFileSync(path.join(dir, '.agents/skills/explain/SKILL.md'), 'utf8');
         assert.match(skill, /^---\nname: explain\ndescription: .+\n---\n/);
         assert.doesNotMatch(skill, /\{\{/);
+        // AGENTS.md is the project's, and leaves the conventions to the file
+        // it points at, which is mesearch's.
+        const agents = fs.readFileSync(path.join(dir, 'AGENTS.md'), 'utf8');
+        assert.match(agents, /^# Writing for My notes\n/);
+        assert.match(agents, /\.agents\/skills\/explain\/authoring\.md/);
+        assert.match(agents, /## Site-specific opinions/);
+        assert.doesNotMatch(agents, /depends_on/);
+        const authoring = fs.readFileSync(
+            path.join(dir, '.agents/skills/explain/authoring.md'),
+            'utf8',
+        );
+        for (const section of ['Layout', 'Frontmatter', 'Links', 'Prose', 'Mathematics']) {
+            assert.match(authoring, new RegExp(`^## ${section}$`, 'm'));
+        }
         assert.match(
             fs.readFileSync(path.join(dir, 'mesearch.config.ts'), 'utf8'),
             /title: 'My notes'/,
@@ -94,15 +108,37 @@ test('init scaffolds a project and never overwrites without --force', () => {
         );
 
         fs.writeFileSync(path.join(dir, 'AGENTS.md'), 'mine');
-        fs.writeFileSync(path.join(dir, '.agents/skills/explain/SKILL.md'), 'mine');
+        // As a project holding an earlier version's skill would have it.
+        fs.writeFileSync(path.join(dir, '.agents/skills/explain/SKILL.md'), 'old');
+        fs.writeFileSync(path.join(dir, '.agents/skills/explain/dropped.md'), 'old');
+        fs.mkdirSync(path.join(dir, '.agents/skills/mine'));
+        fs.writeFileSync(path.join(dir, '.agents/skills/mine/SKILL.md'), 'mine');
+        // The examples are deleted once there is something real to read.
+        fs.rmSync(path.join(dir, 'content/concepts/example-concept'), { recursive: true });
+        fs.rmSync(path.join(dir, 'content/sequences/.gitkeep'));
+        fs.rmSync(path.join(dir, '.gitlab-ci.yml'));
         // As a project made before the skills were would have it.
         fs.writeFileSync(path.join(dir, '.prettierignore'), 'build/\nmine/\n');
         manifest.scripts.dev = 'custom';
         fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify(manifest));
         initProject(dir);
         assert.equal(fs.readFileSync(path.join(dir, 'AGENTS.md'), 'utf8'), 'mine');
+        // What is missing is written again, but never an example document.
+        assert.ok(fs.existsSync(path.join(dir, '.gitlab-ci.yml')));
+        assert.ok(!fs.existsSync(path.join(dir, 'content/concepts/example-concept')));
+        assert.ok(!fs.existsSync(path.join(dir, 'content/sequences/.gitkeep')));
+        // The skills are mesearch's: brought up to date, through the link too,
+        // with nothing left over. A skill of the project's own is not touched.
+        for (const skills of ['.agents/skills', '.claude/skills']) {
+            assert.equal(
+                fs.readFileSync(path.join(dir, skills, 'explain/SKILL.md'), 'utf8'),
+                skill,
+            );
+            assert.ok(!fs.existsSync(path.join(dir, skills, 'explain/dropped.md')));
+        }
+        assert.ok(fs.lstatSync(path.join(dir, '.claude/skills/explain')).isSymbolicLink());
         assert.equal(
-            fs.readFileSync(path.join(dir, '.agents/skills/explain/SKILL.md'), 'utf8'),
+            fs.readFileSync(path.join(dir, '.agents/skills/mine/SKILL.md'), 'utf8'),
             'mine',
         );
         assert.equal(
@@ -115,6 +151,38 @@ test('init scaffolds a project and never overwrites without --force', () => {
         );
         initProject(dir, { force: true });
         assert.notEqual(fs.readFileSync(path.join(dir, 'AGENTS.md'), 'utf8'), 'mine');
+    } finally {
+        console.log = log;
+    }
+});
+
+test('init refreshes a copied skill, and leaves alone a folder that is not its copy', () => {
+    const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'mesearch-init-')), 'my-notes');
+    const log = console.log;
+    console.log = () => {};
+    try {
+        initProject(dir);
+        const installed = path.join(dir, '.agents/skills/explain');
+        const linked = path.join(dir, '.claude/skills/explain');
+        const shipped = fs.readFileSync(path.join(installed, 'SKILL.md'), 'utf8');
+        const stale = () => {
+            fs.writeFileSync(path.join(installed, 'SKILL.md'), 'old');
+            fs.rmSync(linked, { recursive: true });
+            fs.cpSync(installed, linked, { recursive: true });
+        };
+
+        // Where links cannot be made, `.claude/skills/` holds a copy instead.
+        stale();
+        initProject(dir);
+        assert.equal(fs.readFileSync(path.join(linked, 'SKILL.md'), 'utf8'), shipped);
+        assert.ok(!fs.lstatSync(linked).isSymbolicLink());
+
+        // A folder that differs from what was installed is somebody's own.
+        stale();
+        fs.writeFileSync(path.join(linked, 'SKILL.md'), 'mine');
+        initProject(dir);
+        assert.equal(fs.readFileSync(path.join(installed, 'SKILL.md'), 'utf8'), shipped);
+        assert.equal(fs.readFileSync(path.join(linked, 'SKILL.md'), 'utf8'), 'mine');
     } finally {
         console.log = log;
     }
