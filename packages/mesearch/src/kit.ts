@@ -78,22 +78,15 @@ export async function viteConfig(root: string): Promise<UserConfig> {
         server: {
             fs: { allow: [root, packageDir, ...dependencyRoots()] },
         },
-        optimizeDeps: {
-            // The app ships as Svelte source inside this package, which Vite
-            // would otherwise try to pre-bundle as if it were a library. And
-            // Svelte itself is never pre-bundled: a project's documents reach
-            // it from outside this package, the app from inside, and a
-            // pre-bundled copy for one and the source for the other would be
-            // two runtimes.
-            exclude: [
-                '@mvarble/mesearch',
-                '@mvarble/mesearch-cms',
-                '@mvarble/mesearch-markdown',
-                '@mvarble/mesearch-ui',
-                'svelte',
-            ],
+        optimizeDeps: { exclude: NOT_PREBUNDLED },
+        ssr: {
+            noExternal: ['@mvarble/mesearch', '@mvarble/mesearch-ui'],
+            // The server has a list of its own, which the Svelte plugin adds
+            // every entry point of Svelte to unless it is excluded here too.
+            // Vite looks for those from `.mesearch/`, where a project that
+            // does not depend on Svelte itself has none, and says so for each.
+            optimizeDeps: { exclude: NOT_PREBUNDLED },
         },
-        ssr: { noExternal: ['@mvarble/mesearch', '@mvarble/mesearch-ui'] },
         build: {
             chunkSizeWarningLimit: 2000,
             // A report on how long each plugin took is for whoever works on
@@ -102,6 +95,19 @@ export async function viteConfig(root: string): Promise<UserConfig> {
         },
     };
 }
+
+// The app ships as Svelte source inside this package, which Vite would
+// otherwise try to pre-bundle as if it were a library. And Svelte itself is
+// never pre-bundled: a project's documents reach it from outside this package,
+// the app from inside, and a pre-bundled copy for one and the source for the
+// other would be two runtimes.
+const NOT_PREBUNDLED = [
+    '@mvarble/mesearch',
+    '@mvarble/mesearch-cms',
+    '@mvarble/mesearch-markdown',
+    '@mvarble/mesearch-ui',
+    'svelte',
+];
 
 const require = createRequire(import.meta.url);
 

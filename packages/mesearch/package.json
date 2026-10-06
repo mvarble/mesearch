@@ -1,6 +1,6 @@
 {
     "name": "@mvarble/mesearch",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "description": "An opinionated static site for a library of agent-written notes: concepts, writeups and sequences under content/, rendered as a textbook with KaTeX, a dependency graph and an index.",
     "license": "MIT",
     "author": "Matthew Varble <matthew@rodent.club>",

@@ -109,21 +109,7 @@ const LINKED_SKILLS_DIRS = ['.claude/skills'];
 // differently goes in its `AGENTS.md`, which is never touched. Any other
 // folder under `.agents/skills/` is the project's own and is left alone.
 function installSkills(dir: string, written: string[], updated: string[], force = false) {
-    const authoring = fs.readFileSync(path.join(skillsDir, 'authoring.md'), 'utf8');
-    const skills = fs
-        .readdirSync(skillsDir, { withFileTypes: true })
-        .filter((entry) => entry.isDirectory())
-        .map((entry) => entry.name);
-
-    for (const skill of skills) {
-        const shipped = new Map(
-            listFiles(path.join(skillsDir, skill)).map((name) => [
-                name,
-                fs.readFileSync(path.join(skillsDir, skill, name), 'utf8'),
-            ]),
-        );
-        shipped.set('authoring.md', authoring);
-
+    for (const [skill, shipped] of shippedSkills()) {
         const name = `${SKILLS_DIR}/${skill}`;
         const target = path.join(dir, name);
         const installed = readFolder(target);
@@ -163,6 +149,41 @@ function installSkills(dir: string, written: string[], updated: string[], force 
     }
 }
 
+// The skills this version ships, each as the files its folder is to hold.
+function shippedSkills(): Map<string, Map<string, string>> {
+    const authoring = fs.readFileSync(path.join(skillsDir, 'authoring.md'), 'utf8');
+    const skills = fs
+        .readdirSync(skillsDir, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => entry.name);
+    return new Map(
+        skills.map((skill) => {
+            const files = new Map(
+                listFiles(path.join(skillsDir, skill)).map((name) => [
+                    name,
+                    fs.readFileSync(path.join(skillsDir, skill, name), 'utf8'),
+                ]),
+            );
+            files.set('authoring.md', authoring);
+            return [skill, files];
+        }),
+    );
+}
+
+// The skill folders in a project that are not this version's, as
+// `.agents/skills/explain`: the ones `mesearch init` would replace. A skill
+// the project does not have at all is not among them, since a project need
+// not be written by agents.
+export function outdatedSkills(dir: string): string[] {
+    return [...shippedSkills()]
+        .map(([skill, shipped]) => ({ name: `${SKILLS_DIR}/${skill}`, shipped }))
+        .filter(({ name, shipped }) => {
+            const installed = readFolder(path.join(dir, name));
+            return installed && !sameFiles(installed, shipped);
+        })
+        .map(({ name }) => name);
+}
+
 // A folder's files by name, or nothing if it is not a folder.
 function readFolder(dir: string): Map<string, string> | undefined {
     if (!fs.statSync(dir, { throwIfNoEntry: false })?.isDirectory()) return undefined;
@@ -171,8 +192,14 @@ function readFolder(dir: string): Map<string, string> | undefined {
     );
 }
 
+// Line endings aside: a checkout that converts them has changed nothing.
 function sameFiles(a: Map<string, string> | undefined, b: Map<string, string>): boolean {
-    return !!a && a.size == b.size && [...b].every(([name, text]) => a.get(name) === text);
+    const text = (contents?: string) => contents?.replaceAll('\r\n', '\n');
+    return (
+        !!a &&
+        a.size == b.size &&
+        [...b].every(([name, theirs]) => text(a.get(name)) === text(theirs))
+    );
 }
 
 // Replaces a folder with exactly these files.

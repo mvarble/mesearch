@@ -4,7 +4,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 
-import { initProject } from './init.ts';
+import { initProject, outdatedSkills } from './init.ts';
 import { packageDir } from './paths.ts';
 import { exportOptions, findRoot, openProject, type Project } from './project.ts';
 
@@ -138,6 +138,15 @@ async function dev(
     }
     console.log(`mesearch: serving ${project.config.title} from ${project.root}`);
     server.printUrls();
+    // Last, where it is still on screen once the server is up.
+    const outdated = outdatedSkills(project.root);
+    if (outdated.length) {
+        const [is, them] = outdated.length == 1 ? ['is', 'it'] : ['are', 'them'];
+        console.log(
+            `mesearch: ${outdated.map((name) => `${name}/`).join(' and ')} ${is} not mesearch ` +
+                `${version()}'s; run \`mesearch init\` to update ${them}.`,
+        );
+    }
 }
 
 // Marks a directory as ours, so that a mistyped `--out` cannot quietly delete

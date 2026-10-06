@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { validate } from '../src/config.ts';
-import { initProject, tokensFile, userStylesheet } from '../src/init.ts';
+import { initProject, outdatedSkills, tokensFile, userStylesheet } from '../src/init.ts';
 import { rehypeDemoteHeadings } from '../src/headings.ts';
 
 test('a config is filled in with defaults', () => {
@@ -183,6 +183,36 @@ test('init refreshes a copied skill, and leaves alone a folder that is not its c
         initProject(dir);
         assert.equal(fs.readFileSync(path.join(installed, 'SKILL.md'), 'utf8'), shipped);
         assert.equal(fs.readFileSync(path.join(linked, 'SKILL.md'), 'utf8'), 'mine');
+    } finally {
+        console.log = log;
+    }
+});
+
+test("a skill that is not this version's is reported, and a missing one is not", () => {
+    const dir = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'mesearch-init-')), 'my-notes');
+    const log = console.log;
+    console.log = () => {};
+    try {
+        assert.deepEqual(outdatedSkills(dir), []);
+        initProject(dir);
+        assert.deepEqual(outdatedSkills(dir), []);
+
+        const skill = path.join(dir, '.agents/skills/explain/SKILL.md');
+        const shipped = fs.readFileSync(skill, 'utf8');
+        // A checkout that converts line endings has changed nothing.
+        fs.writeFileSync(skill, shipped.replaceAll('\n', '\r\n'));
+        assert.deepEqual(outdatedSkills(dir), []);
+        fs.writeFileSync(skill, shipped + 'An edit.\n');
+        assert.deepEqual(outdatedSkills(dir), ['.agents/skills/explain']);
+        fs.writeFileSync(skill, shipped);
+        fs.writeFileSync(path.join(dir, '.agents/skills/explain/dropped.md'), 'old');
+        assert.deepEqual(outdatedSkills(dir), ['.agents/skills/explain']);
+
+        initProject(dir);
+        assert.deepEqual(outdatedSkills(dir), []);
+        // A project need not be written by agents at all.
+        fs.rmSync(path.join(dir, '.agents'), { recursive: true });
+        assert.deepEqual(outdatedSkills(dir), []);
     } finally {
         console.log = log;
     }
