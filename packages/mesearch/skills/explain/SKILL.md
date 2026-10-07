@@ -1,6 +1,6 @@
 ---
 name: explain
-description: Explains whatever the prompt names in a mesearch site (a concept, a document in source/ or elsewhere, a paper, an algorithm, a theorem, a textbook or one of its chapters, a problem, a question) by assessing what the reader already knows and writing one textbook-style document: a concept in content/concepts/ or, where there is something to work through, a writeup in content/writeups/. The concepts it needs are explained in its own sections unless the site already explains them or they are large enough to need a document of their own. Use when asked to explain, teach, summarise, document or write a companion for anything, or when invoked as /explain <prompt>.
+description: Explains whatever the prompt names in a mesearch site (a concept, a document in source/ or elsewhere, a paper, an algorithm, a theorem, a textbook or one of its chapters, a problem, a question) by assessing what the reader already knows and writing one textbook-style document, either a concept in content/concepts/ or, where there is something to work through, a writeup in content/writeups/. The concepts it needs are explained in its own sections unless the site already explains them or they are large enough to need a document of their own. Use when asked to explain, teach, summarise, document or write a companion for anything, or when invoked as /explain <prompt>.
 ---
 
 # Explain

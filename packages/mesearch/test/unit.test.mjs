@@ -79,6 +79,9 @@ test('init scaffolds a project and never overwrites its own files without --forc
         // A skill is handed over as written: nothing in it is a template.
         const skill = fs.readFileSync(path.join(dir, '.agents/skills/explain/SKILL.md'), 'utf8');
         assert.match(skill, /^---\nname: explain\ndescription: .+\n---\n/);
+        // The description is a plain YAML scalar, which ': ' or ' #' would break.
+        const description = skill.match(/^description: (.+)$/m)[1];
+        assert.doesNotMatch(description, /: | #/);
         assert.doesNotMatch(skill, /\{\{/);
         // AGENTS.md is the project's, and leaves the conventions to the file
         // it points at, which is mesearch's.
