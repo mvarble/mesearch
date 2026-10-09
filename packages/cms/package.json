@@ -1,6 +1,6 @@
 {
     "name": "@mvarble/mesearch-cms",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "An in-memory content database for markdown/mdsvex sites: documents, pages, numbered statements and equations, references, outlines and folded KaTeX macros, kept live by a Vite plugin.",
     "license": "MIT",
     "author": "Matthew Varble <matthew@rodent.club>",
@@ -37,6 +37,14 @@
         "./presets/mesearch/runtime": {
             "types": "./dist/presets/mesearch/runtime.d.ts",
             "import": "./dist/presets/mesearch/runtime.js"
+        },
+        "./presets/skoro": {
+            "types": "./dist/presets/skoro/index.d.ts",
+            "import": "./dist/presets/skoro/index.js"
+        },
+        "./presets/skoro/runtime": {
+            "types": "./dist/presets/skoro/runtime.d.ts",
+            "import": "./dist/presets/skoro/runtime.js"
         },
         "./package.json": "./package.json"
     },

@@ -1,0 +1,18 @@
+---
+depends_on: [retraction, math/tangent-space]
+---
+
+<script>
+	import Statement from '$lib/components/Statement.svelte';
+	import * as whitening from './statements/whitening.md';
+</script>
+
+The residual is whitened, as [](cite:folland1999) does.
+
+$$
+	r = L^{-1}(x \ominus \mu) @tag(residual)
+$$
+
+<Statement {...whitening} />
+
+By [%full](statement:whitening) and [](eq:residual); see also [the plan](plan.md).
