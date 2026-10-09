@@ -122,6 +122,19 @@ test('equations and statements are numbered per document, and links resolve', ()
     assert.equal(landing.target.url, '/skoro/guide/first-model/');
 });
 
+test('links to a section’s own page resolve, with its title', () => {
+    const refs = store.refsOf('content/guide/first-model/index.md');
+    const sections = refs.filter((ref) => ref.resolver == 'section');
+    assert.deepEqual(
+        sections.map((ref) => [ref.target.url, ref.target.formats.title]),
+        [
+            ['/skoro/concepts/', 'Concepts'],
+            ['/skoro/math/', 'Mathematics'],
+        ],
+    );
+    assert.ok(!messages.some((m) => m.includes("'concepts' does not resolve")));
+});
+
 test('the graph joins math notes and entry documents', () => {
     const { nodes, edges } = cms.graph();
     assert.deepEqual(nodes.toSorted(), [

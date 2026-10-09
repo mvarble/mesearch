@@ -7,6 +7,7 @@ import type { SourceFile } from '../../core/source.ts';
 import { bibliographies, readBibliography } from '../../core/bibtex.ts';
 import { registerStatement } from '../../core/statements.ts';
 import type { Store } from '../../core/store.ts';
+import type { Resolver } from '../../core/resolver.ts';
 import { parseHeadings, walkDocument, type WalkTarget } from '../../core/walk.ts';
 import {
     citations,
@@ -46,6 +47,10 @@ export interface SkoroPresetOptions {
     contentDir?: string;
     // The URL prefix the site is served under, as SvelteKit's `paths.base`.
     base?: string;
+    // The titles of the pages that list each track, the math notes and the
+    // archive, which links to them (`../../guide/`) read as `%title`. A track's
+    // id, capitalized, by default.
+    sectionTitles?: Record<string, string>;
     // The import specifier of the component a statement is spread into.
     statementComponent?: string;
     // Where a document's dates come from when its frontmatter is silent. Git
@@ -114,6 +119,16 @@ export function skoroPreset(options: SkoroPresetOptions): Preset {
     }
 
     const url = (pathname: string, hash = '') => `${base}/${pathname ? pathname + '/' : ''}${hash}`;
+
+    // The sections are pages of the site that no document makes.
+    const sections = new Map(
+        [...tracks, 'math', 'archive'].map((id) => [
+            id,
+            options.sectionTitles?.[id] ??
+                { math: 'Mathematics', archive: 'Archive' }[id] ??
+                id.slice(0, 1).toUpperCase() + id.slice(1),
+        ]),
+    );
 
     const placeOf = (id: string): Place | undefined => {
         if (!id.startsWith(contentDir + '/')) return undefined;
@@ -472,6 +487,34 @@ export function skoroPreset(options: SkoroPresetOptions): Preset {
         return { pathname, hash };
     }
 
+    const linkOptions = {
+        // Anything that is not an external URL, a bare fragment, a file such as
+        // a figure, or a reference another resolver claims.
+        match: (href: string) =>
+            !!href &&
+            !/^[a-z][a-z0-9+.-]*:/i.test(href) &&
+            !href.startsWith('#') &&
+            !/\.(?!md$|svx$)[a-z0-9]+$/i.test(href.replace(/[?#].*$/, '')),
+        locate: (store: Store, doc: { id: string }, href: string) => locate(store, doc.id, href),
+        url,
+    };
+
+    // A link to a section's own page: a track, the math notes, the archive.
+    const sectionLinks: Resolver<PageTarget> = {
+        ...pageLinks(linkOptions),
+        name: 'section',
+        matchLink(href, store, doc) {
+            if (!linkOptions.match(href)) return undefined;
+            const location = locate(store, doc.id, href);
+            return location && sections.has(location.pathname) ? href : undefined;
+        },
+        resolve(store, doc, written) {
+            const { pathname, hash } = locate(store, doc.id, written)!;
+            const title = sections.get(pathname)!;
+            return { pathname, hash, formats: { title, full: title }, url: url(pathname, hash) };
+        },
+    };
+
     return {
         name: 'skoro',
         contentDir,
@@ -490,15 +533,8 @@ export function skoroPreset(options: SkoroPresetOptions): Preset {
             equations({ url: (page, slug) => url(page, `#eq:${slug}`) }),
             statements({ url: (page, slug) => url(page, `#statement:${slug}`) }),
             citations({ url: (key) => `#cite:${key}` }),
-            pageLinks({
-                match: (href) =>
-                    !!href &&
-                    !/^[a-z][a-z0-9+.-]*:/i.test(href) &&
-                    !href.startsWith('#') &&
-                    !/\.(?!md$|svx$)[a-z0-9]+$/i.test(href.replace(/[?#].*$/, '')),
-                locate: (store, doc, href) => locate(store, doc.id, href),
-                url,
-            }),
+            sectionLinks,
+            pageLinks(linkOptions),
         ],
         headingDepth: 3,
         runtime: '@mvarble/mesearch-cms/presets/skoro/runtime',
