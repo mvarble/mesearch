@@ -1,0 +1,7 @@
+{
+    "kind": "feature",
+    "stage": "done",
+    "started": "2026-02-01",
+    "finished": "2026-02-20",
+    "events": [{ "date": "2026-02-01", "action": "start", "stage": "math" }]
+}
