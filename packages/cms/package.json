@@ -1,6 +1,6 @@
 {
     "name": "@mvarble/mesearch-cms",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "An in-memory content database for markdown/mdsvex sites: documents, pages, numbered statements and equations, references, outlines and folded KaTeX macros, kept live by a Vite plugin.",
     "license": "MIT",
     "author": "Matthew Varble <matthew@rodent.club>",

@@ -71,6 +71,8 @@ test('an entry carries its workflow record, its documents in order, and its page
 test('an entry document is titled by its name unless it says otherwise', () => {
     assert.equal(cms.get('archive/normal/math').title, 'Mathematics');
     assert.equal(cms.get('archive/normal/implementation').title, 'Implementing the Normal');
+    // Its first heading names a section of it, not the document.
+    assert.equal(cms.get('archive/normal/plan').title, 'Plan');
     assert.equal(cms.get('archive/normal/math').entry, 'archive/normal');
     assert.equal(
         store.pages.get('archive/normal/math').formats.full,

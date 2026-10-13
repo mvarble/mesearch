@@ -303,7 +303,11 @@ export function skoroPreset(options: SkoroPresetOptions): Preset {
                 kind: 'entry-document',
                 entry: `archive/${place.slug}`,
                 name: place.name,
-                title: titleOf(fm, file, documentTitles[place.name]!),
+                // Named by its stage ("Mathematics", "Plan"), not by its first heading, which
+                // names a section of it ("The problem"); only its own `title` overrides that.
+                title: fm.has('title')
+                    ? fm.requiredString('title') || documentTitles[place.name]!
+                    : documentTitles[place.name]!,
             };
             // Read here rather than from the entry's record, which may not be
             // registered yet: files are visited in name order.
