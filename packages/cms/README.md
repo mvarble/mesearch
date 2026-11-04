@@ -129,13 +129,16 @@ What every layout so far has needed, in the same shape:
 
 The BibTeX reader decodes LaTeX accents and drops protective braces. A `cite:` link points at the reference list at the end of its own page.
 
-### From 0.2
+### From 0.1 and 0.2
 
-0.2 shipped `mesearchPreset`, `skoroPreset` and `blogPreset` under `@mvarble/mesearch-cms/presets/*`. To upgrade a site that used one:
+0.1 and 0.2 shipped the presets under `@mvarble/mesearch-cms/presets/*`: `blogPreset` in both, and `mesearchPreset` and `skoroPreset` in 0.2. The blog's preset is the same in both releases, so the steps below take a site straight to 0.3:
 
 1. Copy the preset's `index.ts`, `runtime.ts` and `types.ts` into the site, for instance into `src/lib/cms/`. For the blog, the copy is [`test/blog-preset/`](./test/blog-preset).
-2. Change their relative `../../core/...`, `../../model/...` and `../../resolvers/...` imports to `@mvarble/mesearch-cms`. In `runtime.ts` and `types.ts`, use `@mvarble/mesearch-cms/runtime` instead.
-3. Set `runtime` to the copy's path from the project root, and delete `bindLive` from the runtime.
+2. Point their imports at the package.
+    - In a copy of the 0.2 sources, the relative `../../core/...`, `../../model/...`, `../../resolvers/...` and `../text.ts` imports become `@mvarble/mesearch-cms`.
+    - In a copy of `test/blog-preset/`, the same goes for `../../src/core/...`, `../../src/kit/index.ts`, `../../src/model/...` and `../../src/resolvers/...`.
+    - In `runtime.ts` and `types.ts`, `../../src/runtime-kit.ts` and the outline, citation and statement types come from `@mvarble/mesearch-cms/runtime` instead.
+3. Set `runtime` to the copy's path from the project root (`'./src/lib/cms/runtime.ts'`), and delete `bindLive` from the runtime if it has one.
 4. Point the site's imports of `@mvarble/mesearch-cms/presets/<name>[/runtime]` at the copy, or at `@mvarble/mesearch-cms/runtime` for `citationLabel`, `StatementInjection` and the outline types.
 
 ## How changes propagate

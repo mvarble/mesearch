@@ -1,7 +1,7 @@
 // The blog's content model, kept here as the fixture the core's tests run
 // against: it numbers across a whole sequence, labels its pages by position and
 // gives every post its own scope, which exercises most of what the store does.
-// The blog itself carries its own copy.
+// The blog takes its own copy of it when it upgrades to 0.3.
 import { docRecord, type Doctype, type Preset } from '../../src/core/build.ts';
 import { Frontmatter } from '../../src/core/frontmatter.ts';
 import { resolveId } from '../../src/core/paths.ts';
