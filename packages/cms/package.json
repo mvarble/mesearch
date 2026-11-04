@@ -1,6 +1,6 @@
 {
     "name": "@mvarble/mesearch-cms",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "description": "An in-memory content database for markdown/mdsvex sites: documents, pages, numbered statements and equations, references, outlines and folded KaTeX macros, kept live by a Vite plugin.",
     "license": "MIT",
     "author": "Matthew Varble <matthew@rodent.club>",
@@ -22,29 +22,9 @@
             "types": "./dist/model/index.d.ts",
             "import": "./dist/model/index.js"
         },
-        "./presets/blog": {
-            "types": "./dist/presets/blog/index.d.ts",
-            "import": "./dist/presets/blog/index.js"
-        },
-        "./presets/blog/runtime": {
-            "types": "./dist/presets/blog/runtime.d.ts",
-            "import": "./dist/presets/blog/runtime.js"
-        },
-        "./presets/mesearch": {
-            "types": "./dist/presets/mesearch/index.d.ts",
-            "import": "./dist/presets/mesearch/index.js"
-        },
-        "./presets/mesearch/runtime": {
-            "types": "./dist/presets/mesearch/runtime.d.ts",
-            "import": "./dist/presets/mesearch/runtime.js"
-        },
-        "./presets/skoro": {
-            "types": "./dist/presets/skoro/index.d.ts",
-            "import": "./dist/presets/skoro/index.js"
-        },
-        "./presets/skoro/runtime": {
-            "types": "./dist/presets/skoro/runtime.d.ts",
-            "import": "./dist/presets/skoro/runtime.js"
+        "./runtime": {
+            "types": "./dist/runtime-kit.d.ts",
+            "import": "./dist/runtime-kit.js"
         },
         "./package.json": "./package.json"
     },

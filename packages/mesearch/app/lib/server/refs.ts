@@ -1,4 +1,4 @@
-import type { MesearchDocument } from '@mvarble/mesearch-cms/presets/mesearch';
+import type { MesearchDocument } from '@mvarble/mesearch/preset';
 import { inlineHtml } from '@mvarble/mesearch-ui/server';
 import site from '$site';
 

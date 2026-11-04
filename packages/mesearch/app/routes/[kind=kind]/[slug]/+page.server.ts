@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
-import type { OutlineEntry } from '@mvarble/mesearch-cms/presets/mesearch';
-import { citationLabel } from '@mvarble/mesearch-cms/presets/mesearch/runtime';
+import type { OutlineEntry } from '@mvarble/mesearch-cms/runtime';
+import { citationLabel } from '@mvarble/mesearch-cms/runtime';
 import { referenceHtml } from '@mvarble/mesearch-ui/server';
 import site from '$site';
 import { cms } from '$cms';

@@ -1,12 +1,12 @@
-// Builds the blog preset against a fixture tree and returns everything
-// position-dependent that it produced, in the shape the original SQLite-backed
-// content layer's tests read back out of its database --- so that those tests
-// port over with their expectations untouched.
+// Builds the blog preset, kept in `blog-preset/`, against a fixture tree and
+// returns everything position-dependent that it produced, in the shape the
+// original SQLite-backed content layer's tests read back out of its database
+// --- so that those tests port over with their expectations untouched.
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { buildStore } from '../src/core/build.ts';
-import { blogPreset } from '../src/presets/blog/index.ts';
+import { blogPreset } from './blog-preset/index.ts';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 

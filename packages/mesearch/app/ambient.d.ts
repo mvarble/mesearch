@@ -1,7 +1,7 @@
 // Modules served by mesearch's Vite plugins.
 
 declare module '$cms' {
-    export const cms: import('@mvarble/mesearch-cms/presets/mesearch').MesearchCms;
+    export const cms: import('@mvarble/mesearch/preset/runtime').MesearchCms;
 }
 
 declare module '$cms/loaders' {

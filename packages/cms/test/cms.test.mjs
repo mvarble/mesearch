@@ -11,8 +11,8 @@ import { uneval } from 'devalue';
 import { buildStore } from '../src/core/build.ts';
 import { allFacts, diffFacts } from '../src/core/facts.ts';
 import { createCms } from '../src/cms.ts';
-import { blogPreset } from '../src/presets/blog/index.ts';
-import { bind } from '../src/presets/blog/runtime.ts';
+import { blogPreset } from './blog-preset/index.ts';
+import { bind } from './blog-preset/runtime.ts';
 import { fixtureRoot } from './harness.mjs';
 
 test('a description folds its owner macros and resolves its links', () => {
@@ -150,4 +150,48 @@ test('macrosFor folds a known document and falls back to frontmatter otherwise',
         }),
         { '\\site': 'S', '\\x': 'X' },
     );
+});
+
+test('a preset kept in the site has its runtime resolved from the project root', async () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'cms-runtime-'));
+    fs.mkdirSync(path.join(tmp, 'content'));
+    fs.writeFileSync(path.join(tmp, 'content/a.md'), '# A\n');
+    fs.writeFileSync(
+        path.join(tmp, 'runtime.mjs'),
+        'export const bind = (snapshot) => ({ count: () => snapshot.count });\n',
+    );
+    const preset = {
+        name: 'local',
+        contentDir: 'content',
+        include: (id) => id.endsWith('.md'),
+        doctypes: [],
+        resolvers: [],
+        headingDepth: 2,
+        runtime: './runtime.mjs',
+        snapshot: (store) => ({ count: store.hasFile('content/a.md') ? 1 : 0 }),
+    };
+    const vite = (command) => {
+        const [plugin] = createCms({ root: tmp, preset, label: 'test' }).vite();
+        plugin.configResolved({ command });
+        return plugin;
+    };
+
+    const plugin = vite('serve');
+    const runtime = await plugin.resolveId.call({}, 'virtual:mesearch-cms/runtime');
+    assert.equal(runtime, path.join(tmp, 'runtime.mjs'));
+    const virtual = await plugin.resolveId.call({}, 'virtual:mesearch-cms');
+    const serve = plugin.load.call({}, virtual);
+    // The site need not depend on this package for the generated code to load.
+    assert.ok(!serve.includes('@mvarble/mesearch-cms'));
+    assert.match(serve, /import \{ live \} from "virtual:mesearch-cms\/live"/);
+    const { live } = await import(await plugin.resolveId.call({}, 'virtual:mesearch-cms/live'));
+    const { bind } = await import(runtime);
+    assert.equal(live(bind, () => ({ count: 3 })).count(), 3);
+
+    // A file URL is taken as it is, and a build inlines the snapshot.
+    preset.runtime = new URL(`file://${path.join(tmp, 'runtime.mjs')}`);
+    const built = vite('build');
+    assert.equal(await built.resolveId.call({}, 'virtual:mesearch-cms/runtime'), runtime);
+    assert.match(built.load.call({}, virtual), /export const cms = bind\(\{count:1\}\)/);
+    fs.rmSync(tmp, { recursive: true, force: true });
 });

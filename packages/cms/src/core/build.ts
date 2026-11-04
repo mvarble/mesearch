@@ -34,8 +34,10 @@ export interface Preset {
     // The deepest heading recorded, and the rendered `id` stamped on.
     headingDepth: number;
     // The module, exporting `bind(snapshot)`, that turns a snapshot into the
-    // queries a site's `load` functions call.
-    runtime: string;
+    // queries a site's `load` functions call. An absolute path or a file URL
+    // (`new URL('./runtime.js', import.meta.url)`), a path relative to the
+    // project root (`'./src/lib/cms/runtime.ts'`), or a package specifier.
+    runtime: string | URL;
     // The serialisable part of the store that `bind` is handed.
     snapshot(store: Store): unknown;
 }

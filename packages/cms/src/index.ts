@@ -7,6 +7,7 @@ export {
     type Doctype,
     type Preset,
 } from './core/build.ts';
+export { bibliographies, readBibliography } from './core/bibtex.ts';
 export { allFacts, diffFacts, documentFacts } from './core/facts.ts';
 export { Frontmatter, parseFrontmatter, stripFrontmatter } from './core/frontmatter.ts';
 export { resolveId, slugFromFilename, toAbsolute, toId } from './core/paths.ts';
@@ -26,6 +27,11 @@ export {
 } from './core/scopes.ts';
 export { scan, SourceFile } from './core/source.ts';
 export {
+    registerStatement,
+    type StatementInjection,
+    type StatementOptions,
+} from './core/statements.ts';
+export {
     Store,
     type Anchor,
     type Diagnostic,
@@ -40,6 +46,7 @@ export {
     type WalkOptions,
     type WalkTarget,
 } from './core/walk.ts';
+export * from './kit/index.ts';
 export * from './model/index.ts';
 export * from './resolvers/index.ts';
 export { live } from './runtime.ts';

@@ -1,3 +1,0 @@
-## Tasks
-
-- [x] Add `Normal`.

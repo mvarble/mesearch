@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { uneval } from 'devalue';
 import type { Plugin, ViteDevServer } from 'vite';
@@ -48,8 +49,15 @@ export interface Cms {
     macrosFor(vfile: unknown): KatexMacros;
 }
 
+// The generated module imports the preset's runtime and, in development, this
+// package's `live` through these ids, which the plugin resolves itself. A site
+// need not depend on this package directly --- mesearch's projects depend on
+// `@mvarble/mesearch` alone --- so the generated code never names it.
 const RUNTIME_ID = 'virtual:mesearch-cms/runtime';
+const LIVE_ID = 'virtual:mesearch-cms/live';
 const here = fileURLToPath(import.meta.url);
+// `runtime.ts` from source, `runtime.js` once built.
+const liveModule = path.join(path.dirname(here), `runtime${path.extname(here)}`);
 
 // What was last printed for each root, so that the several passes of one build
 // --- and the several copies of the config a SvelteKit build evaluates --- do
@@ -189,11 +197,21 @@ export function createCms(options: CmsOptions): Cms {
                 async resolveId(id) {
                     if (id == virtualId) return resolvedVirtualId;
                     if (id == loadersId) return resolvedLoadersId;
-                    // Resolved from inside this package, so a site need not
-                    // depend on it directly for the import to be found.
-                    if (id == RUNTIME_ID)
-                        return this.resolve(preset.runtime, here, { skipSelf: true });
-                    return null;
+                    if (id == LIVE_ID) return liveModule;
+                    if (id != RUNTIME_ID) return null;
+                    // A path or file URL is taken as it is, a relative path
+                    // from the project root. A package name resolves from the
+                    // project, and then from this package.
+                    const runtime = preset.runtime;
+                    if (runtime instanceof URL || runtime.startsWith('file:'))
+                        return fileURLToPath(runtime);
+                    if (path.isAbsolute(runtime)) return runtime;
+                    if (runtime.startsWith('.')) return path.resolve(root, runtime);
+                    return (
+                        (await this.resolve(runtime, path.join(root, 'index.html'), {
+                            skipSelf: true,
+                        })) ?? this.resolve(runtime, here, { skipSelf: true })
+                    );
                 },
                 load(id) {
                     if (id == resolvedLoadersId) {
@@ -224,8 +242,9 @@ export function createCms(options: CmsOptions): Cms {
                     current();
                     if (command == 'serve') {
                         return (
-                            `import { bindLive } from ${JSON.stringify(RUNTIME_ID)};\n` +
-                            `export const cms = bindLive(() => globalThis[Symbol.for(${JSON.stringify(bridge.description)})]());\n`
+                            `import { bind } from ${JSON.stringify(RUNTIME_ID)};\n` +
+                            `import { live } from ${JSON.stringify(LIVE_ID)};\n` +
+                            `export const cms = live(bind, () => globalThis[Symbol.for(${JSON.stringify(bridge.description)})]());\n`
                         );
                     }
                     return (

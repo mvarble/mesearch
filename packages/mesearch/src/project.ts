@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { createCms, type Cms } from '@mvarble/mesearch-cms';
-import { mesearchPreset } from '@mvarble/mesearch-cms/presets/mesearch';
+import { mesearchPreset } from './preset/index.ts';
 
 import { loadConfig, type ResolvedConfig } from './config.ts';
 import { BUILD_DIR, CONTENT_DIR, USER_CSS, WORK_DIR } from './paths.ts';
