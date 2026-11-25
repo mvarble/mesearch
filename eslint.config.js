@@ -36,15 +36,21 @@ export default defineConfig(
         // The app and its components render HTML made at build time --- KaTeX
         // for the math in titles and summaries. Every internal link is built
         // by the app through `href()`, which applies the configured base
-        // path; the components only ever receive finished URLs.
-        files: ['packages/mesearch/app/**/*.svelte', 'packages/ui/src/**/*.svelte'],
+        // path; the components only ever receive finished URLs. The same holds
+        // of the workflow's documentation site, whose links come from `resolve()`.
+        files: [
+            'packages/mesearch/app/**/*.svelte',
+            'packages/ui/src/**/*.svelte',
+            'packages/workflow/app/**/*.svelte',
+            'docs-example/site/src/**/*.svelte',
+        ],
         rules: {
             'svelte/no-at-html-tags': 'off',
             'svelte/no-navigation-without-resolve': 'off',
         },
     },
     {
-        ignores: ['**/dist', '**/build', '**/.mesearch', '**/test/fixtures'],
+        ignores: ['**/dist', '**/build', '**/.mesearch', '**/.svelte-kit', '**/test/fixtures'],
     },
     {
         rules: {

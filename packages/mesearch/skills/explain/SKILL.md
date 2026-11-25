@@ -7,7 +7,7 @@ description: Explains whatever the prompt names in a mesearch site (a concept, a
 
 This procedure produces textbook-style documents that explain a subject. The request that invoked this skill is the prompt, and it may be anything: a concept named or loosely described, a document in `source/` or at some other path or address, an algorithm, a theorem, a textbook or one of its chapters, a problem, a question. If the request names nothing to explain, ask what is meant, listing `source/` if the project has one. Work through the following five phases in order.
 
-The documents live in a [mesearch](https://github.com/mvarble/mesearch) site: one folder per document under `content/`, `content/concepts/<slug>/index.md` for concepts and `content/writeups/<slug>/index.md` for writeups. If the project has an `AGENTS.md`, read it before anything else. It holds what is particular to the site (its subject, its reader, its notation, whatever it does differently), and it takes precedence over this procedure and over `authoring.md` wherever they differ. This file and `authoring.md` belong to mesearch and are replaced whenever `mesearch init` is run, so a change meant to last is made in `AGENTS.md`, never here.
+The documents live in a [mesearch](https://github.com/mvarble/mesearch) site: one folder per document under `content/`, `content/concepts/<slug>/index.md` for concepts and `content/writeups/<slug>/index.md` for writeups. If the project has an `AGENTS.md`, read it before anything else. It holds what is particular to the site (its subject, its reader, its notation, whatever it does differently), and it takes precedence over this procedure, `authoring.md` and `markup.md` wherever they differ. This file, `authoring.md` and `markup.md` belong to mesearch and are replaced whenever `mesearch init` is run, so a change meant to last is made in `AGENTS.md`, never here.
 
 A run normally writes **one** document. The concepts that document needs are explained in sections of it, not in small documents of their own. A concept is kept out of the document in only two cases: the site already explains it, in which case it is linked, or explaining it takes several sections, in which case it gets a document of its own. [Place each concept](#place-each-concept) gives the rule in full.
 
@@ -116,7 +116,7 @@ Beside each new `index.md`, write a `description.md`: one or two plain sentences
 
 ## Conventions
 
-Before writing anything, read `authoring.md`, which sits beside this file, and follow it: it says where documents go and how their frontmatter, links, prose, mathematics, numbered equations, statements, proofs, citations and plots are written in a mesearch site.
+Before writing anything, read `authoring.md` and `markup.md`, which sit beside this file, and follow them: `authoring.md` says where documents go and how their frontmatter, links, prose and plots are written in a mesearch site, and `markup.md` how mathematics, numbered equations, statements, proofs and citations are written.
 
 ## Structure and prose
 

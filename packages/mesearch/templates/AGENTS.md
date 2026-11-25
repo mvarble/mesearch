@@ -4,7 +4,7 @@ This repository is a [mesearch](https://github.com/mvarble/mesearch) site: a lib
 
 This file holds what is particular to this site. How a mesearch site is written in general is kept in two files that belong to mesearch:
 
-- `.agents/skills/explain/authoring.md`: the conventions --- where documents go, their frontmatter, links and prose, and how mathematics, statements, proofs, citations and plots are written. Read it before writing or editing any document here.
+- `.agents/skills/explain/authoring.md` and `.agents/skills/explain/markup.md`: the conventions. The first says where documents go and how their frontmatter, links, prose and plots are written, and the second how mathematics, statements, proofs and citations are written. Read both before writing or editing any document here.
 - `.agents/skills/explain/SKILL.md`: an [agent skill](https://agentskills.io), the procedure for explaining whatever is asked for --- a concept, a document in `source/` or elsewhere, an algorithm, a theorem, a textbook chapter. Follow it when asked to explain something, whether or not your harness loaded it for you.
 
 Both are replaced each time `mesearch init` is run, which is how this project takes the conventions of a newer mesearch, so never edit them. Whatever this site does differently is written below, and this file wins wherever it disagrees with them.

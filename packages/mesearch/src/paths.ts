@@ -11,7 +11,7 @@ export const appDir = path.join(packageDir, 'app');
 export const templatesDir = path.join(packageDir, 'templates');
 
 // The agent skills `mesearch init` installs: one folder per skill, and the
-// `authoring.md` every one of them is given a copy of.
+// `authoring.md` every one of them is given a copy of, beside the CMS's `markup.md`.
 export const skillsDir = path.join(packageDir, 'skills');
 
 // Inside a project: where mesearch keeps its generated SvelteKit scaffolding,

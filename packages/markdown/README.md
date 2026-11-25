@@ -17,4 +17,10 @@ preprocess: markdownPreprocessors({
 - **Shiki** highlighting in a light and a dark theme at once, with grammars loaded on first use. A fence whose whole body is `{./file}` or `{./file:10..20}` is replaced by those lines of the file.
 - **Relative assets** --- `![](./figure.png)` --- turned into Vite imports, so they are hashed and emitted with the page.
 
+For documentation sites that quote their own repository, as [`@mvarble/mesearch-workflow`](../workflow)'s do, there are three more exports, which `markdownPreprocessors` does not apply by itself:
+
+- **`quotingHighlighter({ root, repoUrl, branch })`**, a highlighter for mdsvex's `highlight` option that replaces the fenced import above. A fence whose body is `{path}` or `{path:start..end}` is replaced by those lines, **numbered from 1 and inclusive**, as an editor shows them. The excerpt is dedented, a run of Rust doc comments is quoted as Markdown, and the block is captioned with the file and lines, linked to `repoUrl` when one is given. Every fence becomes a `figure.code-block` coloured by Shiki's CSS variables. `resolveFileRef` and `expandFileRefs` do the same for plain-text output, such as an `llms.txt`. The fenced import of `highlight` keeps numbering from 0, so neither kind of document changes under the other.
+- **`remarkCallouts`** turns GitHub-style `> [!NOTE]` blockquotes (`NOTE`, `TIP`, `WARNING`, `DECISION`, `TODO`, with an optional title after the marker) into `aside.callout`.
+- **`rehypeHeadingAnchors`** gives every `h2` and `h3` with an `id` a trailing `#` link to itself.
+
 `styles/katex.css` styles all of it. It also keeps inline math from breaking across a line.

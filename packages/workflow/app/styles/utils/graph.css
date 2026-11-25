@@ -1,0 +1,186 @@
+/* `<ModelGraph>` figures. A node or edge sets `--c` from its hue; everything else is drawn from
+ * `--c`, so a new hue needs one rule here, one token in `tokens/colors.css` and one entry in
+ * `HUES` (`$lib/graph/spec.ts`). A figure's kinds of node and edge are its own, built from these. */
+
+.model-graph {
+    margin: var(--space-6) 0;
+
+    svg {
+        display: block;
+        width: 100%;
+        height: auto;
+        overflow: visible;
+    }
+
+    figcaption {
+        margin-top: var(--space-3);
+        font: var(--font-small);
+        color: var(--fg-3);
+        text-align: center;
+
+        strong {
+            color: var(--fg-1);
+        }
+    }
+}
+
+/* The drawing and its text layer. The canvas is a size container, so `cqw` (1% of its width) lets
+ * the labels' font size scale with the SVG: a font of `--graph-font` viewport units in a viewport
+ * `--graph-width` units wide. */
+.graph-canvas {
+    position: relative;
+    margin: 0 auto;
+    container-type: inline-size;
+}
+
+.graph-labels {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    font-size: calc(var(--graph-font) * 100cqw / var(--graph-width));
+    line-height: 1;
+
+    > span {
+        position: absolute;
+        white-space: nowrap;
+    }
+
+    /* A node's label may break into lines with \n, each centred. */
+    > span.node-label {
+        white-space: pre;
+        text-align: center;
+        line-height: 1.35;
+    }
+
+    .katex {
+        font-size: 1.05em;
+    }
+}
+
+.node-label {
+    color: var(--fg-1);
+    font-family: var(--font-family-ui);
+    font-style: italic;
+}
+
+.node-annotation {
+    color: var(--fg-3);
+    font-family: var(--font-family-ui);
+    font-size: 0.78em;
+}
+
+.edge-label {
+    color: var(--c);
+    font-family: var(--font-family-mono);
+    font-size: 0.72em;
+    padding: 0.1em 0.3em;
+    background: var(--bg-1);
+    border-radius: var(--radius-sm);
+}
+
+/* ---- nodes ------------------------------------------------------------ */
+.graph-node {
+    --c: var(--graph-gray);
+
+    :is(circle, rect) {
+        fill: color-mix(in srgb, var(--c) var(--graph-fill-mix), var(--bg-1));
+        stroke: var(--c);
+        stroke-width: 2;
+    }
+
+    &.fill-shaded :is(circle, rect) {
+        fill: color-mix(in srgb, var(--c) var(--graph-shaded-mix), var(--bg-1));
+    }
+
+    &.outline-dashed :is(circle, rect) {
+        stroke-dasharray: 5 3;
+    }
+}
+
+/* ---- edges ------------------------------------------------------------ */
+.graph-edge {
+    --c: var(--graph-edge);
+
+    path {
+        fill: none;
+        stroke: var(--c);
+        stroke-width: 1.6;
+    }
+
+    polygon {
+        fill: var(--c);
+    }
+
+    &.line-dotted path {
+        stroke-dasharray: 1.5 4;
+        stroke-linecap: round;
+        stroke-width: 2;
+    }
+
+    &.line-dashed path {
+        stroke-dasharray: 6 4;
+    }
+}
+
+/* ---- the palette, for nodes and edges alike ---------------------------- */
+.hue-gray {
+    --c: var(--graph-gray);
+}
+.hue-blue {
+    --c: var(--graph-blue);
+}
+.hue-orange {
+    --c: var(--graph-orange);
+}
+.hue-green {
+    --c: var(--graph-green);
+}
+.hue-purple {
+    --c: var(--graph-purple);
+}
+.hue-teal {
+    --c: var(--graph-teal);
+}
+.hue-red {
+    --c: var(--graph-red);
+}
+.hue-sky {
+    --c: var(--graph-sky);
+}
+.hue-amber {
+    --c: var(--graph-amber);
+}
+.hue-olive {
+    --c: var(--graph-olive);
+}
+.hue-magenta {
+    --c: var(--graph-magenta);
+}
+
+.graph-muted {
+    opacity: 0.3;
+}
+
+/* ---- legend ----------------------------------------------------------- */
+.graph-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-1) var(--space-4);
+    margin-top: var(--space-3);
+    font: var(--font-tiny);
+    color: var(--fg-3);
+    list-style: none;
+    padding: 0;
+
+    li {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    svg {
+        width: auto;
+        margin: 0;
+    }
+}

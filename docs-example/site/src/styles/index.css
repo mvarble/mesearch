@@ -1,0 +1,4 @@
+/* The shared stylesheet, and the example's colours. */
+
+@import '@mvarble/mesearch-workflow/styles/index.css';
+@import './tokens/colors.css';

@@ -1,0 +1,17 @@
+/* The documentation site's stylesheet. Every rule refers to the tokens, and never to a raw colour:
+ * the site defines the colour tokens itself (`src/styles/tokens/colors.css`, which its own
+ * `src/styles/index.css` imports beside this file). */
+
+@import './tokens.css';
+@import './katex.css';
+@import './base.css';
+@import './layout.css';
+@import './text.css';
+@import './code.css';
+@import './utils/buttons.css';
+@import './utils/callouts.css';
+@import './utils/tables.css';
+@import './utils/cards.css';
+@import './utils/graph.css';
+@import './utils/map.css';
+@import './utils/archive.css';

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="%sveltekit.assets%/favicon.svg" />
+        <script>
+            // Apply the theme before first paint, so a dark-mode reader never sees a white flash.
+            // The key matches `THEME_KEY` of `$site`, the site's name followed by `:theme`.
+            try {
+                const stored = localStorage.getItem('{{slug}}:theme');
+                const dark =
+                    stored === 'dark' ||
+                    (stored !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+                if (dark) document.documentElement.classList.add('dark');
+            } catch {}
+        </script>
+        %sveltekit.head%
+    </head>
+    <body data-sveltekit-preload-data="hover">
+        <div style="display: contents">%sveltekit.body%</div>
+    </body>
+</html>

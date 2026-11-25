@@ -61,8 +61,10 @@ test('init scaffolds a project and never overwrites its own files without --forc
             '.gitlab-ci.yml',
             '.agents/skills/explain/SKILL.md',
             '.agents/skills/explain/authoring.md',
+            '.agents/skills/explain/markup.md',
             '.claude/skills/explain/SKILL.md',
             '.claude/skills/explain/authoring.md',
+            '.claude/skills/explain/markup.md',
         ]) {
             assert.ok(fs.existsSync(path.join(dir, file)), `${file} is written`);
         }
@@ -94,8 +96,14 @@ test('init scaffolds a project and never overwrites its own files without --forc
             path.join(dir, '.agents/skills/explain/authoring.md'),
             'utf8',
         );
-        for (const section of ['Layout', 'Frontmatter', 'Links', 'Prose', 'Mathematics']) {
+        for (const section of ['Layout', 'Frontmatter', 'Links', 'Prose', 'Plots']) {
             assert.match(authoring, new RegExp(`^## ${section}$`, 'm'));
+        }
+        // The mathematics is the CMS's, in a file of its own beside it.
+        assert.match(agents, /\.agents\/skills\/explain\/markup\.md/);
+        const markup = fs.readFileSync(path.join(dir, '.agents/skills/explain/markup.md'), 'utf8');
+        for (const section of ['Mathematics', 'Numbered equations', 'Statements and proofs']) {
+            assert.match(markup, new RegExp(`^## ${section}$`, 'm'));
         }
         assert.match(
             fs.readFileSync(path.join(dir, 'mesearch.config.ts'), 'utf8'),

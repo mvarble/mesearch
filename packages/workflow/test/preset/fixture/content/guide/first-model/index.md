@@ -1,0 +1,9 @@
+---
+title: A first model
+summary: Build a model and evaluate its density.
+order: 1
+created: 2026-01-01
+depends_on: [guide/estimation]
+---
+
+Add a quantity, then score it. The [graph](../../concepts/graph/) holds it; the [%title](../../concepts/) say more, and [the notes](../../math/) less.

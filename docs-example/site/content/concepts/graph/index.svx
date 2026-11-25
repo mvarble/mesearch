@@ -1,0 +1,22 @@
+---
+title: The compilation graph
+summary: Its values, the operations between them, and bindings.
+order: 1
+created: 2026-01-03
+---
+
+<script>
+	import ModelGraph from '$lib/components/ModelGraph.svelte';
+	import { chain } from './chain.graph';
+</script>
+
+The compilation graph: a node for each value, an edge from each input of an operation to its
+output.
+
+<ModelGraph spec={chain} />
+
+The code that builds it, quoted from the repository:
+
+```rust
+{example.rs:2..7}
+```

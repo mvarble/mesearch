@@ -1,0 +1,95 @@
+.card-grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+
+    & + & {
+        margin-top: var(--space-4);
+    }
+
+    &.secondary .card {
+        padding: var(--space-4) var(--space-6);
+    }
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-6);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    color: var(--fg-2);
+    transition:
+        border-color 0.15s,
+        box-shadow 0.15s;
+
+    &:hover {
+        text-decoration: none;
+        border-color: var(--fg-accent);
+        box-shadow: var(--shadow-md);
+    }
+
+    .card-title {
+        font: var(--font-h3);
+        color: var(--fg-1);
+    }
+
+    .card-body {
+        font: var(--font-small);
+        color: var(--fg-3);
+    }
+
+    .card-cta {
+        margin-top: auto;
+        padding-top: var(--space-2);
+        font: var(--font-small);
+        font-weight: 600;
+        color: var(--fg-accent);
+    }
+}
+
+/* The crate map: one row per dependency layer, foundations at the top. */
+.crate-map {
+    list-style: none;
+    display: grid;
+    gap: var(--space-2);
+}
+
+.crate-layer {
+    display: grid;
+    gap: var(--space-2);
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--border);
+}
+
+.crate {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    &:hover {
+        text-decoration: none;
+    }
+
+    &:is(a):hover {
+        border-color: var(--fg-accent);
+    }
+
+    code {
+        font-size: var(--font-size-small);
+        font-weight: 600;
+        color: var(--fg-1);
+    }
+
+    span {
+        font: var(--font-small);
+        color: var(--fg-3);
+    }
+}

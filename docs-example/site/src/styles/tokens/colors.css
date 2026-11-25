@@ -1,0 +1,107 @@
+/* A neutral slate scale with one indigo accent, the logo's `COLOR` in `logo/generate.py`. Every
+ * other stylesheet refers to these names, so a palette change is made here and nowhere else. */
+
+:root {
+    color-scheme: light;
+
+    --accent-hue: 255;
+
+    /* Foreground: 1 is headings, 2 body text, 3 secondary, 4 faint. */
+    --fg-1: hsl(222, 30%, 11%);
+    --fg-2: hsl(220, 16%, 22%);
+    --fg-3: hsl(220, 9%, 42%);
+    --fg-4: hsl(220, 8%, 58%);
+    --fg-accent: hsl(var(--accent-hue), 55%, 52%);
+    --fg-on-accent: hsl(0, 0%, 100%);
+
+    /* Background: 1 is the page, 2 raised surfaces (sidebar, cards), 3 code, 4 hover. */
+    --bg-1: hsl(0, 0%, 100%);
+    --bg-2: hsl(220, 20%, 98%);
+    --bg-3: hsl(220, 18%, 96.5%);
+    --bg-4: hsl(220, 16%, 93%);
+    --bg-accent: hsl(var(--accent-hue), 60%, 60%);
+    --bg-accent-soft: hsl(var(--accent-hue), 80%, 96%);
+    --bg-selection: hsla(var(--accent-hue), 90%, 60%, 0.22);
+    --bg-topbar: hsla(0, 0%, 100%, 0.85);
+
+    --border: hsl(220, 14%, 90%);
+    --border-strong: hsl(220, 12%, 82%);
+
+    /* Callouts: a hue per kind, used for the border and a faint tint. */
+    --callout-note: hsl(212, 70%, 48%);
+    --callout-tip: hsl(152, 55%, 36%);
+    --callout-warning: hsl(36, 90%, 45%);
+    --callout-decision: hsl(268, 50%, 55%);
+    --callout-todo: hsl(44, 95%, 42%);
+    --callout-tint: 6%;
+
+    /* Graph figures: the palette a figure's kinds of node and edge are drawn from (the `Hue`s of
+     * `$lib/graph/spec.ts`), and the neutral colour of an edge with no kind. */
+    --graph-gray: hsl(220, 9%, 46%);
+    --graph-blue: hsl(212, 72%, 46%);
+    --graph-orange: hsl(20, 68%, 46%);
+    --graph-green: hsl(152, 55%, 33%);
+    --graph-purple: hsl(268, 48%, 52%);
+    --graph-teal: hsl(186, 70%, 33%);
+    --graph-red: hsl(345, 70%, 50%);
+    --graph-sky: hsl(199, 80%, 42%);
+    --graph-amber: hsl(38, 92%, 42%);
+    --graph-olive: hsl(80, 55%, 36%);
+    --graph-magenta: hsl(310, 60%, 48%);
+    --graph-edge: hsl(220, 14%, 38%);
+    --graph-fill-mix: 12%;
+    --graph-shaded-mix: 55%;
+
+    --scrollbar: hsla(220, 10%, 20%, 0.25);
+    --shadow-sm: 0 1px 2px hsla(220, 30%, 10%, 0.06);
+    --shadow-md: 0 4px 16px hsla(220, 30%, 10%, 0.08);
+}
+
+:root.dark {
+    color-scheme: dark;
+
+    --fg-1: hsl(220, 20%, 94%);
+    --fg-2: hsl(220, 12%, 80%);
+    --fg-3: hsl(220, 8%, 62%);
+    --fg-4: hsl(220, 7%, 46%);
+    --fg-accent: hsl(var(--accent-hue), 85%, 76%);
+    --fg-on-accent: hsl(0, 0%, 100%);
+
+    --bg-1: hsl(222, 16%, 9%);
+    --bg-2: hsl(222, 14%, 11.5%);
+    --bg-3: hsl(222, 14%, 13.5%);
+    --bg-4: hsl(222, 12%, 18%);
+    --bg-accent: hsl(var(--accent-hue), 60%, 56%);
+    --bg-accent-soft: hsla(var(--accent-hue), 70%, 50%, 0.12);
+    --bg-selection: hsla(var(--accent-hue), 90%, 60%, 0.3);
+    --bg-topbar: hsla(222, 16%, 9%, 0.85);
+
+    --border: hsl(222, 10%, 20%);
+    --border-strong: hsl(222, 10%, 28%);
+
+    --callout-note: hsl(212, 80%, 64%);
+    --callout-tip: hsl(152, 50%, 55%);
+    --callout-warning: hsl(36, 90%, 58%);
+    --callout-decision: hsl(268, 70%, 72%);
+    --callout-todo: hsl(44, 95%, 58%);
+    --callout-tint: 9%;
+
+    --graph-gray: hsl(220, 10%, 64%);
+    --graph-blue: hsl(212, 85%, 66%);
+    --graph-orange: hsl(22, 85%, 64%);
+    --graph-green: hsl(152, 50%, 56%);
+    --graph-purple: hsl(268, 75%, 74%);
+    --graph-teal: hsl(186, 65%, 55%);
+    --graph-red: hsl(345, 80%, 68%);
+    --graph-sky: hsl(199, 85%, 62%);
+    --graph-amber: hsl(40, 95%, 60%);
+    --graph-olive: hsl(80, 50%, 58%);
+    --graph-magenta: hsl(310, 70%, 72%);
+    --graph-edge: hsl(220, 12%, 70%);
+    --graph-fill-mix: 16%;
+    --graph-shaded-mix: 45%;
+
+    --scrollbar: hsla(0, 0%, 100%, 0.2);
+    --shadow-sm: 0 1px 2px hsla(0, 0%, 0%, 0.4);
+    --shadow-md: 0 4px 16px hsla(0, 0%, 0%, 0.4);
+}

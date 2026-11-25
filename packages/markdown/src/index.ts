@@ -20,7 +20,10 @@ export {
 } from './katex.ts';
 export { rehypeMathBox, type MathBoxOptions } from './mathbox.ts';
 export { rehypeAssets, hoistAssetImports } from './assets.ts';
-export { highlight } from './highlight.ts';
+export { highlight, quotingHighlighter, type QuotingOptions } from './highlight.ts';
+export { expandFileRefs, isFileRef, resolveFileRef, type FileRef } from './file-ref.ts';
+export { CALLOUTS, remarkCallouts } from './callouts.ts';
+export { rehypeHeadingAnchors } from './anchors.ts';
 
 export const DOCUMENT_EXTENSIONS = ['.svx', '.md'];
 

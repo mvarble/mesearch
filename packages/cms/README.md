@@ -141,6 +141,20 @@ The BibTeX reader decodes LaTeX accents and drops protective braces. A `cite:` l
 3. Set `runtime` to the copy's path from the project root (`'./src/lib/cms/runtime.ts'`), and delete `bindLive` from the runtime if it has one.
 4. Point the site's imports of `@mvarble/mesearch-cms/presets/<name>[/runtime]` at the copy, or at `@mvarble/mesearch-cms/runtime` for `citationLabel`, `StatementInjection` and the outline types.
 
+## Agent files
+
+`@mvarble/mesearch-cms/agents` is what a tool uses to hand an agent-written project its skills and keep them current. `mesearch init` installs `explain` with it, and `mesearch-wf sync` installs the workflow's skills. A _managed_ folder belongs to the package, not the project. It is replaced whole whenever it differs from what the package ships, apart from line endings, and nothing else in the project is touched.
+
+| export                                                           |                                                                                                                                                                                                     |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `installSkills(dir, skills, { force })`                          | Writes each skill to `.agents/skills/<name>/` and links it from `.claude/skills/`, copying where a link cannot be made. A `.claude/skills` that is itself a link to `.agents/skills` is left alone. |
+| `installFolders(dir, folders)`                                   | Brings any folder, by path within the project, to exactly the files given.                                                                                                                          |
+| `outdatedSkills`, `outdatedFolders`                              | Lists what an install would replace. A folder the project does not have is not counted.                                                                                                             |
+| `filesOf`, `readFolder`, `sameFiles`, `writeFolder`, `listFiles` | Reads and writes folders as maps of path to contents.                                                                                                                                               |
+| `markup()`, `markupPath`                                         | `agents/markup.md`: the conventions for what this package resolves, namely mathematics, numbered equations, statements and proofs, and citations. Each tool gives every skill it ships a copy.      |
+
+`markup.md` leaves three things to the site's own conventions: where the site-wide macros are defined, how a reference names another document, and where `Statement` and `Proof` are imported from.
+
 ## How changes propagate
 
 Every document has _facts_: everything the markdown plugins and module injection read for it, such as its labels, resolved references, headings and folded macros. When the content changes, the store is rebuilt and the facts compared. Only the documents whose facts changed are recompiled, even when the file that changed was a different one: inserting a statement renumbers every later statement in its scope.

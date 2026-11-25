@@ -1,0 +1,22 @@
+{
+    "name": "{{slug}}-site",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite dev",
+        "build": "vite build",
+        "prepare": "svelte-kit sync || echo ''",
+        "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
+    },
+    "devDependencies": {
+        "@mvarble/mesearch-workflow": "^{{version}}",
+        "@sveltejs/adapter-static": "^3.0.10",
+        "@sveltejs/kit": "^2.63.0",
+        "@sveltejs/vite-plugin-svelte": "^7.1.2",
+        "katex": "^0.18.4",
+        "svelte": "^5.57.1",
+        "svelte-check": "^4.7.6",
+        "typescript": "^6.0.3",
+        "vite": "^8.0.16"
+    }
+}
