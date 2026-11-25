@@ -62,6 +62,9 @@ export interface WorkflowConfig {
     code: RegExp[];
     // Paths (prefixes, from the root) open at every stage, such as a ledger kept as it is learned.
     free?: string[];
+    // How the reference documents name the code and the paths always open, in prose, since the
+    // patterns read poorly: "`crates/`, `Cargo.*`".
+    describe?: { code?: string; free?: string };
     kinds: Record<string, KindConfig>;
     stages: Record<string, StageConfig>;
     // Frontmatter `start` writes into a new entry's `index.md` beside `title` and `pages`, as

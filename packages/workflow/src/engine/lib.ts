@@ -41,6 +41,7 @@ export const MATH = () => {
 };
 export const ACTIVE = '.workflow/active';
 export const MANAGED = '.workflow/managed.json';
+export const SKILLS = '.agents/skills';
 
 export const kinds = (): Record<Kind, Stage[]> =>
     Object.fromEntries(Object.entries(config().kinds).map(([kind, { stages }]) => [kind, stages]));
@@ -299,9 +300,11 @@ export function refusal(
     managed?: Manifest,
 ): string | undefined {
     rel = rel.split(path.sep).join('/');
-    if (editing && managed && Object.hasOwn(managed.files, rel)) {
+    // Claude Code reaches the skills through `.claude/skills`, a link to `.agents/skills`.
+    const canonical = rel.replace(/^\.claude\/skills\//, `${SKILLS}/`);
+    if (editing && managed && Object.hasOwn(managed.files, canonical)) {
         return (
-            `${rel} is managed by ${managed.package} ${managed.version}: change it there, then ` +
+            `${canonical} is managed by ${managed.package} ${managed.version}: change it there, then ` +
             'run `mesearch-wf sync`.'
         );
     }

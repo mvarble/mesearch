@@ -9,3 +9,5 @@ pnpm-lock.yaml
 packages/mesearch/templates/
 packages/mesearch/skills/
 packages/cms/agents/
+packages/workflow/agents/
+packages/workflow/templates/

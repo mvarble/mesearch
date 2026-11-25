@@ -41,7 +41,9 @@
     },
     "files": [
         "dist",
-        "app"
+        "app",
+        "agents",
+        "templates"
     ],
     "engines": {
         "node": ">=22.18"
