@@ -1,0 +1,14 @@
+@import 'katex/dist/katex.css';
+@import '@mvarble/mesearch-markdown/styles/katex.css';
+
+/* The site's sizes over the shared rules: the scroll box around display math, the lifted `\tag`, and
+ * inline math that never breaks across a line all come from mesearch-markdown. */
+
+.katex {
+    font-size: 1.08em;
+    line-height: 1.2;
+}
+
+.katex-display {
+    margin: var(--space-2) 0 !important;
+}

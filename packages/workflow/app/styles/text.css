@@ -1,0 +1,96 @@
+/* Long-form content: everything rendered from a `.svx` page sits inside `.prose`. */
+
+.prose {
+    > * + * {
+        margin-top: var(--space-4);
+    }
+
+    h2,
+    h3 {
+        position: relative;
+        color: var(--fg-1);
+        scroll-margin-top: calc(var(--topbar-height) + var(--space-6));
+    }
+
+    h2 {
+        font: var(--font-h2);
+        letter-spacing: -0.01em;
+        margin-top: var(--space-12);
+        padding-top: var(--space-2);
+    }
+
+    h3 {
+        font: var(--font-h3);
+        margin-top: var(--space-8);
+    }
+
+    .heading-anchor {
+        margin-left: var(--space-2);
+        color: var(--fg-4);
+        font-weight: 400;
+        opacity: 0;
+        text-decoration: none;
+    }
+
+    :is(h2, h3):hover .heading-anchor,
+    .heading-anchor:focus-visible {
+        opacity: 1;
+    }
+
+    ul,
+    ol {
+        padding-left: 1.4rem;
+    }
+
+    li + li {
+        margin-top: var(--space-1);
+    }
+
+    li > :is(ul, ol) {
+        margin-top: var(--space-1);
+    }
+
+    /* A plan's checklist: the boxes stand where the bullets would, and a task that wraps hangs
+     * clear of its box. */
+    ul.contains-task-list {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    li.task-list-item {
+        position: relative;
+        padding-left: 1.6rem;
+
+        > input[type='checkbox'] {
+            position: absolute;
+            left: 0.1rem;
+            top: 0.25em;
+            margin: 0;
+        }
+    }
+
+    strong {
+        font-weight: 650;
+        color: var(--fg-1);
+    }
+
+    hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: var(--space-8) 0;
+    }
+
+    blockquote:not(.callout) {
+        padding-left: var(--space-4);
+        border-left: 3px solid var(--border-strong);
+        color: var(--fg-3);
+    }
+
+    img {
+        border-radius: var(--radius);
+    }
+
+    a code {
+        color: inherit;
+    }
+}

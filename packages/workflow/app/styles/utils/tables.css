@@ -1,0 +1,25 @@
+.prose table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font: var(--font-small);
+}
+
+.prose :is(th, td) {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+}
+
+.prose th {
+    font-weight: 600;
+    color: var(--fg-1);
+    border-bottom-color: var(--border-strong);
+}
+
+.prose tr:hover td {
+    background: var(--bg-2);
+}

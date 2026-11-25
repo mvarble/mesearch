@@ -9,3 +9,4 @@ export type {
 } from './engine/config.ts';
 export { CONFIG_FILE } from './engine/config.ts';
 export { run, type Result, type RunOptions } from './engine/cli.ts';
+export type { ChangeGroup, ChangeLink, MarkdownContext, SiteHooks } from './site/hooks.ts';

@@ -1,0 +1,41 @@
+/* `> [!KIND]` blockquotes, turned into `<aside class="callout callout-kind">` by
+ * `plugins/remark-callouts.ts`. Each kind only sets `--callout`. */
+
+.callout {
+    --callout: var(--callout-note);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid color-mix(in srgb, var(--callout) 35%, transparent);
+    border-left: 4px solid var(--callout);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--callout) var(--callout-tint), transparent);
+
+    > * + * {
+        margin-top: var(--space-2);
+    }
+
+    .callout-title {
+        font: var(--font-tiny);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--callout);
+    }
+}
+
+.callout-tip {
+    --callout: var(--callout-tip);
+}
+
+.callout-warning {
+    --callout: var(--callout-warning);
+}
+
+.callout-decision {
+    --callout: var(--callout-decision);
+}
+
+/* Loud on purpose: a TODO is something the author has yet to write. */
+.callout-todo {
+    --callout: var(--callout-todo);
+    border-style: dashed;
+    border-left-style: solid;
+}

@@ -1,0 +1,339 @@
+/* What documents say about one another: chips, statuses, lists of links, an entry's history, a
+ * page's references, and the statements and proofs of the math notes. */
+
+.muted {
+    color: var(--fg-3);
+}
+
+.chips {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1em 0.6em;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg-2);
+    font: var(--font-tiny);
+    color: var(--fg-2);
+    white-space: nowrap;
+
+    a&:hover {
+        border-color: var(--fg-accent);
+        text-decoration: none;
+    }
+}
+
+/* An entry's status: done is quiet, in progress and set aside are not. */
+.status-active {
+    border-color: var(--callout-todo);
+    color: var(--callout-todo);
+}
+
+.status-abandoned {
+    border-style: dashed;
+    color: var(--fg-3);
+}
+
+.status-dot {
+    display: inline-block;
+    width: 0.45em;
+    height: 0.45em;
+    margin-left: 0.4em;
+    border-radius: 50%;
+    vertical-align: middle;
+    background: var(--callout-todo);
+
+    &.status-abandoned {
+        background: var(--fg-4);
+    }
+}
+
+.doc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    font: var(--font-small);
+    color: var(--fg-3);
+}
+
+.doc-builds-on {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+
+    .label {
+        font: var(--font-tiny);
+        color: var(--fg-3);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+}
+
+.doc-context {
+    margin-top: var(--space-12);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--border);
+
+    h2 {
+        font: var(--font-h3);
+        margin: var(--space-6) 0 var(--space-3);
+        color: var(--fg-1);
+    }
+
+    p {
+        color: var(--fg-2);
+        margin: 0 0 var(--space-3);
+    }
+}
+
+.link-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: var(--space-2);
+        padding: var(--space-2) 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .summary {
+        flex-basis: 100%;
+        font: var(--font-small);
+        color: var(--fg-3);
+    }
+}
+
+.timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-left: 2px solid var(--border);
+
+    li {
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        padding: var(--space-1) 0 var(--space-2) var(--space-4);
+        font: var(--font-small);
+        color: var(--fg-2);
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: calc(-0.3rem - 1px);
+            top: 0.55rem;
+            width: 0.6rem;
+            height: 0.6rem;
+            border-radius: 50%;
+            background: var(--bg-1);
+            border: 2px solid var(--fg-accent);
+        }
+    }
+
+    .event-reopen::before,
+    .event-abandon::before {
+        border-color: var(--callout-todo);
+    }
+
+    time {
+        color: var(--fg-3);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .commit {
+        font-size: var(--font-size-tiny);
+    }
+
+    .reason {
+        flex-basis: 100%;
+        color: var(--fg-3);
+    }
+}
+
+.references {
+    margin-top: var(--space-12);
+
+    h2 {
+        font: var(--font-h3);
+    }
+
+    ol {
+        padding: 0;
+        list-style: none;
+        font: var(--font-small);
+    }
+
+    li {
+        padding: var(--space-1) 0;
+        scroll-margin-top: 5rem;
+
+        &:target {
+            background: var(--bg-accent-soft);
+        }
+    }
+
+    .reference-label {
+        margin-right: var(--space-2);
+        color: var(--fg-3);
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+/* A theorem, a definition: its heading runs into its first line, and claims are set in italics. */
+.statement {
+    margin: var(--space-6) 0;
+    padding: 0.1em 0 0.1em var(--space-4);
+    border-left: 2px solid color-mix(in srgb, var(--fg-accent) 45%, transparent);
+    font-style: italic;
+    scroll-margin-top: 5rem;
+
+    &.upright {
+        border-left-color: var(--border-strong);
+        font-style: normal;
+    }
+
+    .math-tag {
+        font-style: normal;
+    }
+
+    > :first-child:not(.statement-heading) {
+        margin-top: 0;
+    }
+
+    > :last-child {
+        margin-bottom: 0;
+    }
+
+    .statement-heading + p {
+        display: inline;
+    }
+}
+
+.statement-heading {
+    display: inline-block;
+    margin-right: 0.3em;
+    font-style: normal;
+    font-weight: 650;
+    color: var(--fg-1);
+}
+
+.statement-title {
+    margin-left: 0.3em;
+    font-weight: 400;
+}
+
+.proof {
+    margin: var(--space-4) 0;
+
+    .proof-heading {
+        margin-right: 0.3em;
+        font-style: italic;
+        font-weight: 600;
+    }
+
+    .proof-heading + p {
+        display: inline;
+    }
+
+    .qed {
+        display: block;
+        text-align: right;
+        color: var(--fg-3);
+    }
+}
+
+.breadcrumb .sep {
+    margin: 0 0.4em;
+    color: var(--fg-4);
+}
+
+.callout.revised {
+    margin-bottom: var(--space-8);
+}
+
+/* An entry's stages, in order, with the current one marked. */
+.stage-rail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: var(--space-3) 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+        padding: 0.15em 0.7em;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        font: var(--font-small);
+        color: var(--fg-4);
+    }
+
+    li + li::before {
+        content: none;
+    }
+
+    .stage-approved {
+        color: var(--fg-2);
+        background: var(--bg-3);
+    }
+
+    .stage-approved::after {
+        content: ' ✓';
+    }
+
+    .stage-current {
+        border-color: var(--callout-todo);
+        color: var(--callout-todo);
+        font-weight: 600;
+    }
+
+    .stage-reopened {
+        border-style: dashed;
+        color: var(--fg-3);
+    }
+}
+
+/* An entry in progress, on the home page. */
+.open-entry {
+    margin-bottom: var(--space-4);
+    padding: var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-2);
+
+    header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-3);
+        font: var(--font-h3);
+    }
+
+    .open-count {
+        margin: var(--space-3) 0 var(--space-2);
+        color: var(--fg-2);
+    }
+
+    .open-questions {
+        margin: 0 0 var(--space-3);
+        padding-left: 1.4em;
+    }
+
+    p:last-child {
+        margin-bottom: 0;
+    }
+}
