@@ -2,6 +2,16 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 
+import {
+    filesOf,
+    installSkills,
+    listFiles,
+    markup,
+    MARKUP_FILE,
+    outdatedSkills as outdatedProjectSkills,
+    type Files,
+} from '@mvarble/mesearch-cms/agents';
+
 import { CONTENT_DIR, packageDir, skillsDir, templatesDir } from './paths.ts';
 
 export interface InitOptions {
@@ -66,7 +76,7 @@ export function initProject(dir: string, options: InitOptions = {}) {
         write(name, fill(fs.readFileSync(path.join(templatesDir, name), 'utf8')));
     }
     if (starting) write(`${CONTENT_DIR}/sequences/.gitkeep`, '');
-    installSkills(dir, written, updated, options.force);
+    installProjectSkills(dir, written, updated, options.force);
     write('mesearch.css', userStylesheet());
     write(
         'tsconfig.json',
@@ -93,81 +103,34 @@ export function initProject(dir: string, options: InitOptions = {}) {
     );
 }
 
-// Where harnesses look for a project's skills. `.agents/skills/` is the Agent
-// Skills convention, which most read. Those that only read a directory of their
-// own are given a link to each skill there.
-const SKILLS_DIR = '.agents/skills';
-const LINKED_SKILLS_DIRS = ['.claude/skills'];
-
 // The skills an agent writes documents with, of which there is one: `/explain`.
-// Each is a folder with a `SKILL.md` and the shared `authoring.md`, which holds
-// the conventions `AGENTS.md` points at.
+// Each is a folder with a `SKILL.md`, mesearch's `authoring.md` (the site's
+// layout, frontmatter, links, prose and plots), and the CMS's `markup.md` (its
+// mathematics, statements and citations). `AGENTS.md` points at the last two.
 //
 // These folders are mesearch's rather than the project's: each is replaced
 // whole whenever it differs from what this version ships, so that a file a
 // newer version no longer has does not linger. What a project wants to say
 // differently goes in its `AGENTS.md`, which is never touched. Any other
 // folder under `.agents/skills/` is the project's own and is left alone.
-function installSkills(dir: string, written: string[], updated: string[], force = false) {
-    for (const [skill, shipped] of shippedSkills()) {
-        const name = `${SKILLS_DIR}/${skill}`;
-        const target = path.join(dir, name);
-        const installed = readFolder(target);
-        const stale = !sameFiles(installed, shipped);
-        if (stale) {
-            writeFolder(target, shipped);
-            if (installed) updated.push(`${name}/`);
-            else for (const file of shipped.keys()) written.push(`${name}/${file}`);
-        }
-
-        for (const linked of LINKED_SKILLS_DIRS) {
-            const name = `${linked}/${skill}`;
-            const link = path.join(dir, name);
-            const stat = fs.lstatSync(link, { throwIfNoEntry: false });
-            if (stat && !stat.isSymbolicLink()) {
-                // A folder is somebody's own, unless it is the copy made below
-                // where links cannot be: that one follows what it was copied from.
-                if (installed && sameFiles(readFolder(link), installed)) {
-                    if (!stale) continue;
-                    writeFolder(link, shipped);
-                    updated.push(`${name}/`);
-                } else console.log(`  kept     ${name} (exists)`);
-                continue;
-            }
-            // A link already points at the folder brought up to date above.
-            if (stat && !force) continue;
-            if (stat) fs.unlinkSync(link);
-            fs.mkdirSync(path.dirname(link), { recursive: true });
-            try {
-                fs.symlinkSync(path.relative(path.dirname(link), target), link, 'dir');
-            } catch {
-                // Where links cannot be made (Windows without the privilege), a copy.
-                fs.cpSync(target, link, { recursive: true });
-            }
-            written.push(name);
-        }
-    }
+function installProjectSkills(dir: string, written: string[], updated: string[], force = false) {
+    const report = installSkills(dir, shippedSkills(), { force });
+    written.push(...report.written);
+    updated.push(...report.updated);
+    for (const name of report.kept) console.log(`  kept     ${name} (exists)`);
 }
 
 // The skills this version ships, each as the files its folder is to hold.
-function shippedSkills(): Map<string, Map<string, string>> {
-    const authoring = fs.readFileSync(path.join(skillsDir, 'authoring.md'), 'utf8');
+function shippedSkills(): Map<string, Files> {
+    const shared = {
+        'authoring.md': fs.readFileSync(path.join(skillsDir, 'authoring.md'), 'utf8'),
+        [MARKUP_FILE]: markup(),
+    };
     const skills = fs
         .readdirSync(skillsDir, { withFileTypes: true })
         .filter((entry) => entry.isDirectory())
         .map((entry) => entry.name);
-    return new Map(
-        skills.map((skill) => {
-            const files = new Map(
-                listFiles(path.join(skillsDir, skill)).map((name) => [
-                    name,
-                    fs.readFileSync(path.join(skillsDir, skill, name), 'utf8'),
-                ]),
-            );
-            files.set('authoring.md', authoring);
-            return [skill, files];
-        }),
-    );
+    return new Map(skills.map((skill) => [skill, filesOf(path.join(skillsDir, skill), shared)]));
 }
 
 // The skill folders in a project that are not this version's, as
@@ -175,41 +138,7 @@ function shippedSkills(): Map<string, Map<string, string>> {
 // the project does not have at all is not among them, since a project need
 // not be written by agents.
 export function outdatedSkills(dir: string): string[] {
-    return [...shippedSkills()]
-        .map(([skill, shipped]) => ({ name: `${SKILLS_DIR}/${skill}`, shipped }))
-        .filter(({ name, shipped }) => {
-            const installed = readFolder(path.join(dir, name));
-            return installed && !sameFiles(installed, shipped);
-        })
-        .map(({ name }) => name);
-}
-
-// A folder's files by name, or nothing if it is not a folder.
-function readFolder(dir: string): Map<string, string> | undefined {
-    if (!fs.statSync(dir, { throwIfNoEntry: false })?.isDirectory()) return undefined;
-    return new Map(
-        listFiles(dir).map((name) => [name, fs.readFileSync(path.join(dir, name), 'utf8')]),
-    );
-}
-
-// Line endings aside: a checkout that converts them has changed nothing.
-function sameFiles(a: Map<string, string> | undefined, b: Map<string, string>): boolean {
-    const text = (contents?: string) => contents?.replaceAll('\r\n', '\n');
-    return (
-        !!a &&
-        a.size == b.size &&
-        [...b].every(([name, theirs]) => text(a.get(name)) === text(theirs))
-    );
-}
-
-// Replaces a folder with exactly these files.
-function writeFolder(dir: string, files: Map<string, string>) {
-    fs.rmSync(dir, { recursive: true, force: true });
-    for (const [name, contents] of files) {
-        const file = path.join(dir, name);
-        fs.mkdirSync(path.dirname(file), { recursive: true });
-        fs.writeFileSync(file, contents);
-    }
+    return outdatedProjectSkills(dir, shippedSkills());
 }
 
 // Adds mesearch's scripts and dependencies to the project's manifest, making
@@ -307,13 +236,6 @@ export function userStylesheet(): string {
 
 ${body.trimEnd()}
 `;
-}
-
-function listFiles(dir: string, prefix = ''): string[] {
-    return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-        const name = prefix ? `${prefix}/${entry.name}` : entry.name;
-        return entry.isDirectory() ? listFiles(path.join(dir, entry.name), name) : [name];
-    });
 }
 
 // A title from the directory's name: `probability-notes` → `Probability notes`.
