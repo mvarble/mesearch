@@ -1,0 +1,45 @@
+{
+    "name": "@mvarble/mesearch-workflow",
+    "version": "0.1.0",
+    "description": "Documented development: the workflow engine a project's entries go through, the skills that drive it, and the documentation site its records are published on.",
+    "license": "MIT",
+    "author": "Matthew Varble <matthew@rodent.club>",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mvarble/mesearch.git",
+        "directory": "packages/workflow"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "type": "module",
+    "bin": {
+        "mesearch-wf": "./dist/cli.js"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "dist"
+    ],
+    "engines": {
+        "node": ">=22.18"
+    },
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "check": "tsc -p tsconfig.json --noEmit",
+        "test": "node --test 'test/**/*.test.ts' 'test/**/*.test.mjs'",
+        "prepare": "tsc -p tsconfig.json"
+    },
+    "dependencies": {
+        "@mvarble/mesearch-cms": "workspace:^"
+    },
+    "devDependencies": {
+        "@types/node": "^22.14.0",
+        "typescript": "^6.0.3"
+    }
+}
