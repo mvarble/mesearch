@@ -1,6 +1,6 @@
 {
     "name": "@mvarble/mesearch-markdown",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "The mdsvex pipeline shared by mesearch, mkdoc and the blog: KaTeX with layered macros, scrollable display math, Shiki highlighting and relative assets.",
     "license": "MIT",
     "author": "Matthew Varble <matthew@rodent.club>",

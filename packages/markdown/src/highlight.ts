@@ -3,6 +3,8 @@ import path from 'node:path';
 import { createHighlighter, bundledLanguages, type Highlighter } from 'shiki';
 import { escapeSvelte } from 'mdsvex';
 
+import { isFileRef, resolveFileRef } from './file-ref.ts';
+
 const THEMES = { light: 'vitesse-light', dark: 'vitesse-dark' } as const;
 
 // Loading all of Shiki's grammars eagerly costs seconds, and a site cannot know
@@ -95,4 +97,48 @@ function parseImportString(
     }
 
     return [path.resolve(path.dirname(filename), imported), start, end];
+}
+
+export interface QuotingOptions {
+    /** The repository quoted files live in; captions name a file by its path from here. */
+    root: string;
+    /** Where the repository is browsed, as `https://github.com/<owner>/<repo>`: captions link there. */
+    repoUrl?: string;
+    /** The branch captions link to. */
+    branch?: string;
+}
+
+// The highlighter of a documentation site that quotes its repository's code. Every fence becomes
+// a `figure.code-block`, coloured by CSS variables rather than inline (Shiki's `defaultColor:
+// false`), so the site's theme picks light or dark. A fence whose body is a file reference
+// (`file-ref.ts`, numbered from 1) is replaced by those lines, under a caption naming the file
+// and the lines, linked to the repository when `repoUrl` is given.
+export function quotingHighlighter(options: QuotingOptions) {
+    const branch = options.branch ?? 'main';
+    return async (
+        code: string,
+        lang: string | null | undefined,
+        _meta: string | null | undefined,
+        filename: string | undefined,
+    ): Promise<string> => {
+        let caption = '';
+        if (isFileRef(code)) {
+            if (!filename) throw new Error('cannot resolve a file reference without a filename.');
+            const ref = resolveFileRef(code, filename, options.root, lang ?? undefined);
+            code = ref.code;
+            lang = ref.lang;
+            const what = `<code>${ref.repoPath}</code> <span>lines ${ref.start}–${ref.end}</span>`;
+            caption = options.repoUrl
+                ? `<figcaption><a href="${options.repoUrl}/blob/${branch}/${ref.repoPath}#L${ref.start}-L${ref.end}" rel="external">${what}</a></figcaption>`
+                : `<figcaption>${what}</figcaption>`;
+        }
+        const shiki = await highlighterFor();
+        const html = shiki.codeToHtml(code, {
+            lang: await languageFor(shiki, lang),
+            themes: THEMES,
+            defaultColor: false,
+        });
+        const figure = `<figure class="code-block">${caption}${html}</figure>`;
+        return `{@html \`${escapeSvelte(figure)}\` }`;
+    };
 }
