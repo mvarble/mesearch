@@ -213,6 +213,25 @@ main {
         }
     }
 
+    /* A group (a part of the mathematics, an entry of the archive) and, while it is unfolded, its
+       children beneath it. */
+    li.nav-group.unfolded > a {
+        color: var(--fg-1);
+        font-weight: 550;
+    }
+
+    li.nav-child a {
+        padding-left: calc(2 * var(--space-3));
+
+        &[aria-current='page'] {
+            padding-left: calc(2 * var(--space-3) - 1px);
+        }
+    }
+
+    ol ol {
+        margin-top: 0;
+    }
+
     /* A link listed under the one before it, as a crate's page under the page of the crates. */
     li.nav-sub a {
         padding-left: calc(2 * var(--space-3));
