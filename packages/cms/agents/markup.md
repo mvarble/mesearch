@@ -2,11 +2,14 @@
 
 How mathematics, numbered equations, statements and proofs, and citations are written in any site whose content goes through `@mvarble/mesearch-cms`: mesearch's notes sites and the documentation sites of `@mvarble/mesearch-workflow` alike.
 
-This file belongs to `@mvarble/mesearch-cms` and is replaced with the current version whenever the site's tool brings its agent files up to date, so it is never edited in a project. Three things differ from site to site, and the site's own conventions say what they are: where the site-wide KaTeX macros are defined, how another document is named in a reference (its _key_), and where the `Statement` and `Proof` components are imported from. Where the site's conventions or its `AGENTS.md` say anything else differently, they take precedence over this file.
+This file belongs to `@mvarble/mesearch-cms` and is replaced with the current version whenever the site's tool brings its agent files up to date, so it is never edited in a project.
+Three things differ from site to site, and the site's own conventions say what they are: where the site-wide KaTeX macros are defined, how another document is named in a reference (its _key_), and where the `Statement` and `Proof` components are imported from.
+Where the site's conventions or its `AGENTS.md` say anything else differently, they take precedence over this file.
 
 ## Mathematics
 
-Inline math uses single dollar signs, as in `$x + y$`. A displayed equation opens with `$$` alone at the beginning of a line, has its body indented by one tab (several lines are allowed), and closes with `$$` alone on its own line:
+Inline math uses single dollar signs, as in `$x + y$`.
+A displayed equation opens with `$$` alone at the beginning of a line, has its body indented by one tab (several lines are allowed), and closes with `$$` alone on its own line:
 
 $$
 	f(x) = f(0) + \int_0^x f'(y) {\rm d}y
@@ -23,7 +26,8 @@ Never write a displayed equation on the same line as its delimiters, as in `$$f(
 
 In a `.md` file, write a star in inline math as `\ast` (`$q^\ast$`), never `*`: Prettier does not read math, pairs two asterisks of a paragraph as emphasis, and rewrites them.
 
-Shorthand macros such as `\bbR` ($\mathbb{R}$), `\calF` ($\mathcal{F}$), `\bfx` (bold $x$) and `\defeq` are always available, along with any the site defines. Notation used throughout one document belongs in its frontmatter as `katex_macros`, with single quotes around keys and values:
+Shorthand macros such as `\bbR` ($\mathbb{R}$), `\calF` ($\mathcal{F}$), `\bfx` (bold $x$) and `\defeq` are always available, along with any the site defines.
+Notation used throughout one document belongs in its frontmatter as `katex_macros`, with single quotes around keys and values:
 
 ```yaml
 katex_macros:
@@ -40,7 +44,10 @@ $$
 	\mu\Big(\bigcup_n A_n\Big) = \sum_n \mu(A_n). @tag(additivity)
 $$
 
-Refer to it as `[](eq:additivity)`, which renders as its number, as in "(2)". From another document, put that document's key before the equation's slug: `[](eq:<key>/<equation-slug>)`. A tag after `\end{aligned}` or `\end{gathered}` numbers the whole block. Number only the equations that are referred to.
+Refer to it as `[](eq:additivity)`, which renders as its number, as in "(2)".
+From another document, put that document's key before the equation's slug: `[](eq:<key>/<equation-slug>)`.
+A tag after `\end{aligned}` or `\end{gathered}` numbers the whole block.
+Number only the equations that are referred to.
 
 ## Statements and proofs
 
@@ -55,7 +62,10 @@ slug: heine-borel # optional: the filename without its extension
 ---
 ```
 
-The body is the statement alone, in the same markdown as any document, with no heading and no proof. The document must be `.svx` to show it. It imports the statement and shows it where it belongs, and puts its proof, if it gives one, directly after it. The components are imported from wherever the site's conventions say; a mesearch notes site, as here, takes them from `@mvarble/mesearch`:
+The body is the statement alone, in the same markdown as any document, with no heading and no proof.
+The document must be `.svx` to show it.
+It imports the statement and shows it where it belongs, and puts its proof, if it gives one, directly after it.
+The components are imported from wherever the site's conventions say; a mesearch notes site, as here, takes them from `@mvarble/mesearch`:
 
 ```svelte
 <script>
@@ -72,13 +82,19 @@ The body is the statement alone, in the same markdown as any document, with no h
 - The `<script>` block goes directly after the frontmatter, with one import per statement shown.
 - Leave a blank line after `<Proof>` and before `</Proof>`, so that what is between them is read as markdown.
 - Statements and equations share one count within a document: Theorem 1, equation (2), Lemma 3.
-- Refer to a statement as `[%full](statement:heine-borel)`, which renders as "Theorem 1". `%kind` and `%label` give "Theorem" and "1" alone, as in `[%kind %label (Heine–Borel)](statement:heine-borel)`. From another document, write `statement:<key>/<statement-slug>`.
-- Claims (theorems, lemmas, propositions, corollaries) are set in italics, and definitions, remarks and examples are not. Never italicise or bold a statement's text yourself, and never write "Theorem 1." by hand.
-- Use statements for what the exposition genuinely states and returns to. An idea explained in flowing prose does not need to become a definition, and a document should not read as a list of statements.
+- Refer to a statement as `[%full](statement:heine-borel)`, which renders as "Theorem 1".
+  `%kind` and `%label` give "Theorem" and "1" alone, as in `[%kind %label (Heine–Borel)](statement:heine-borel)`.
+  From another document, write `statement:<key>/<statement-slug>`.
+- Claims (theorems, lemmas, propositions, corollaries) are set in italics, and definitions, remarks and examples are not.
+  Never italicise or bold a statement's text yourself, and never write "Theorem 1." by hand.
+- Use statements for what the exposition genuinely states and returns to.
+  An idea explained in flowing prose does not need to become a definition, and a document should not read as a list of statements.
 
 ## Citations
 
-Bibliography entries go in BibTeX files anywhere under the content directory, usually `references.bib` at its top. Keys are shared across the site, so check whether an entry already exists before adding one, and name new keys `<surname><year>`, as `folland1999`. Give each entry its `author`, `title`, `year`, and whichever of `journal`, `volume`, `number`, `pages`, `publisher`, `edition` and `doi` apply.
+Bibliography entries go in BibTeX files anywhere under the content directory, usually `references.bib` at its top.
+Keys are shared across the site, so check whether an entry already exists before adding one, and name new keys `<surname><year>`, as `folland1999`.
+Give each entry its `author`, `title`, `year`, and whichever of `journal`, `volume`, `number`, `pages`, `publisher`, `edition` and `doi` apply.
 
 ```bibtex
 @book{folland1999,
@@ -90,8 +106,12 @@ Bibliography entries go in BibTeX files anywhere under the content directory, us
 }
 ```
 
-- `[](cite:folland1999)` cites an entry as `[Foll99]`, and `[Theorem 1.8](cite:folland1999)` as `[Foll99, Theorem 1.8]`. Point at the exact theorem, section or page whenever possible.
+- `[](cite:folland1999)` cites an entry as `[Foll99]`, and `[Theorem 1.8](cite:folland1999)` as `[Foll99, Theorem 1.8]`.
+  Point at the exact theorem, section or page whenever possible.
 - A citation brings its own brackets, so never wrap it in parentheses: "a smooth local frame [Chapter 8](cite:lee2013)", not "([Chapter 8](cite:lee2013))".
-- Each document ends with a list of exactly what it cites, and each citation jumps to its entry there. Cite in the sentence that relies on the source; never write a reference list or a "Further reading" section of your own.
-- Cite only sources you are certain of, with their real titles, authors, years and DOIs. Never invent or guess a reference: leave the citation out rather than risk a wrong one.
-- A file or an address a document is about is linked, not cited. A published work it is about, such as a textbook or a paper, is cited.
+- Each document ends with a list of exactly what it cites, and each citation jumps to its entry there.
+  Cite in the sentence that relies on the source; never write a reference list or a "Further reading" section of your own.
+- Cite only sources you are certain of, with their real titles, authors, years and DOIs.
+  Never invent or guess a reference: leave the citation out rather than risk a wrong one.
+- A file or an address a document is about is linked, not cited.
+  A published work it is about, such as a textbook or a paper, is cited.

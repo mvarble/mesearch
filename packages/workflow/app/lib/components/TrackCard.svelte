@@ -4,7 +4,8 @@
 
     let { id, eyebrow, blurb }: { id: string; eyebrow?: string; blurb: string } = $props();
     const section = $derived((page.data.nav as NavSection[]).find((s) => s.id == id)!);
-    const first = $derived(section.items[0]);
+    // The first document to read: the first item, or its first child when it is a group.
+    const first = $derived(section.items[0]?.children?.[0] ?? section.items[0]);
 </script>
 
 <a class="card track-card" href={first && id != 'archive' ? first.href : section.href}>

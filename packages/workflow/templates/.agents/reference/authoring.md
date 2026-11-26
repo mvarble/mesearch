@@ -1,7 +1,6 @@
 # Writing {{name}}'s documents
 
-This project's own conventions, over `.agents/reference/mesearch/authoring.md` and `markup.md`,
-which win where nothing here says otherwise.
+This project's own conventions, over `.agents/reference/mesearch/authoring.md` and `markup.md`, which win where nothing here says otherwise.
 
 ## What the site is for
 
