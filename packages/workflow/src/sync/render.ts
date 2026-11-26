@@ -88,16 +88,20 @@ export function renderWorkflow(text: string, config: WorkflowConfig): string {
     if (pagesAt.length) {
         areas.push(`the pages (the rest of ${code(`${content}/`)}) at ${openedAt(pagesAt)}`);
     }
-    let areaText =
-        `${areas.join('; ')}. Without an active entry, code is closed and the rest is open for ` +
-        'housekeeping.';
-    areaText = areaText.slice(0, 1).toUpperCase() + areaText.slice(1);
+    // One sentence to a line, at the indent of the list item the template puts them in.
+    const capitalized = (text: string) => text.slice(0, 1).toUpperCase() + text.slice(1);
+    const areaSentences = [
+        `${capitalized(areas.join('; '))}.`,
+        'Without an active entry, code is closed and the rest is open for housekeeping.',
+    ];
     if (config.free?.length) {
         const free = config.describe?.free ?? config.free.map(code).join(', ');
-        areaText +=
-            ` ${free.slice(0, 1).toUpperCase()}${free.slice(1)} ${config.free.length > 1 ? 'are' : 'is'} ` +
-            'always open, so that a fact can be recorded the moment it is known.';
+        areaSentences.push(
+            `${capitalized(free)} ${config.free.length > 1 ? 'are' : 'is'} always open, so that a ` +
+                'fact can be recorded the moment it is known.',
+        );
     }
+    const areaText = areaSentences.join('\n   ');
 
     const gates = ['a document that is uncommitted, empty, or still has a `> [!TODO]`'];
     for (const stage of stages) {

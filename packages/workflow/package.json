@@ -1,6 +1,6 @@
 {
     "name": "@mvarble/mesearch-workflow",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Documented development: the workflow engine a project's entries go through, the skills that drive it, and the documentation site its records are published on.",
     "license": "MIT",
     "author": "Matthew Varble <matthew@rodent.club>",
